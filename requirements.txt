@@ -1,0 +1,21 @@
+upload a config file, found in \motesoft\config  use example_config2.csv
+config contains list of actuators and list of sensors
+
+
+SENSORS:
+should make a page with a generating graph for each sensor
+tare button that resets value to 0 on graph
+untare button that shows the raw value before the tare
+read from python function as fast as possible, pass in config line for sensor as a parameter
+
+
+ACTUATORS:
+buttons for each actuator that are movable relative to a jpg image background and savable in the current location this will later be a jpg background or a 3d model
+buttons should run a python function passing in the config line for the actuator as a parameter
+should show the last state sent, on or off
+
+
+OTHERS:
+arm/disarm button that prevents any other buttons from being clicked until armed
+autosequence that takes a file and automatically "clicks" buttons at set times relative to each other
+for details look in motesoft/Autoseq   use hot_fire_commands_2023_02_12.csv for example
