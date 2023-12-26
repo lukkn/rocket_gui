@@ -1,0 +1,241 @@
+#include "sensors_and_servos.h"
+#include <SparkFun_ADS122C04_ADC_Arduino_Library.h>
+#include <Wire.h>
+#include "Servo.h"
+
+#include <PWMServo.h>
+
+IntervalTimer PWMServo_Timer;
+
+#define servo_angle 45
+
+/* Flowmeter Board Configuration, 74LS393 */
+
+//See page 2 for truthtable;
+//https://www.ti.com/lit/ds/symlink/sn54ls393-sp.pdf?ts=1631127405847&ref_url=https%253A%252F%252Fwww.google.com%252F
+//C1-p1 = pin 38 = Q0 = QA  LOWEST ORDER
+//C1-p2 = pin 37 = Q1 = QB
+//C1-p3 = pin 36 = Q2 = QC
+//C1-p4 = pin 35 = Q3 = QD  HIGHEST ORDER
+//C1-reset = pin 28
+#define FLOWMETER_BIT_THREE 35
+#define FLOWMETER_BIT_TWO	36
+#define FLOWMETER_BIT_ONE	37
+#define FLOWMETER_BIT_ZERO	38
+#define FLOWMETER_CLEAR_PIN 28
+
+void test_blink()
+{
+	digitalWrite(13, HIGH);
+	delay(1000);
+	digitalWrite(13, LOW);
+	delay(1000);
+}
+
+void analog_write(int pin_number, int arguement)
+/* pinMode() must be setup either through here, or through a configuration block in setup(). */
+{
+  pinMode(pin_number, OUTPUT);
+  if (!arguement)
+  {
+    analogWrite(pin_number, -servo_angle);
+  }
+  else if(arguement)
+  {
+    analogWrite(pin_number, servo_angle);
+  }
+  else
+  {
+    ;
+  }
+	
+}
+
+void servo_write(Servo servo, int pin_number, int arguement)
+/* PWM Servo. */
+{
+	servo.attach(pin_number);
+	servo.write(arguement);
+}
+
+int teensy_analog_read(int pin_number, int arguement)
+/* pinMode() must be setup either through here, or through a configuration block in setup(). */
+{
+	pinMode(pin_number, INPUT);
+	int analog_output = analogRead(pin_number);
+	return analog_output;
+}
+
+/* For the ADC chip, the initial parameters need to first be adjusted for either 1 wire operation or 2 wire operation. These are based on a structure defined in the ADC's *.h file. Seen here:
+*
+* // struct to hold the initialisation parameters  (https://github.com/sparkfun/SparkFun_ADS122C04_ADC_Arduino_Library/blob/master/src/SparkFun_ADS122C04_ADC_Arduino_Library.h)
+	  typedef struct{
+	  uint8_t inputMux;
+	  uint8_t gainLevel;
+	  uint8_t pgaBypass;
+	  uint8_t dataRate;
+	  uint8_t opMode;
+	  uint8_t convMode;
+	  uint8_t selectVref;
+	  uint8_t tempSensorEn;
+	  uint8_t dataCounterEn;
+	  uint8_t dataCRCen;
+	  uint8_t burnOutEn;
+	  uint8_t idacCurrent;
+	  uint8_t routeIDAC1;
+	  uint8_t routeIDAC2;
+	} ADS122C04_initParam;
+
+There are 4 8-bit configuration registers. On a RESET command, all registers are set to 0.
+
+See Chapter 8.6, Register Map, for more: https://cdn.sparkfun.com/assets/7/4/e/1/4/ads122c04_datasheet.pdf
+
+I2C address is configured physically on each ADC module, referenced chapter "8.5.1.1 I2C Address" here: https://cdn.sparkfun.com/assets/7/4/e/1/4/ads122c04_datasheet.pdf#page=47&zoom=100,0,705
+
+*/
+
+//conversion function
+
+uint32_t i2c_adc_1_wire(SFE_ADS122C04 ADC, int i2c_address, int input_channel)
+//https://www.digikey.com/en/maker/projects/qwiic-12-bit-adc-hookup-guide/6b187358d1dc45f6918808d17af94326
+//Set default values, then apply masks and multiplexer for single ended operation.
+//i2c_address is a binary value, e.g. 0b1000000, 0b1000001, ...
+//PGA := Programmable gain amplifier
+{
+  Serial.print("Beep.");
+	ADC.reset();
+	delay(250); //Maybe needed, page 9 of data sheet
+	ADC.enablePGA(ADS122C04_PGA_DISABLED);			 //Active low. Disables PGA_BYPASS, table 19 of datasheet
+	/*			Configure input channel. Table 19 of datasheet
+								 1000 : AINP = AIN0, AINN = AVSS
+								 1001 : AINP = AIN1, AINN = AVSS
+								 1010 : AINP = AIN2, AINN = AVSS
+								 1011 : AINP = AIN3, AINN = AVSS
+								Input Multiplexer Configuration
+									//Differential inputs
+								#define ADS122C04_MUX_AIN0_AIN1     0x0
+								#define ADS122C04_MUX_AIN0_AIN2     0x1
+								#define ADS122C04_MUX_AIN0_AIN3     0x2
+								#define ADS122C04_MUX_AIN1_AIN0     0x3
+								#define ADS122C04_MUX_AIN1_AIN2     0x4
+								#define ADS122C04_MUX_AIN1_AIN3     0x5
+								#define ADS122C04_MUX_AIN2_AIN3     0x6
+								#define ADS122C04_MUX_AIN3_AIN2     0x7
+									//Single ended
+								#define ADS122C04_MUX_AIN0_AVSS     0x8
+								#define ADS122C04_MUX_AIN1_AVSS     0x9
+								#define ADS122C04_MUX_AIN2_AVSS     0xa
+								#define ADS122C04_MUX_AIN3_AVSS     0xb
+								#define ADS122C04_MUX_REFPmREFN     0xc
+								#define ADS122C04_MUX_AVDDmAVSS     0xd
+								#define ADS122C04_MUX_SHORTED       0xe
+	*/
+	if (input_channel == 0) { ADC.setInputMultiplexer(ADS122C04_MUX_AIN0_AVSS); }
+	else if (input_channel == 1) { ADC.setInputMultiplexer(ADS122C04_MUX_AIN1_AVSS); }
+	else if (input_channel == 2) { ADC.setInputMultiplexer(ADS122C04_MUX_AIN2_AVSS); }
+	else if (input_channel == 3) { ADC.setInputMultiplexer(ADS122C04_MUX_AIN3_AVSS); }
+	else return -1;
+	if (ADC.begin(i2c_address, Wire) == false)
+	{
+		Serial.println("ADC module not found at specified I2C address.");
+		return 0;
+	}
+	// Read the raw signed 24-bit ADC value as uint32_t
+	// The ADC data is returned in the least-significant 24-bits
+	// Higher functions will need to convert the result to (e.g.) int32_t
+	/* Found here: https://openbci.com/forum/index.php?p=/discussion/258/converting-24bit-samples-to-int32 */
+	uint32_t rVal = ADC.readADC(); //24Bit value, 4 bits per hex digit. 
+	//int32_t adcValue32 = rVal & 0x800000 ? 0xff000000 | rVal : rVal; 
+
+	//Alternative Way, from documentation: https://github.com/sparkfun/SparkFun_ADS122C04_ADC_Arduino_Library/blob/master/examples/Qwiic_PT100_ADS122C04/Example9_ManualConfig/Example9_ManualConfig.ino
+
+	return rVal;
+}
+
+uint32_t i2c_adc_2_wire(SFE_ADS122C04 ADC, int i2c_address)
+//i2c_address is a binary value, e.g. 0b1000000, 0b1000001, ...
+{
+	//Configure ADC for 2 wire operation. 
+	ADC.reset();
+	ADC.configureADCmode(ADS122C04_2WIRE_MODE);
+	__asm("nop"); //Inserts single NOP, delaying for a single clock cycle. Maybe needed for setting ADC
+	//Begins ADC communication. Returns -1 if module isn't found at this I2C address.
+	if (ADC.begin(i2c_address, Wire) == false)
+	{
+		Serial.println("ADC module not found at specified I2C address.");
+		return -1;
+	}
+	// Read the raw signed 24-bit ADC value as uint32_t
+	// The ADC data is returned in the least-significant 24-bits
+	// Higher functions will need to convert the result to (e.g.) int32_t
+	/* Found here: https://openbci.com/forum/index.php?p=/discussion/258/converting-24bit-samples-to-int32 */
+	uint32_t rVal = ADC.readADC(); //24Bit value, 4 bits per hex digit. 
+	//int32_t adcValue32 = rVal & 0x800000 ? 0xff000000 | rVal : rVal; //Checks if top digit is a 1 in the 24-bit ADC sample, and if so sets higher order 32-bits to 1. Important as the ADC result is signed.  
+
+	//Alternative Way, from documentation: https://github.com/sparkfun/SparkFun_ADS122C04_ADC_Arduino_Library/blob/master/examples/Qwiic_PT100_ADS122C04/Example9_ManualConfig/Example9_ManualConfig.ino
+
+
+	return rVal;
+}
+
+uint8_t flowmeter_read_wrapper()
+{
+	/* Possible wrapper for flowmeter_read function to first perform digitalRead on flowmeter pins, assuming they've alread been setup
+		Some logic behind nesting functions on embedded systems:
+		https://scienceprog.com/function-calls-and-stacking-of-in-embedded-systems/
+	*/
+	uint8_t current_bit_three, current_bit_two, current_bit_one, current_bit_zero, return_val;
+
+	/* Reading current flowmeter pins.
+	See comment #3 for speed tests on digitalRead vs digitalReadFast:
+	https://forum.pjrc.com/threads/54363-Teensy-3-6-speed-of-DigitalReadFast
+	See comment #3 for reasoning ala Paul (father of Teensy) on using digital____Fast instead of native code:
+	https://forum.pjrc.com/threads/23431-Teensy-3-using-IO-pins */
+
+	current_bit_three = digitalReadFast(FLOWMETER_BIT_THREE);
+	current_bit_two = digitalReadFast(FLOWMETER_BIT_TWO);
+	current_bit_one = digitalReadFast(FLOWMETER_BIT_ONE);
+	current_bit_zero = digitalReadFast(FLOWMETER_BIT_ZERO);
+
+	return_val = flowmeter_read(current_bit_three, current_bit_two, current_bit_one, current_bit_zero, 0);
+	return return_val;
+}
+
+uint8_t flowmeter_read(uint8_t bit_three, uint8_t bit_two, uint8_t bit_one, uint8_t bit_zero, uint8_t reset)
+{
+	//Reads a 4 bit counter, through 4 digitalReads. 1 reset pin. 
+	//See schematic.
+	//Masks bits for return value. Input parameters are weird, with the msot significant bit entered first. 
+	//   bit_three -> 0 0 0 0 <- bit_one
+	uint8_t return_value = 0b0000;
+
+	//I'm not sure if CLEAR is active low or high, so that needs to be tested. FLOWMETER_CLEAR_PIN also needs to be setup through 
+	if (reset)
+	{
+		digitalWrite(FLOWMETER_CLEAR_PIN, HIGH);
+		delay(250); //Delay to wait for reset. TODO: See datasheet for more specific timing requirement
+		digitalWrite(FLOWMETER_CLEAR_PIN, LOW);
+	}
+
+	if (bit_zero) return_value |= 0b0001;
+	if (bit_one) return_value |= 0b0010;
+	if (bit_two) return_value |= 0b0100;
+	if (bit_three) return_value |= 0b1000;
+
+	return return_value;
+}
+
+float i2c_adc_internal_temp(SFE_ADS122C04 ADC, int i2c_address)
+{
+	if (ADC.begin(i2c_address, Wire) == false) //Connect to the PT100 using: Address 0x44 and the Wire1 port
+	{
+		Serial.print(F("Qwiic PT100 not detected at I2C address: "));
+		Serial.print(i2c_address, HEX);
+		Serial.println(F(". Please check wiring. Freezing."));
+		while (1)
+			;
+	}
+	ADC.reset();
+	float return_val = ADC.readInternalTemperature();
+	return return_val;
+}

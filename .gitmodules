@@ -1,0 +1,9 @@
+[submodule "firmware for teensy/cores"]
+	path = firmware for teensy (OLD. DO NOT USE)/cores
+	url = https://github.com/PaulStoffregen/cores
+[submodule "firmware for teensy/libraries/FNET"]
+	path = firmware for teensy (OLD. DO NOT USE)/libraries/FNET
+	url = https://github.com/vjmuzik/FNET
+[submodule "firmware for teensy/libraries/NativeEthernet"]
+	path = firmware for teensy (OLD. DO NOT USE)/libraries/NativeEthernet
+	url = https://github.com/vjmuzik/NativeEthernet/

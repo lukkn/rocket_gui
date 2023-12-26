@@ -1,0 +1,15 @@
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit,min,max
+1,sensor,ADC Internal Temp,MoTE Temperature TOEI,20,TEMP,*C Internal,-50,250
+1,sensor,i2c ADC 2ch PGA128,Thermocouple TOEI,30,TOEI,Degrees C,-50,250
+1,sensor,i2c ADC 2ch PGA128,Thermocouple TEEI,1,TEEI,Degrees C,-50,250
+1,sensor,i2c ADC 2ch PGA128,Thermocouple TEC1,0,TEC1,Degrees C,-50,250
+1,sensor,i2c ADC 2ch PGA128,Thermocouple TEC2,31,TEC2,Degrees C,-50,250
+1,sensor,i2c ADC 2ch PGA128,Mystery Sensor LECT,40,LECT,Volts,0,2.048
+1,sensor,i2c ADC 1ch,Pressure Transducer PFIM,11,PFIM,PSI_1k,0,1000
+1,sensor,i2c ADC 1ch,Pressure Transducer PMCC,10,PMCC,PSI_1k,0,1000
+1,sensor,i2c ADC 1ch,Pressure Transducer POIM,13,POIM,PSI_1k,0,1000
+1,actuator,servoPWM_12V,Servo 12V VFRP (J12),6,VFRP,PSI_1k,0,1000
+1,actuator,Binary GPIO,VFRP PWR (J33),32,VFRP,NONE,NONE,NONE
+1,actuator,Binary GPIO,VNMO 12V (J7),37,VNMO,NONE,NONE,NONE
+1,actuator,Binary GPIO,IGNITION 12V (J5),36,IGNTN,NONE,NONE,NONE
+

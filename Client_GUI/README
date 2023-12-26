@@ -1,0 +1,41 @@
+GTK Instructions:
+Note: all scripts referenced in the installation instructions are in the "shell_scripts" folder
+
+WINDOWS
+1.  To install GTK and it's dependencies, run the "windows_gtk_install.ps1" script AS AN ADMINISTRATOR
+1A. If this script throws an error for some reason, defer to the instructions here: https://pygobject.readthedocs.io/en/latest/getting_started.html
+2.  To run the GUI, run the run_gtk.ps1 with the filename as a parameter
+    E.g. win10_gtk.ps1 gui.py
+2A. Alternativley, run C:/msys64/mingw64.exe, and run python3 commands as normal in the shell that opens.
+
+MAC
+Run "mac_gtk_install.sh" OR follow the instructions below:
+1. If you don't have it already, install HOMEBREW (https://brew.sh/)
+2. Open the terminal, and run "brew install pygobject3 gtk+3" (without quotations)
+3. Run python3 code as normal
+
+LINUX
+Honestly, if you use linux, you'll probably figure this one out.
+Same Instructions as above: https://pygobject.readthedocs.io/en/latest/getting_started.html
+
+***
+
+Some questions:
+
+how does udphandler interact with builder object
+(learn more about socketserver.udpserver)
+
+decide which variables are global, class, and local variables
+
+are daemon threads necessary ... 
+
+***
+
+To do:
+
+test speed between udp, tcp
+construct instruction byte array and byte parser for data 
+standardize stuff ...
+update this readme 
+finish commenting stuff
+experiment with threads (asyincio), select, or some other libraries 

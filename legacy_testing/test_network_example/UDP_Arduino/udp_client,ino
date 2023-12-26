@@ -1,0 +1,78 @@
+#include <Ethernet.h> //Load Ethernet Library
+#include <EthernetUdp.h> //Load UDP Library
+#include <SPI.h> //serial communication with other boards (normally with 4 wires)
+//(serial clock, master output master input. slave-selection)
+
+#define UDP_TX_PACKET_MAX_SIZE 128  //default 24
+
+//default is 24, UDP can max at 65,507 bytes or 16 bits addressing?
+
+byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02}; //Assign a mac address
+
+IPAddress ip(192, 168, 0, 36); //Assign my IP adress
+
+unsigned int localPort = 5000; //Assign a Port to talk over
+
+char packetBuffer[UDP_TX_PACKET_MAX_SIZE];
+String datReq; //String for our data
+int packetSize; //Size of Packet
+EthernetUDP Udp; //Define UDP Object
+
+void check_equipment(){
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB port only
+  }
+
+  // Check for Ethernet hardware present
+  if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+    Serial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
+    while (true) {
+      delay(1); // do nothing, no point running without Ethernet hardware
+    }
+  }
+  if (Ethernet.linkStatus() == LinkOFF) {
+    Serial.println("Ethernet cable is not connected.");
+  }
+}
+
+void connection_setup(){
+  Ethernet.begin(mac, ip); //Initialize Ethernet
+  Udp.begin(localPort); //Initialize Udp
+//  delay(1000); //delay
+}
+
+void setup() {
+  
+  Serial.begin(9600); //Turn on Serial Port
+  void check_equipment();
+  connection_setup();
+}
+
+//limited to 24 bytes 
+void loop() {
+  
+  packetSize = Udp.parsePacket(); //Read theh packetSize
+
+  //will need to sent package regardless if you get command from server
+  if(packetSize>0){ //Check to see if a request is present
+  
+    Udp.read(packetBuffer, UDP_TX_PACKET_MAX_SIZE); //Reading the data request on the Udp
+    
+    String datReq(packetBuffer); //Convert packetBuffer array to string datReq
+    Serial.println(datReq); //can convert char or byte array as string
+
+    int remotePort = Udp.remotePort();
+    IPAddress remoteIP = Udp.remoteIP();
+
+    Serial.println(remoteIP);
+    
+    Udp.beginPacket(remoteIP, remotePort);  //Initialize Packet send
+
+    char send_back [] = "Hi Again!";
+//    Udp.write(send_back); //Send string back to client 
+    Udp.print(packetBuffer); //(does it still exist with udP.write)
+    Udp.endPacket(); //Packet has been sent 
+    
+  }
+  memset(packetBuffer, 0, UDP_TX_PACKET_MAX_SIZE);
+}
