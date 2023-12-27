@@ -22,7 +22,7 @@
         }
         #backgroundContainer {
             z-index:-1;
-            height: 100vh;
+            height: calc(100vh - 25px);
             width: 100vw;
             position: fixed;
 
@@ -31,6 +31,8 @@
             background-repeat: no-repeat;
             background-origin: content-box;
             background-position: center center;
+
+            transform: translateY(25px);
         }
         .collapsible-menu label {
             display: block;
