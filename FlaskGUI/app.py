@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import csv
 import json
+import os
 
 # GLOBAL VARIABLES
 actuator_buttons = []
@@ -62,7 +63,7 @@ def update_coordinates():
     coordinates = data.get('coordinates', [])
     print("Received coordinates:", coordinates)
     # You can process the coordinates here as needed
-    with open('coordinates.json', 'w') as file:
+    with open(os.path.dirname(os.path.abspath(__file__)) + '/static/coordinates.json', 'r') as file:
         json.dump(coordinates, file)
     return jsonify({'message': 'Coordinates received successfully'})
 
@@ -70,7 +71,8 @@ def update_coordinates():
 @app.route('/get_coordinates', methods=['GET'])
 def get_coordinates():
     # Retrieve coordinates from file
-    with open('coordinates.json', 'r') as file:
+    with open(os.path.dirname(os.path.abspath(__file__)) + '/static/coordinates.json', 'r') as file:
+
         coordinates = json.load(file)
     return jsonify({'coordinates': coordinates})
 
