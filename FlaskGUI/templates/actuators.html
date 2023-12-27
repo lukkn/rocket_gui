@@ -20,16 +20,16 @@
             background-origin: content-box;
             background-position: center center;
         }
-        div.buttonsContainer {
+        div.guiControlButtonsContainer {
             max-width: 150px;
             padding: 10px 10px;
 
             border: solid;
-            background-color:azure;
+            background-color:antiquewhite;
             cursor: pointer;
             align-items: center;
         }
-        #actuatorButtons{
+        #guiControlButtons{
             position: relative;
             padding: 10px;
             width: 150px;
@@ -57,11 +57,11 @@
 </form>
 
 <div class="backgroundContainer"></div>
-<div class="buttonsContainer">
-    <button id="actuatorButtons" onclick="submitCoordinates()">Submit Coordinates</button>
-    <button id="actuatorButtons" onclick="getCoordinates(false)">Get Coordinates</button>
-    <button id="actuatorButtons" onclick="lockButtons()">Lock Buttons</button>
-    <button id="actuatorButtons" onclick="unlockButtons()">Unlock Buttons</button>
+<div class="guiControlButtonsContainer">
+    <button id="guiControlButtons" onclick="submitCoordinates()">Submit Coordinates</button>
+    <button id="guiControlButtons" onclick="getCoordinates(false)">Get Coordinates</button>
+    <button id="guiControlButtons" onclick="lockButtons()">Lock Buttons</button>
+    <button id="guiControlButtons" onclick="unlockButtons()">Unlock Buttons</button>
     <div id="messageContainer"></div>
 </div>
 
