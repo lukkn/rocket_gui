@@ -6,6 +6,7 @@
     <title>Draggable Buttons</title>
     <style>
         body{
+            /*makes everything unselectable, DO NOT REMOVE, buttons will drag while locked if selected, I do not know why :(*/
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             -khtml-user-select: none;
@@ -23,7 +24,7 @@
             -webkit-transform: translate(-50%, -50%);
             transform: translate(-50%, -50%);
             background-image: url("{{ url_for('static', filename='HTS_PandID.png') }}");
-            background-size: contain; /* 100% width, maintain aspect ratio for height */
+            background-size: contain; 
             background-repeat: no-repeat;
             background-origin: content-box;
             background-position: center center;
@@ -47,8 +48,6 @@
             padding: 2px 2px;
 
             position: absolute;
-            top: 50%;
-            left: 50%;
 
             cursor: move;
             pointer-events: auto;
@@ -74,7 +73,7 @@
 
 <form method="post">
     {% for button in actuator_buttons %}
-        <div id="{{ [button[5], 'container'] }}" class="draggable" draggable="true">
+        <div id="{{ button }}" class="draggable" draggable="true">
             <legend id="buttonNames">{{button[5]}}</legend>
             <button id="{{ [button[5], 'on'] }}" class = "onOffButtons" onclick="buttonClicked(id)" >On</button>
             <button id="{{ [button[5], 'off'] }}" class = "onOffButtons" onclick="buttonClicked(id)" >Off</button> 

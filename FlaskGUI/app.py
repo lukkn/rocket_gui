@@ -63,7 +63,7 @@ def update_coordinates():
     coordinates = data.get('coordinates', [])
     print("Received coordinates:", coordinates)
     # You can process the coordinates here as needed
-    with open(os.path.dirname(os.path.abspath(__file__)) + '/static/coordinates.json', 'r') as file:
+    with open(os.path.dirname(os.path.abspath(__file__)) + '/static/coordinates.json', 'w') as file:
         json.dump(coordinates, file)
     return jsonify({'message': 'Coordinates received successfully'})
 
