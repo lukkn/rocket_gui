@@ -16,9 +16,10 @@
         }
         #messageContainer{
             position: absolute;
-            right: 0%;
-            text-align: center;
-            width: 12vw;
+            left: 25vh;
+            text-align: left;
+            width: 15vw;
+            font-weight: bold;
         }
         #backgroundContainer {
             z-index:-1;
@@ -39,6 +40,7 @@
             cursor: pointer;
             background-color: antiquewhite;
             text-align: center;
+            font-weight: bold;
             width: 10vw;
             padding: 0 10px 5px 10px;
         }
@@ -71,9 +73,6 @@
             background-color:red;
             border: none;
             align-items: center;
-        }
-        .buttonOn {
-            background-color: green;
         }
         .onButtons{
             position: relative;
@@ -112,15 +111,17 @@
 </head>
 <body>
 
+
 <form method="post">
     {% for button in actuator_buttons %}
         <div id="{{ button }}" class="draggable" draggable="true">
             <legend id="buttonNames">{{button[5]}}</legend>
             <div id="{{ button, 'on' }}" class = "onButtons" onclick="buttonClicked(id)" >On</div>
-            <div id="{{ button, 'off' }}" class = "offButtons" onclick="buttonClicked(id)" >Off</div> 
+            <div id="{{ button, 'off' }}" class = "offButtons" onclick="buttonClicked(id)" >Off</div>
         </div>
     {% endfor %}
 </form>
+
 
 <div id="backgroundContainer"></div>
 <div id="messageContainer"></div>
@@ -141,12 +142,12 @@
     document.addEventListener("DOMContentLoaded", function () {
         // Fetch coordinates when the page is loaded
         getCoordinates(true);
-        
+
         let draggableElements = document.querySelectorAll('.draggable');
         let isLocked = false;
 
         // TODO: a proper way of locking cuz running this function is kinda stupid, GPT wrote this and idk how it works
-        lockButtons()
+        lockButtons();
 
         draggableElements.forEach(function (element) {
             element.addEventListener('dragstart', function (e) {
@@ -175,6 +176,13 @@
 
             draggedElement.style.left = offsetX + 'px';
             draggedElement.style.top = offsetY + 'px';
+        });
+
+        // on page load we set every actuator to off
+        let buttonlist = document.querySelectorAll('.offButtons');
+        buttonlist.forEach(function (element) {
+            console.log("button id: ", element.id)
+            buttonClicked(element.id);
         });
     });
 
@@ -240,42 +248,22 @@
     }
 
     function getCoordinates(initial_load) {
-        textprompt="tim hates linux"
-        while(true){
-            if(!initial_load){
-                confirmationPhrase = prompt("Type 'tim hates linux' to confirm");
-            } else {
-                confirmationPhrase = textprompt;
-            }
+        fetch('/get_coordinates')
+            .then(response => response.json())
+            .then(data => {
+                let coordinates = data.coordinates;
+                console.log("Coordinates:", coordinates);
 
-            console.log(confirmationPhrase);
-            if (confirmationPhrase === textprompt) {
-
-                fetch('/get_coordinates')
-                    .then(response => response.json())
-                    .then(data => {
-                        let coordinates = data.coordinates;
-                        console.log("Coordinates:", coordinates);
-
-                        // Place the buttons at the fetched coordinates
-                        coordinates.forEach(coord => {
-                            let button = document.getElementById(coord.id);
-                            if (button) {
-                                button.style.left = coord.x + 'px';
-                                button.style.top = coord.y + 'px';
-                            }
-                        });
-                    })
-                    .catch(error => console.error('Error:', error));
-                return;
-
-            } else if (confirmationPhrase === null) {
-                return; //user clicked cancel
-                
-            } else {
-                alert("Confirmation failed. Incorrect phrase.");
-            }
-        }
+                // Place the buttons at the fetched coordinates
+                coordinates.forEach(coord => {
+                    let button = document.getElementById(coord.id);
+                    if (button) {
+                        button.style.left = coord.x + 'px';
+                        button.style.top = coord.y + 'px';
+                    }
+                });
+            })
+            .catch(error => console.error('Error:', error));
     }
 
     function lockButtons() {
@@ -285,7 +273,7 @@
             element.draggable = false;
         });
         isLocked = true;
-        messageContainer.innerText = "Buttons are LOCKED";
+        messageContainer.innerText = "Button Positions are LOCKED";
     }
 
     function unlockButtons() {
@@ -295,7 +283,7 @@
             element.draggable = true;
         });
         isLocked = false;
-        messageContainer.innerText = "Buttons are UNLOCKED";
+        messageContainer.innerText = "Button Positions are UNLOCKED";
     }
 </script>
 
