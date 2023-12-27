@@ -1,0 +1,10 @@
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID
+1,actuator,servoPWM,Nitrogen engine purge,0,VPTE
+1,actuator,Binary GPIO,Fuel bang-bang,0,VNTB
+1,actuator,servoPWM,Fuel tank vent,1,VFTV
+1,actuator,Binary GPIO,Ox bang-bang,0,VNTO
+2,sensor,i2c ADC 1ch,Nitrogen storage bottle pressure,0,PNTB
+1,actuator,servoPWM,Ox tank fill,0,VOTF
+2,sensor,i2c ADC 1ch,Ox storage bottle pressure,1,POTB
+
+

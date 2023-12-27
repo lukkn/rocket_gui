@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+<body>
+    {% if config_loaded %}
+        <h1>Config loaded successfully!</h1>
+        <!-- Display additional content for a loaded config -->
+    {% else %}
+        <h1>Load Config</h1>
+        <form method="post" enctype="multipart/form-data" action="{{ url_for('loadconfig') }}">
+            <!-- Add an input field for file upload -->
+            <input type="file" name="file" accept=".csv" required>
+            <button type="submit" name="button" value="Button 1" onclick="enableButton()">Load Config</button>
+        </form>
+
+        <script>
+            function enableButton() {
+                // Enable the button after uploading a file
+                document.querySelector('button[name="button"]').disabled = false;
+            }
+        </script>
+        
+        <!-- Display additional content for when config is not loaded -->
+    {% endif %}
+</body>
+
+</html>

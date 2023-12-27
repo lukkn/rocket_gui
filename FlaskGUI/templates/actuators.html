@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draggable Buttons</title>
+    <style>
+        div.backgroundContainer {
+            z-index:-1;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            background-image: url("{{ url_for('static', filename='HTS_PandID.png') }}");
+            background-size: contain; /* 100% width, maintain aspect ratio for height */
+            background-repeat: no-repeat;
+            background-origin: content-box;
+            background-position: center center;
+        }
+        #submitBtn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 10px;
+            width: 150px;
+            background-color: #4CAF50;
+            color: black;
+            cursor: pointer;
+        }
+        #getCoordinatesBtn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translateY(38px);
+            padding: 10px;
+            width: 150px;
+            background-color: #54c1e6;
+            color: black;
+            cursor: pointer;
+        }
+        #lockBtn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translateY(72px);
+            padding: 10px;
+            width: 150px;
+            cursor: pointer;
+        }
+        #unlockBtn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translateY(110px);
+            padding: 10px;
+            width: 150px;
+            cursor: pointer;
+        }
+        .draggable {
+            position: absolute;
+            cursor: move;
+            pointer-events: auto;
+            font-weight: bold;
+            color: black;
+            font-size: 16pt;
+            background-color: yellow;
+        }
+        .locked {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<form method="post">
+    {% for button in actuator_buttons %}
+        <div id="{{ button }}" onclick="buttonClicked(id)" class="draggable" draggable="true">{{ button[5] }}</div>
+    {% endfor %}
+</form>
+
+<button id="submitBtn" onclick="submitCoordinates()">Submit Coordinates</button>
+<button id="getCoordinatesBtn" onclick="getCoordinates(false)">Get Coordinates</button>
+<button id="lockBtn" onclick="lockButtons()">Lock Buttons</button>
+<button id="unlockBtn" onclick="unlockButtons()">Unlock Buttons</button>
+
+<div id="messageContainer"></div>
+<div class="backgroundContainer"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Fetch coordinates when the page is loaded
+        getCoordinates(true);
+        
+        let draggableElements = document.querySelectorAll('.draggable');
+        let isLocked = false;
+
+        // TODO: a proper way of locking cuz running this function is kinda stupid, GPT wrote this and idk how it works
+        lockButtons()
+
+        draggableElements.forEach(function (element) {
+            element.addEventListener('dragstart', function (e) {
+                if (isLocked) {
+                    e.preventDefault(); // Prevent dragging when locked
+                    return;
+                }
+                e.dataTransfer.setData('text/plain', element.id);
+            });
+        });
+
+        document.addEventListener('dragover', function (e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('drop', function (e) {
+            e.preventDefault();
+            if (isLocked) {
+                return; // Ignore drop when locked
+            }
+            let data = e.dataTransfer.getData('text/plain');
+            let draggedElement = document.getElementById(data);
+
+            let offsetX = e.clientX - draggedElement.offsetWidth / 2;
+            let offsetY = e.clientY - draggedElement.offsetHeight / 2;
+
+            draggedElement.style.left = offsetX + 'px';
+            draggedElement.style.top = offsetY + 'px';
+        });
+    });
+
+    function buttonClicked(id){
+        // when we unlock buttons we want to ignore any accidential clicks
+        if (!isLocked){
+            return;
+        }
+        // Make a POST request to the Flask server with the button ID
+        fetch('/actuators', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: id }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response from the server if needed
+            console.log(data);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function submitCoordinates() {
+        textprompt="tim hates linux"
+            while(true){
+            let confirmationPhrase = prompt("Type 'tim hates linux' to confirm");
+            if (confirmationPhrase === textprompt) {
+
+                let draggableElements = document.querySelectorAll('.draggable');
+                let coordinates = [];
+
+                draggableElements.forEach(function (element) {
+                    let rect = element.getBoundingClientRect();
+                    coordinates.push({ id: element.id, x: rect.left, y: rect.top });
+                });
+
+                // Send coordinates to Flask
+                sendDataToFlask(coordinates);
+                return;
+
+            } else if (confirmationPhrase === null) {
+                return; //user clicked cancel
+                
+            } else {
+                alert("Confirmation failed. Incorrect phrase.");
+            }
+        }
+    }
+
+    function sendDataToFlask(coordinates) {
+        fetch('/update_coordinates', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ coordinates: coordinates }),
+        })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+    }
+
+    function getCoordinates(initial_load) {
+        textprompt="tim hates linux"
+        while(true){
+            if(!initial_load){
+                confirmationPhrase = prompt("Type 'tim hates linux' to confirm");
+            } else {
+                confirmationPhrase = textprompt;
+            }
+
+            console.log(confirmationPhrase);
+            if (confirmationPhrase === textprompt) {
+
+                fetch('/get_coordinates')
+                    .then(response => response.json())
+                    .then(data => {
+                        let coordinates = data.coordinates;
+                        console.log("Coordinates:", coordinates);
+
+                        // Place the buttons at the fetched coordinates
+                        coordinates.forEach(coord => {
+                            let button = document.getElementById(coord.id);
+                            if (button) {
+                                button.style.left = coord.x + 'px';
+                                button.style.top = coord.y + 'px';
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+                return;
+
+            } else if (confirmationPhrase === null) {
+                return; //user clicked cancel
+                
+            } else {
+                alert("Confirmation failed. Incorrect phrase.");
+            }
+        }
+    }
+
+    function lockButtons() {
+        let draggableElements = document.querySelectorAll('.draggable');
+        draggableElements.forEach(function (element) {
+            element.classList.add('locked');
+            element.draggable = false;
+        });
+        isLocked = true;
+        messageContainer.innerText = "buttons are locked";
+    }
+
+    function unlockButtons() {
+        let draggableElements = document.querySelectorAll('.draggable');
+        draggableElements.forEach(function (element) {
+            element.classList.remove('locked');
+            element.draggable = true;
+        });
+        isLocked = false;
+        messageContainer.innerText = "buttons are unlocked";
+    }
+</script>
+
+</body>
+</html>
