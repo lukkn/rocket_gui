@@ -75,11 +75,18 @@
 </head>
 <body>
 
-<form method="post">
-    {% for button in actuator_buttons %}
-        <div id="{{ button }}" onclick="buttonClicked(id)" class="draggable" draggable="true">{{ button[5] }}</div>
-    {% endfor %}
-</form>
+<!-- Inside the form loop -->
+{% for button in actuator_buttons %}
+    <div class="button-container">
+        <div id="{{ [button[5], 'off'] }}" onclick="buttonClicked(id)" class="draggable" draggable="true">
+            Off
+            <!-- Add a data-attribute to link the On/Off buttons -->
+            <div class="attached-button" data-linked-button="{{ [button[5], 'on'] }}">On</div>
+        </div>
+        <!-- Remove the separate "On" button -->
+    </div>
+{% endfor %}
+
 
 <button id="submitBtn" onclick="submitCoordinates()">Submit Coordinates</button>
 <button id="getCoordinatesBtn" onclick="getCoordinates(false)">Get Coordinates</button>

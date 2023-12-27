@@ -51,7 +51,7 @@ def loadconfig():
 @app.route('/actuators', methods=['GET', 'POST'])
 def actuators():
     if request.method == 'POST':
-        data = request.get_json()
+        data = request.get_json()['id']
         #TODO: depending on button shape run some network functions
         print(data)
     return render_template('actuators.html', actuator_buttons=actuator_buttons)
