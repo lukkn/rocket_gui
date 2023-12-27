@@ -20,44 +20,19 @@
             background-origin: content-box;
             background-position: center center;
         }
-        #submitBtn {
-            position: absolute;
-            top: 0;
-            right: 0;
-            padding: 10px;
-            width: 150px;
-            background-color: #4CAF50;
-            color: black;
+        div.guiControlButtonsContainer {
+            max-width: 150px;
+            padding: 10px 10px;
+
+            border: solid;
+            background-color:antiquewhite;
             cursor: pointer;
+            align-items: center;
         }
-        #getCoordinatesBtn {
-            position: absolute;
-            top: 0;
-            right: 0;
-            transform: translateY(38px);
+        #guiControlButtons{
+            position: relative;
             padding: 10px;
             width: 150px;
-            background-color: #54c1e6;
-            color: black;
-            cursor: pointer;
-        }
-        #lockBtn {
-            position: absolute;
-            top: 0;
-            right: 0;
-            transform: translateY(72px);
-            padding: 10px;
-            width: 150px;
-            cursor: pointer;
-        }
-        #unlockBtn {
-            position: absolute;
-            top: 0;
-            right: 0;
-            transform: translateY(110px);
-            padding: 10px;
-            width: 150px;
-            cursor: pointer;
         }
         .draggable {
             position: absolute;
@@ -88,13 +63,14 @@
 {% endfor %}
 
 
-<button id="submitBtn" onclick="submitCoordinates()">Submit Coordinates</button>
-<button id="getCoordinatesBtn" onclick="getCoordinates(false)">Get Coordinates</button>
-<button id="lockBtn" onclick="lockButtons()">Lock Buttons</button>
-<button id="unlockBtn" onclick="unlockButtons()">Unlock Buttons</button>
-
-<div id="messageContainer"></div>
 <div class="backgroundContainer"></div>
+<div class="guiControlButtonsContainer">
+    <button id="guiControlButtons" onclick="submitCoordinates()">Submit Coordinates</button>
+    <button id="guiControlButtons" onclick="getCoordinates(false)">Get Coordinates</button>
+    <button id="guiControlButtons" onclick="lockButtons()">Lock Buttons</button>
+    <button id="guiControlButtons" onclick="unlockButtons()">Unlock Buttons</button>
+    <div id="messageContainer"></div>
+</div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
