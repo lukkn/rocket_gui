@@ -41,30 +41,40 @@
             width: 10vw;
         }
         .draggable {
-            max-width: 150px;
-            padding: 2px 2px;
-
+            width: 60px;
             position: absolute;
-
             cursor: move;
             pointer-events: auto;
-            color: black;
-            background-color:black;
-            border: solid;
+            background-color:red;
+            border: none;
             align-items: center;
-            
+        }
+        .buttonOn {
+            background-color: green;
         }
         .onButtons{
             position: relative;
-            width:50%;
+            width: 27px;
             float: left;
+            color: black;
             background-color: white;
+            border-right: 1px solid #000;
+            border-top: 2px solid #000;
+            border-left: 2px solid #000;
+            border-bottom: 2px solid #000;
+            text-align: center;
         }
         .offButtons{
             position: relative;
-            width:50%;
+            width: 27px;
             float: left;
+            color: black;
             background-color: white;
+            border-left: 1px solid #000;
+            border-top: 2px solid #000;
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            text-align: center;
         }
         #buttonNames{
             position: relative;
@@ -82,8 +92,8 @@
     {% for button in actuator_buttons %}
         <div id="{{ button }}" class="draggable" draggable="true">
             <legend id="buttonNames">{{button[5]}}</legend>
-            <div id="{{ button[5], 'on' }}" class = "onButtons" onclick="buttonClicked(id)" >On</div>
-            <div id="{{ button[5], 'off' }}" class = "offButtons" onclick="buttonClicked(id)" >Off</div> 
+            <div id="{{ button, 'on' }}" class = "onButtons" onclick="buttonClicked(id)" >On</div>
+            <div id="{{ button, 'off' }}" class = "offButtons" onclick="buttonClicked(id)" >Off</div> 
         </div>
     {% endfor %}
 </form>
