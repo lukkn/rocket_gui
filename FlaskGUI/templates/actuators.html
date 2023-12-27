@@ -35,13 +35,27 @@
             width: 150px;
         }
         .draggable {
+            max-width: 150px;
+            padding: 2px 2px;
+
             position: absolute;
+            top: 50%;
+            left: 50%;
+
             cursor: move;
             pointer-events: auto;
-            font-weight: bold;
             color: black;
-            font-size: 16pt;
-            background-color: yellow;
+            background-color:black;
+            border: solid;
+            align-items: center;
+        }
+        #onOffButtons{
+            position: relative;
+        }
+        #buttonNames{
+            position: relative;
+            color: white;
+            text-align: center;
         }
         .locked {
             cursor: pointer;
@@ -52,13 +66,13 @@
 
 <form method="post">
     {% for button in actuator_buttons %}
-        <div class="button-container">
-            <div id="{{ [button[5], 'off'] }}" onclick="buttonClicked(id)" class="draggable" draggable="true">Off</div>
-            <div id="{{ [button[5], 'on'] }}" onclick="buttonClicked(id)" class="draggable" draggable="true">On</div>
+        <div id="{{ [button[5], 'container'] }}" class="draggable" draggable="true">
+            <legend id="buttonNames">{{button[5]}}</legend>
+            <button id="{{ [button[5], 'on'] }}" class = "onOffButtons" onclick="buttonClicked(id)" >On</button>
+            <button id="{{ [button[5], 'off'] }}" class = "onOffButtons" onclick="buttonClicked(id)" >Off</button> 
         </div>
     {% endfor %}
 </form>
-
 
 <div class="backgroundContainer"></div>
 <div class="guiControlButtonsContainer">
