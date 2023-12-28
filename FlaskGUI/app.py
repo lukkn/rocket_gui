@@ -1,9 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask_socketio import SocketIO, emit
+from threading import Lock
 import csv
 import json
 import os
-
 import time
+
+async_mode = None
 
 # GLOBAL VARIABLES
 actuator_buttons = []
@@ -11,6 +14,10 @@ sensors = []
 
 
 app = Flask(__name__, static_url_path='/static')
+socketio = SocketIO(app, async_mode=async_mode)
+#TODO: what should thread equal, same with async_mode at top of page
+thread = None
+thread_lock = Lock()
 
 #TODO: try except logic
 def load_config(config_bytes):
@@ -58,6 +65,11 @@ def actuators():
         print(data)
     return render_template('actuators.html', actuator_buttons=actuator_buttons)
 
+@socketio.on('revieved_actuator_button_press')
+def handle_actuator_button_press(buttonID):
+    print('received button press: ', buttonID)
+
+
 
 @app.route('/update_coordinates', methods=['POST'])
 def update_coordinates():
@@ -79,36 +91,22 @@ def get_coordinates():
     return jsonify({'coordinates': coordinates})
 
 
+@socketio.event
+def connect():
+    global thread
+    with thread_lock:
+        if thread is None:
+            thread = socketio.start_background_task(background_thread)
 
-@app.route('/sensors', methods=['GET'])
-def sensors():
-    return render_template('sensors.html')
-
-@app.route('/sensors2', methods=['GET'])
-def sensors2():
-    return render_template('sensors2.html')
-
-@app.route('/sensors_main', methods=['GET'])
-def sensors_main():
-    return render_template('sensors_main.html')
-
-
-
-@app.route('/sensor_data', methods=['GET'])
-def sensor_data():
-    return str(time.time())
-
-@app.route('/sensor_data2', methods=['GET'])
-def sensor_data2():
-    return str(time.time())
-
-@app.route('/sensor_data3', methods=['GET'])
-def sensor_data3():
-    return str(time.time())
-
-
-
+def background_thread():
+    """Example of how to send server generated events to clients."""
+    count = 0
+    while True:
+        # do 0.001 for about 950hz
+        socketio.sleep(5)
+        count += 1
+        socketio.emit('sensor_data', str(count))
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app)

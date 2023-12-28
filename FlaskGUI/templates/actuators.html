@@ -143,6 +143,16 @@
 </div>
 
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io();
+    socket.on('connect', function() {
+        //socket.emit('my_event', {data: 'I\'m connected!'});
+    });
+
+</script>
+
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Fetch coordinates when the page is loaded
@@ -192,25 +202,15 @@
     });
 
     function buttonClicked(id){
-        // when we unlock buttons we want to ignore any accidential clicks
+        // when we unlock buttons we want to ignore any accidental clicks
         if (!isLocked){
             return;
         }
-        // Make a POST request to the Flask server with the button ID
-        fetch('/actuators', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ id: id }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Handle the response from the server if needed
-            console.log(data);
-        })
-        .catch(error => console.error('Error:', error));
+        console.log("right before socket.emit")
+        // Replace 'received_actuator_button_press' with your actual event name
+        socket.emit('revieved_actuator_button_press', id);
     }
+
 
     function submitCoordinates() {
         textprompt="tim hates linux"
