@@ -75,37 +75,35 @@
             border: none;
             align-items: center;
         }
-        .toggle{
+        .input.radio {display: inline-block;}
+        .toggleOn{
             position : relative ;
             display : inline-block;
-            width : 60px;
+            width : 30px;
             height : 20x;
             background-color: white;
-        }
-        .toggle:after {
-            content: 'OFF';
             text-align: center;
-            position: absolute;
-            width: 30px;
-            height: 20px;
-            background-color: red;
-            left: 1px;
-            transition:  all 0.5s;
         }
-        /* Checkbox checked effect */
-        .checkbox:checked + .toggle::after {
-            left : 30px; 
-            background-color: green;
-            content: 'ON';
-        }   
-        .onOffLabel{
-            font-size: small;
+        .toggleOff{
+            position : relative ;
+            display : inline-block;
+            width : 30px;
+            height : 20x;
+            background-color: white;
+            text-align: center;
         }
+        .checkbox:checked + .toggleOff{
+            background-color: lightcoral;
+        }
+        .checkbox:checked + .toggleOn{
+            background-color: lightgreen;
+        }
+
         /* Checkbox vanished */
-        .checkbox { 
-            display : none;
+        .checkbox {
+            display: none;
         }
-        #buttonNames{
+        #buttonName{
             position: relative;
             color: white;
             text-align: center;
@@ -122,14 +120,11 @@
         
         </label>
         <div id="{{ button }}" class="draggable" draggable="true">
-            <legend id="buttonNames">{{button[5]}}</legend>
-            <input type="checkbox" id="{{ button[5] }}" class="checkbox" onclick="buttonClicked(this)"/>        
-            <label for="{{ button[5] }}" class="toggle">
-                <onOffLabel>
-                    OFF    ON
-                </onOffLabel>
-            </label>
+            <legend id="buttonName">{{button[5]}}</legend>
+            <input type="radio" id="{{ button[5] }} OFF" name="{{ button }}" class="checkbox"  onclick="buttonClicked(id)"/><label for="{{ button[5] }} OFF" class="toggleOff">OFF</label><input type="radio" id="{{ button[5] }} ON" name="{{ button }}" class="checkbox"  onclick="buttonClicked(id)"/><label for="{{ button[5] }} ON" class="toggleOn">ON</label>
         </div>
+
+
     {% endfor %}
 </form>
 
@@ -196,20 +191,11 @@
         });
     });
 
-    function buttonClicked(checkbox){
+    function buttonClicked(id){
         // when we unlock buttons we want to ignore any accidential clicks
         if (!isLocked){
             return;
         }
-        
-        var id;
-        
-        if (checkbox.checked){
-            id = checkbox.id + ' ON';
-        } else {
-            id = checkbox.id + ' OFF';
-        }
-
         // Make a POST request to the Flask server with the button ID
         fetch('/actuators', {
             method: 'POST',
