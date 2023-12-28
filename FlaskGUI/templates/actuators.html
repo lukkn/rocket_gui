@@ -136,14 +136,14 @@
     <label for="menu">Menu</label>
     <div class="guiControlButtonsContainer">
         <button id="guiControlButtons" onclick="submitCoordinates()">Submit Coordinates</button>
-        <button id="guiControlButtons" onclick="getCoordinates(false)">Get Coordinates</button>
+        <button id="guiControlButtons" onclick="getCoordinates()">Get Coordinates</button>
         <button id="guiControlButtons" onclick="lockButtons()">Lock Buttons</button>
         <button id="guiControlButtons" onclick="unlockButtons()">Unlock Buttons</button>
     </div>
 </div>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='socket.io.js') }}"></script>
 <script type="text/javascript" charset="utf-8">
     var socket = io();
     socket.on('connect', function() {
@@ -156,7 +156,21 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Fetch coordinates when the page is loaded
-        getCoordinates(true);
+        getCoordinates();
+
+        /*
+        socket.on('get_actuator_button_location_config', function(coordinates) {
+            console.log("Coordinates:", coordinates);
+            // Place the buttons at the fetched coordinates
+            coordinates.forEach(coord => {
+                let button = document.getElementById(coord.id);
+                if (button) {
+                    button.style.left = coord.x + 'px';
+                    button.style.top = coord.y + 'px';
+                }
+            });
+        });
+        */
 
         let draggableElements = document.querySelectorAll('.draggable');
         let isLocked = false;
@@ -193,12 +207,6 @@
             draggedElement.style.top = offsetY + 'px';
         });
 
-        // on page load we set every actuator to off
-        let buttonlist = document.querySelectorAll('.offButtons');
-        buttonlist.forEach(function (element) {
-            console.log("button id: ", element.id)
-            buttonClicked(element.id);
-        });
     });
 
     function buttonClicked(id){
@@ -206,8 +214,6 @@
         if (!isLocked){
             return;
         }
-        console.log("right before socket.emit")
-        // Replace 'received_actuator_button_press' with your actual event name
         socket.emit('revieved_actuator_button_press', id);
     }
 
@@ -252,24 +258,23 @@
             .catch(error => console.error('Error:', error));
     }
 
-    function getCoordinates(initial_load) {
-        fetch('/get_coordinates')
-            .then(response => response.json())
-            .then(data => {
-                let coordinates = data.coordinates;
-                console.log("Coordinates:", coordinates);
 
-                // Place the buttons at the fetched coordinates
-                coordinates.forEach(coord => {
-                    let button = document.getElementById(coord.id);
-                    if (button) {
-                        button.style.left = coord.x + 'px';
-                        button.style.top = coord.y + 'px';
-                    }
-                });
-            })
-            .catch(error => console.error('Error:', error));
+
+    function getCoordinates() {
+        socket.emit('request_actuator_buttons', 'getCoordinates');
+        //TODO: reasearch this, may one day skip over socket.on and just not get anything on a slower computer
+        socket.on('get_actuator_button_location_config', function(coordinates) {
+            // Place the buttons at the fetched coordinates
+            coordinates.forEach(coord => {
+                let button = document.getElementById(coord.id);
+                if (button) {
+                    button.style.left = coord.x + 'px';
+                    button.style.top = coord.y + 'px';
+                }
+            });
+        });
     }
+
 
     function lockButtons() {
         let draggableElements = document.querySelectorAll('.draggable');

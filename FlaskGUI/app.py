@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO
 from threading import Lock
 import csv
 import json
@@ -71,6 +71,19 @@ def handle_actuator_button_press(buttonID):
 
 
 
+@socketio.on('request_actuator_buttons')
+def request_actuator_buttons(get_or_update):
+    print('received button press: ', get_or_update)
+
+    if get_or_update == 'getCoordinates':
+        #emit coordinates
+        with open(os.path.dirname(os.path.abspath(__file__)) + '/static/coordinates.json', 'r') as file:
+            coordinates = json.load(file)
+            print(coordinates)
+        socketio.emit('get_actuator_button_location_config', coordinates)
+
+
+
 @app.route('/update_coordinates', methods=['POST'])
 def update_coordinates():
     data = request.get_json()
@@ -105,7 +118,7 @@ def background_thread():
         # do 0.001 for about 950hz
         socketio.sleep(5)
         count += 1
-        socketio.emit('sensor_data', str(count))
+        socketio.emit('sensor_data', count)
 
 
 if __name__ == '__main__':
