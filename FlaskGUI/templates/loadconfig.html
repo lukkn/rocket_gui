@@ -12,10 +12,17 @@
             <button type="submit" name="button" value="Button 1" onclick="enableButton()">Load Config</button>
         </form>
 
+        <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
+        <script type="text/javascript" charset="utf-8">
+            var socket = io();
+        </script>
+
         <script>
             function enableButton() {
                 // Enable the button after uploading a file
                 document.querySelector('button[name="button"]').disabled = false;
+                //TODO: change this entire file to be better
+                socket.emit('config_uploaded');
             }
         </script>
         

@@ -4,7 +4,7 @@ from threading import Lock
 import csv
 import json
 import os
-import time
+import random
 
 async_mode = None
 
@@ -92,8 +92,8 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
 
 
 
-@socketio.event
-def connect():
+@socketio.on('config_uploaded')
+def config_uploaded():
     global thread
     with thread_lock:
         if thread is None:   
@@ -102,12 +102,20 @@ def connect():
 
 def background_thread():
     """Example of how to send server generated events to clients."""
-    count = 0
+    # if this delay is not here code fails
+    socketio.sleep(1)
     while True:
         # do 0.001 for about 950hz
-        socketio.sleep(5)
-        count += 1
-        socketio.emit('sensor_data', count)
+        socketio.sleep(0.001)
+        sensors_and_data = packet_sensor_data(sensors)
+        socketio.emit('sensor_data', sensors_and_data)
+
+
+def packet_sensor_data(sensors):
+    a = []
+    for sensor in sensors:
+        a.append([sensor, 100+random.random()])
+    return a
 
 
 if __name__ == '__main__':

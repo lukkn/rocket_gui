@@ -1,25 +1,66 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Flask-SocketIO Test</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
-    <script type="text/javascript" charset="utf-8">
-        $(document).ready(function() {
-            var socket = io();
-
-            socket.on('sensor_data', function(msg) {
-                $('#log').append('<br>' + $('<div/>').text(msg).html());
-            });
-        });
-    </script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 </head>
 <body>
-    <h1>Sensors</h1>
-    <p>
-      Async mode is: <b>{{ async_mode }}</b><br>
-    </p>
-    <h2>Receive:</h2>
-    <div id="log"></div>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Sensor Name</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody id="sensorTableBody">
+            <!-- Sensor data rows will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <script>
+        // Connect to the Socket.IO server
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        // Listen for 'sensor_data' events
+        socket.on('sensor_data', function (data) {
+            updateSensorData(data);
+        });
+
+        // Function to update sensor data in the HTML table
+        function updateSensorData(data) {
+            // Assuming each element in the 'data' array is an array with [sensorInfo, sensorValue]
+            data.forEach(function (sensor) {
+                var sensorInfo = sensor[0];
+                var sensorValue = sensor[1];
+
+                // Update or create a new row for the sensor in the table
+                var rowId = 'row_' + sensorInfo[5]; // Assuming the sensor ID is in the last element of sensorInfo
+                var existingRow = document.getElementById(rowId);
+
+                if (existingRow) {
+                    // Update existing row
+                    existingRow.cells[1].innerText = sensorValue;
+                } else {
+                    // Create new row
+                    var newRow = document.createElement('tr');
+                    newRow.id = rowId;
+
+                    var sensorNameCell = document.createElement('td');
+                    sensorNameCell.innerText = sensorInfo[3]; // Assuming sensor name is in the fourth element of sensorInfo
+                    newRow.appendChild(sensorNameCell);
+
+                    var sensorValueCell = document.createElement('td');
+                    sensorValueCell.innerText = sensorValue;
+                    newRow.appendChild(sensorValueCell);
+
+                    // Add the new row to the table body
+                    document.getElementById('sensorTableBody').appendChild(newRow);
+                }
+            });
+        }
+    </script>
 </body>
 </html>

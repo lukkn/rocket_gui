@@ -146,9 +146,11 @@
 <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
 <script type="text/javascript" charset="utf-8">
     var socket = io();
-    socket.on('connect', function() {
+
+    //can we delete this?
+    //socket.on('connect', function() {
         //socket.emit('my_event', {data: 'I\'m connected!'});
-    });
+    //});
 
 </script>
 
