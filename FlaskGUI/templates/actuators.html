@@ -75,31 +75,6 @@
             border: none;
             align-items: center;
         }
-<<<<<<< Updated upstream
-        .onButtons{
-            position: relative;
-            width: 27px;
-            float: left;
-            color: black;
-            background-color: white;
-            border-right: 1px solid #000;
-            border-top: 2px solid #000;
-            border-left: 2px solid #000;
-            border-bottom: 2px solid #000;
-            text-align: center;
-        }
-        .offButtons{
-            position: relative;
-            width: 27px;
-            float: left;
-            color: black;
-            background-color: white;
-            border-left: 1px solid #000;
-            border-top: 2px solid #000;
-            border-right: 2px solid #000;
-            border-bottom: 2px solid #000;
-            text-align: center;
-=======
         .toggle{
             position : relative ;
             display : inline-block;
@@ -129,7 +104,6 @@
         /* Checkbox vanished */
         .checkbox { 
             display : none;
->>>>>>> Stashed changes
         }
         #buttonNames{
             position: relative;
@@ -143,28 +117,18 @@
     </style>
 </head>
 <body>
-<<<<<<< Updated upstream
-
-
-=======
->>>>>>> Stashed changes
 <form method="post">
     {% for button in actuator_buttons %}
         
         </label>
         <div id="{{ button }}" class="draggable" draggable="true">
             <legend id="buttonNames">{{button[5]}}</legend>
-<<<<<<< Updated upstream
-            <div id="{{ button, 'on' }}" class = "onButtons" onclick="buttonClicked(id)" >On</div>
-            <div id="{{ button, 'off' }}" class = "offButtons" onclick="buttonClicked(id)" >Off</div>
-=======
             <input type="checkbox" id="{{ button[5] }}" class="checkbox" onclick="buttonClicked(this)"/>        
             <label for="{{ button[5] }}" class="toggle">
                 <onOffLabel>
                     OFF    ON
                 </onOffLabel>
             </label>
->>>>>>> Stashed changes
         </div>
     {% endfor %}
 </form>
