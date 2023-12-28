@@ -1,58 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Counter Test</title>
+    <title>Flask-SocketIO Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            var socket = io();
+
+            socket.on('sensor_data', function(msg) {
+                $('#log').append('<br>' + $('<div/>').text(msg).html());
+            });
+        });
+    </script>
 </head>
 <body>
-    <div id="counter-container"></div>
-
-    <script>
-
-
-        const sensorDataList = [];
-        
-        count = 0;
-
-        function fetchData() {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', '/sensor_data', true);
-
-        xhr.onload = function () {
-            if (xhr.status >= 200 && xhr.status < 300) {
-            // Append the response to the list
-            //sensorDataList.push(xhr.responseText);
-            count = count + 1;
-            } else {
-            console.error('Error fetching sensor data:', xhr.statusText);
-            }
-        };
-
-        xhr.onerror = function () {
-            console.error('Network error while fetching sensor data.');
-        };
-
-        xhr.send();
-        }
-
-        // Fetch sensor data every 1 second for 10 seconds
-        const fetchInterval = setInterval(fetchData, 5);
-
-        // Stop fetching after 10 seconds
-        setTimeout(() => {
-        clearInterval(fetchInterval);
-
-        // Return the length of the list
-        const lengthOfList = sensorDataList.length;
-        console.log('Sensor data list:', sensorDataList);
-        console.log('Length of the list:', lengthOfList);
-        console.log('count: ', count);
-        }, 10000);
-
-
-
-    </script>
+    <h1>Sensors</h1>
+    <p>
+      Async mode is: <b>{{ async_mode }}</b><br>
+    </p>
+    <h2>Receive:</h2>
+    <div id="log"></div>
 </body>
 </html>

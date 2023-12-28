@@ -37,8 +37,10 @@ def index():
     if request.method == 'POST':
         buttonID = request.form.get('button')
 
-        if buttonID == 'Button 2':
+        if buttonID == 'actuators':
             return redirect(url_for('actuators'))
+        if buttonID == 'sensors':
+            return redirect(url_for('sensors'))
 
     return render_template('index.html')
 
@@ -64,6 +66,10 @@ def actuators():
         #TODO: depending on button shape run some network functions
         print(data)
     return render_template('actuators.html', actuator_buttons=actuator_buttons)
+
+@app.route('/sensors')
+def sensors():
+    return render_template('sensors.html', async_mode=socketio.async_mode)
 
 @socketio.on('revieved_actuator_button_press')
 def handle_actuator_button_press(buttonID):
@@ -108,8 +114,9 @@ def get_coordinates():
 def connect():
     global thread
     with thread_lock:
-        if thread is None:
+        if thread is None:   
             thread = socketio.start_background_task(background_thread)
+
 
 def background_thread():
     """Example of how to send server generated events to clients."""
