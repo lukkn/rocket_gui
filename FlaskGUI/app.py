@@ -3,6 +3,8 @@ import csv
 import json
 import os
 
+import time
+
 # GLOBAL VARIABLES
 actuator_buttons = []
 sensors = []
@@ -75,6 +77,34 @@ def get_coordinates():
 
         coordinates = json.load(file)
     return jsonify({'coordinates': coordinates})
+
+
+
+@app.route('/sensors', methods=['GET'])
+def sensors():
+    return render_template('sensors.html')
+
+@app.route('/sensors2', methods=['GET'])
+def sensors2():
+    return render_template('sensors2.html')
+
+@app.route('/sensors_main', methods=['GET'])
+def sensors_main():
+    return render_template('sensors_main.html')
+
+
+
+@app.route('/sensor_data', methods=['GET'])
+def sensor_data():
+    return str(time.time())
+
+@app.route('/sensor_data2', methods=['GET'])
+def sensor_data2():
+    return str(time.time())
+
+@app.route('/sensor_data3', methods=['GET'])
+def sensor_data3():
+    return str(time.time())
 
 
 
