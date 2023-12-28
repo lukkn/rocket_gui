@@ -26,6 +26,7 @@
             height: calc(100vh - 25px);
             width: 100vw;
             position: fixed;
+            margin-top: 1%;    
 
             background-image: url("{{ url_for('static', filename='HTS_PandID.png') }}");
             background-size: contain; 
@@ -70,10 +71,11 @@
             position: absolute;
             cursor: move;
             pointer-events: auto;
-            background-color:red;
+            background-color:black;
             border: none;
             align-items: center;
         }
+<<<<<<< Updated upstream
         .onButtons{
             position: relative;
             width: 27px;
@@ -97,6 +99,37 @@
             border-right: 2px solid #000;
             border-bottom: 2px solid #000;
             text-align: center;
+=======
+        .toggle{
+            position : relative ;
+            display : inline-block;
+            width : 60px;
+            height : 20x;
+            background-color: white;
+        }
+        .toggle:after {
+            content: 'OFF';
+            text-align: center;
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            background-color: red;
+            left: 1px;
+            transition:  all 0.5s;
+        }
+        /* Checkbox checked effect */
+        .checkbox:checked + .toggle::after {
+            left : 30px; 
+            background-color: green;
+            content: 'ON';
+        }   
+        .onOffLabel{
+            font-size: small;
+        }
+        /* Checkbox vanished */
+        .checkbox { 
+            display : none;
+>>>>>>> Stashed changes
         }
         #buttonNames{
             position: relative;
@@ -110,14 +143,28 @@
     </style>
 </head>
 <body>
+<<<<<<< Updated upstream
 
 
+=======
+>>>>>>> Stashed changes
 <form method="post">
     {% for button in actuator_buttons %}
+        
+        </label>
         <div id="{{ button }}" class="draggable" draggable="true">
             <legend id="buttonNames">{{button[5]}}</legend>
+<<<<<<< Updated upstream
             <div id="{{ button, 'on' }}" class = "onButtons" onclick="buttonClicked(id)" >On</div>
             <div id="{{ button, 'off' }}" class = "offButtons" onclick="buttonClicked(id)" >Off</div>
+=======
+            <input type="checkbox" id="{{ button[5] }}" class="checkbox" onclick="buttonClicked(this)"/>        
+            <label for="{{ button[5] }}" class="toggle">
+                <onOffLabel>
+                    OFF    ON
+                </onOffLabel>
+            </label>
+>>>>>>> Stashed changes
         </div>
     {% endfor %}
 </form>
@@ -138,7 +185,6 @@
 
 
 <script>
-    
     document.addEventListener("DOMContentLoaded", function () {
         // Fetch coordinates when the page is loaded
         getCoordinates(true);
@@ -186,11 +232,20 @@
         });
     });
 
-    function buttonClicked(id){
+    function buttonClicked(checkbox){
         // when we unlock buttons we want to ignore any accidential clicks
         if (!isLocked){
             return;
         }
+        
+        var id;
+        
+        if (checkbox.checked){
+            id = checkbox.id + ' ON';
+        } else {
+            id = checkbox.id + ' OFF';
+        }
+
         // Make a POST request to the Flask server with the button ID
         fetch('/actuators', {
             method: 'POST',
