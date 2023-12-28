@@ -155,22 +155,9 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+
         // Fetch coordinates when the page is loaded
         getCoordinates();
-
-        /*
-        socket.on('get_actuator_button_location_config', function(coordinates) {
-            console.log("Coordinates:", coordinates);
-            // Place the buttons at the fetched coordinates
-            coordinates.forEach(coord => {
-                let button = document.getElementById(coord.id);
-                if (button) {
-                    button.style.left = coord.x + 'px';
-                    button.style.top = coord.y + 'px';
-                }
-            });
-        });
-        */
 
         let draggableElements = document.querySelectorAll('.draggable');
         let isLocked = false;
@@ -214,8 +201,9 @@
         if (!isLocked){
             return;
         }
-        socket.emit('revieved_actuator_button_press', id);
+        socket.emit('received_actuator_button_press', id);
     }
+
 
 
     function submitCoordinates() {
@@ -232,8 +220,7 @@
                     coordinates.push({ id: element.id, x: rect.left, y: rect.top });
                 });
 
-                // Send coordinates to Flask
-                sendDataToFlask(coordinates);
+                socket.emit('actuator_button_coordinates', coordinates);
                 return;
 
             } else if (confirmationPhrase === null) {
@@ -245,23 +232,9 @@
         }
     }
 
-    function sendDataToFlask(coordinates) {
-        fetch('/update_coordinates', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ coordinates: coordinates }),
-        })
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(error => console.error('Error:', error));
-    }
-
-
 
     function getCoordinates() {
-        socket.emit('request_actuator_buttons', 'getCoordinates');
+        socket.emit('actuator_button_coordinates', 'getCoordinates');
         //TODO: reasearch this, may one day skip over socket.on and just not get anything on a slower computer
         socket.on('get_actuator_button_location_config', function(coordinates) {
             // Place the buttons at the fetched coordinates

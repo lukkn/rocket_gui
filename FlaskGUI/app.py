@@ -59,55 +59,37 @@ def loadconfig():
     return render_template('loadconfig.html')
 
     
-@app.route('/actuators', methods=['GET', 'POST'])
+@app.route('/actuators', methods=['GET'])
 def actuators():
-    if request.method == 'POST':
-        data = request.get_json()['id']
-        #TODO: depending on button shape run some network functions
-        print(data)
     return render_template('actuators.html', actuator_buttons=actuator_buttons)
 
 @app.route('/sensors')
 def sensors():
     return render_template('sensors.html', async_mode=socketio.async_mode)
 
-@socketio.on('revieved_actuator_button_press')
+@socketio.on('received_actuator_button_press')
 def handle_actuator_button_press(buttonID):
     print('received button press: ', buttonID)
 
 
 
-@socketio.on('request_actuator_buttons')
-def request_actuator_buttons(get_or_update):
-    print('received button press: ', get_or_update)
+@socketio.on('actuator_button_coordinates')
+def actuator_button_coordinates(get_request_or_coordinate_data):
 
-    if get_or_update == 'getCoordinates':
+    # if actuators.html is requesting the coordinates stored in the .json
+    if get_request_or_coordinate_data == 'getCoordinates':
         #emit coordinates
         with open(os.path.dirname(os.path.abspath(__file__)) + '/static/coordinates.json', 'r') as file:
             coordinates = json.load(file)
-            print(coordinates)
+            print("actuators.html is asking for coordinates from .json")
         socketio.emit('get_actuator_button_location_config', coordinates)
 
+    else: # actuators.html is sending new button coordinates for saving
+        with open(os.path.dirname(os.path.abspath(__file__)) + '/static/coordinates.json', 'w') as file:
+            json.dump(get_request_or_coordinate_data, file)
+            print("button coordinates saved to .json file")
 
 
-@app.route('/update_coordinates', methods=['POST'])
-def update_coordinates():
-    data = request.get_json()
-    coordinates = data.get('coordinates', [])
-    print("Received coordinates:", coordinates)
-    # You can process the coordinates here as needed
-    with open(os.path.dirname(os.path.abspath(__file__)) + '/static/coordinates.json', 'w') as file:
-        json.dump(coordinates, file)
-    return jsonify({'message': 'Coordinates received successfully'})
-
-
-@app.route('/get_coordinates', methods=['GET'])
-def get_coordinates():
-    # Retrieve coordinates from file
-    with open(os.path.dirname(os.path.abspath(__file__)) + '/static/coordinates.json', 'r') as file:
-
-        coordinates = json.load(file)
-    return jsonify({'coordinates': coordinates})
 
 
 @socketio.event
