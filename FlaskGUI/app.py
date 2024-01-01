@@ -107,7 +107,7 @@ def background_thread():
 def packet_sensor_data(sensors):
     a = []
     for sensor in sensors:
-        a.append([sensor, 100+random.random()])
+        a.append([sensor['P and ID'], 100+random.random()])
     return a
 
 

@@ -37,7 +37,7 @@
                 var sensorValue = sensor[1];
 
                 // Update or create a new row for the sensor in the table
-                var rowId = 'row_' + sensorInfo[5]; // Assuming the sensor ID is in the last element of sensorInfo
+                var rowId = 'row_' + sensorInfo; // Assuming the sensor ID is in the last element of sensorInfo
                 var existingRow = document.getElementById(rowId);
 
                 if (existingRow) {
@@ -49,7 +49,7 @@
                     newRow.id = rowId;
 
                     var sensorNameCell = document.createElement('td');
-                    sensorNameCell.innerText = sensorInfo[3]; // Assuming sensor name is in the fourth element of sensorInfo
+                    sensorNameCell.innerText = sensorInfo; // Assuming sensor name is in the fourth element of sensorInfo
                     newRow.appendChild(sensorNameCell);
 
                     var sensorValueCell = document.createElement('td');
