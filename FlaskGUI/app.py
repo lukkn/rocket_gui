@@ -6,6 +6,8 @@ import json
 import os
 import random
 
+import configuration
+
 async_mode = None
 
 # GLOBAL VARIABLES
@@ -18,17 +20,6 @@ socketio = SocketIO(app, async_mode=async_mode)
 #TODO: what should thread equal, same with async_mode at top of page
 thread = None
 thread_lock = Lock()
-
-#TODO: try except logic
-def load_config(config_bytes):
-    decoded_string = config_bytes.decode('utf-8')
-    lines = decoded_string.strip().split('\n')
-    config_list = [row for row in csv.reader(lines)]
-    
-    actuator_buttons = [row for row in config_list if row[1] == 'actuator']
-    sensors = [row for row in config_list if row[1] == 'sensor']
-
-    return actuator_buttons, sensors
 
 
 
@@ -54,14 +45,16 @@ def loadconfig():
 
         if buttonID == 'Button 1':
             config_bytes = request.files['file'].read()
-            actuator_buttons, sensors = load_config(config_bytes)
+            actuator_buttons, sensors = configuration.load_config(config_bytes)
+            print("actuator_buttons: ", actuator_buttons)
+            print("sensors: ", sensors)
 
     return render_template('loadconfig.html')
 
     
 @app.route('/actuators', methods=['GET'])
 def actuators():
-    return render_template('actuators.html', actuator_buttons=actuator_buttons)
+    return render_template('actuators.html', actuator_buttons=actuator_buttons)  
 
 @app.route('/sensors')
 def sensors():
