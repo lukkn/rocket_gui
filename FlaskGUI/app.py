@@ -110,7 +110,7 @@ def background_thread():
     socketio.sleep(1)
     while True:
         # do 0.001 for about 950hz
-        socketio.sleep(0.001)
+        socketio.sleep(0.02)
         sensors_and_data = packet_sensor_data(sensor_list)
         socketio.emit('sensor_data', sensors_and_data)
 
