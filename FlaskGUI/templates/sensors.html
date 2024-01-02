@@ -6,7 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sensor Data Dashboard</title>
     <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 </head>
+
+
 <body>
     <table border="1">
         <thead>
@@ -29,6 +33,7 @@
         // Listen for 'sensor_data' events
         socket.on('sensor_data', function (data) {
             updateSensorData(data);
+            updateChart(data);
         });
 
         // Function to update sensor data in the HTML table
@@ -88,6 +93,67 @@
         function handleTareUntare(sensorName, action) {
             // You can emit to server
             socket.emit('tare_untare_button_press', sensorName, action);
+        }
+        
+            </script>
+        <canvas id="myChart" style="width:100%;max-width:100%"></canvas>
+        <script>
+        const canvas = document.getElementById('myChart');
+
+        const labels = [];
+
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: "sensorName",
+                borderColor: 'rgb(0,0,0)',
+                pointRadius: 0,
+                lineTension: 0,
+                fill: false,
+                data: [],
+            }]
+        };
+        const config = {
+            type: 'line',
+            data: data,
+            options: {}
+        };
+
+        const myChart = new Chart(
+            canvas,
+            config
+        );
+
+        window.setInterval(function(){
+            getNewSeries(lastDate,{
+                min:10, 
+                max: 15
+            })
+        })
+
+        function addData(chart, label, data) {
+            chart.data.labels.push(label);
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.push(data);
+            });
+            chart.update();
+        }
+
+        function removeData(chart) {
+            chart.data.labels.shift();
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.shift();
+            });
+            chart.update();
+        }
+
+        function updateChart(data){
+            const newLabel = "";
+            const newData = data[0][1];
+            addData(myChart, newLabel, newData);
+            if(labels.length > 100){
+                removeData(myChart);
+            }
         }
     </script>
 </body>
