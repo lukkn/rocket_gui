@@ -203,7 +203,9 @@
         if (!isLocked){
             return;
         }
-        socket.emit('received_actuator_button_press', id);
+        // index 0 holds name, index 1 holds state; on/off
+        name_and_state = id.split(" ");
+        socket.emit('received_actuator_button_press', name_and_state[0], name_and_state[1]);
     }
 
 

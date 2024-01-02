@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sensor Data Dashboard</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
 </head>
 <body>
     <table border="1">
@@ -13,6 +13,8 @@
             <tr>
                 <th>Sensor Name</th>
                 <th>Data</th>
+                <th>Tare</th>
+                <th>Untare</th>
             </tr>
         </thead>
         <tbody id="sensorTableBody">
@@ -37,7 +39,7 @@
                 var sensorValue = sensor[1];
 
                 // Update or create a new row for the sensor in the table
-                var rowId = 'row_' + sensorInfo; // Assuming the sensor ID is in the last element of sensorInfo
+                var rowId = 'row_' + sensorInfo;
                 var existingRow = document.getElementById(rowId);
 
                 if (existingRow) {
@@ -49,17 +51,43 @@
                     newRow.id = rowId;
 
                     var sensorNameCell = document.createElement('td');
-                    sensorNameCell.innerText = sensorInfo; // Assuming sensor name is in the fourth element of sensorInfo
+                    sensorNameCell.innerText = sensorInfo;
                     newRow.appendChild(sensorNameCell);
 
                     var sensorValueCell = document.createElement('td');
                     sensorValueCell.innerText = sensorValue;
                     newRow.appendChild(sensorValueCell);
 
+                    // Create Tare button
+                    var tareButtonCell = document.createElement('td');
+                    var tareButton = document.createElement('button');
+                    tareButton.innerText = 'Tare';
+                    tareButton.addEventListener('click', function() {
+                        handleTareUntare(sensorInfo, 'tare');
+                    });
+                    tareButtonCell.appendChild(tareButton);
+                    newRow.appendChild(tareButtonCell);
+
+                    // Create Untare button
+                    var untareButtonCell = document.createElement('td');
+                    var untareButton = document.createElement('button');
+                    untareButton.innerText = 'Untare';
+                    untareButton.addEventListener('click', function() {
+                        handleTareUntare(sensorInfo, 'untare');
+                    });
+                    untareButtonCell.appendChild(untareButton);
+                    newRow.appendChild(untareButtonCell);
+
                     // Add the new row to the table body
                     document.getElementById('sensorTableBody').appendChild(newRow);
                 }
             });
+        }
+
+        // Function to handle tare and untare button clicks
+        function handleTareUntare(sensorName, action) {
+            // You can emit to server
+            socket.emit('tare_untare_button_press', sensorName, action);
         }
     </script>
 </body>
