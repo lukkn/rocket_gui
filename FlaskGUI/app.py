@@ -12,10 +12,12 @@ async_mode = None
 
 # GLOBAL VARIABLES
 actuator_buttons = []
-sensors = []
+sensor_list = []
 
+# REMOVE BEFORE DEPLOYMENT
 actuator_buttons = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'VNTB'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Fuel tank vent', 'Pin': '1', 'P and ID': 'VFTV'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Ox bang-bang', 'Pin': '0', 'P and ID': 'VNTO'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Ox tank fill', 'Pin': '0', 'P and ID': 'VOTF'}]
-sensors = [{'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '0', 'P and ID': 'PNTB'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '1', 'P and ID': 'POTB'}]
+sensor_list = [{'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '0', 'P and ID': 'PNTB'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '1', 'P and ID': 'POTB'}]
+
 
 app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app, async_mode=async_mode)
@@ -40,15 +42,15 @@ def index():
 # TODO: better way than using global variables, verify config
 @app.route('/loadconfig', methods=['GET', 'POST'])
 def loadconfig():
-    global actuator_buttons, sensors
+    global actuator_buttons, sensor_list
     if request.method == 'POST':
         buttonID = request.form.get('button')
 
         if buttonID == 'Button 1':
             config_bytes = request.files['file'].read()
-            actuator_buttons, sensors = configuration.load_config(config_bytes)
-            print("actuator_buttons: ", actuator_buttons)
-            print("sensors: ", sensors)
+            actuator_buttons, sensor_list = configuration.load_config(config_bytes)
+            #print("actuator_buttons: ", actuator_buttons)
+            #print("sensors: ", sensor_list)
 
     return render_template('loadconfig.html')
 
@@ -59,6 +61,8 @@ def actuators():
 
 @app.route('/sensors')
 def sensors():
+    #REMOVE BEFORE DEPLOYMENT
+    config_uploaded()
     return render_template('sensors.html', async_mode=socketio.async_mode)
 
 
@@ -100,7 +104,6 @@ def config_uploaded():
     with thread_lock:
         if thread is None:   
             thread = socketio.start_background_task(background_thread)
-
 def background_thread():
     """Example of how to send server generated events to clients."""
     # if this delay is not here code fails
@@ -108,14 +111,14 @@ def background_thread():
     while True:
         # do 0.001 for about 950hz
         socketio.sleep(0.001)
-        sensors_and_data = packet_sensor_data(sensors)
+        sensors_and_data = packet_sensor_data(sensor_list)
         socketio.emit('sensor_data', sensors_and_data)
 
 
 # Dummy data function
-def packet_sensor_data(sensors):
+def packet_sensor_data(sensor_list):
     a = []
-    for sensor in sensors:
+    for sensor in sensor_list:
         a.append([sensor['P and ID'], 100+random.random()])
     return a
 
