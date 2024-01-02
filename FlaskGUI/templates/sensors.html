@@ -13,6 +13,7 @@
             <tr>
                 <th>Sensor Name</th>
                 <th>Data</th>
+                <th>Unit</th>
                 <th>Tare</th>
                 <th>Untare</th>
             </tr>
@@ -39,7 +40,7 @@
                 var sensorValue = sensor[1];
 
                 // Update or create a new row for the sensor in the table
-                var rowId = 'row_' + sensorInfo;
+                var rowId = 'row_' + sensorInfo['P and ID'];
                 var existingRow = document.getElementById(rowId);
 
                 if (existingRow) {
@@ -51,12 +52,17 @@
                     newRow.id = rowId;
 
                     var sensorNameCell = document.createElement('td');
-                    sensorNameCell.innerText = sensorInfo;
+                    sensorNameCell.innerText = sensorInfo['P and ID'];
                     newRow.appendChild(sensorNameCell);
 
                     var sensorValueCell = document.createElement('td');
                     sensorValueCell.innerText = sensorValue;
+                    sensorValueCell.style.width = '150px'; // Set the width to 150px so table doesn't move if a short number appears; this is a min width not a max width
                     newRow.appendChild(sensorValueCell);
+
+                    var sensorUnitCell = document.createElement('td');
+                    sensorUnitCell.innerText = sensorInfo['unit'];
+                    newRow.appendChild(sensorUnitCell);
 
                     // Create Tare button
                     var tareButtonCell = document.createElement('td');

@@ -121,7 +121,7 @@
         </label>
         <div id="{{ button }}" class="draggable" draggable="true">
             <legend id="buttonName">{{button['P and ID']}}</legend>
-            <input type="radio" id="{{ button['P and ID'] }} OFF" name="{{ button }}" class="checkbox"  onclick="buttonClicked(id)"/><label for="{{ button['P and ID'] }} OFF" class="toggleOff">OFF</label><input type="radio" id="{{ button['P and ID'] }} ON" name="{{ button }}" class="checkbox"  onclick="buttonClicked(id)"/><label for="{{ button['P and ID'] }} ON" class="toggleOn">ON</label>
+            <input type="radio" id="{{ button['P and ID'] }} OFF" name="{{ button }}" class="checkbox"  onclick="buttonClicked(name, 'OFF')"/><label for="{{ button['P and ID'] }} OFF" class="toggleOff">OFF</label><input type="radio" id="{{ button['P and ID'] }} ON" name="{{ button }}" class="checkbox"  onclick="buttonClicked(name, 'ON')"/><label for="{{ button['P and ID'] }} ON" class="toggleOn">ON</label>
         </div>
 
 
@@ -198,14 +198,12 @@
 
     });
 
-    function buttonClicked(id){
+    function buttonClicked(id, state){
         // when we unlock buttons we want to ignore any accidental clicks
         if (!isLocked){
             return;
         }
-        // index 0 holds name, index 1 holds state; on/off
-        name_and_state = id.split(" ");
-        socket.emit('received_actuator_button_press', name_and_state[0], name_and_state[1]);
+        socket.emit('received_actuator_button_press', id, state);
     }
 
 
