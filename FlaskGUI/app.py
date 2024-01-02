@@ -14,6 +14,8 @@ async_mode = None
 actuator_buttons = []
 sensors = []
 
+actuator_buttons = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'VNTB'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Fuel tank vent', 'Pin': '1', 'P and ID': 'VFTV'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Ox bang-bang', 'Pin': '0', 'P and ID': 'VNTO'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Ox tank fill', 'Pin': '0', 'P and ID': 'VOTF'}]
+sensors = [{'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '0', 'P and ID': 'PNTB'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '1', 'P and ID': 'POTB'}]
 
 app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app, async_mode=async_mode)
@@ -34,7 +36,6 @@ def index():
             return redirect(url_for('sensors'))
 
     return render_template('index.html')
-
 
 # TODO: better way than using global variables, verify config
 @app.route('/loadconfig', methods=['GET', 'POST'])
@@ -60,11 +61,16 @@ def actuators():
 def sensors():
     return render_template('sensors.html', async_mode=socketio.async_mode)
 
+
+
+
 @socketio.on('received_actuator_button_press')
-def handle_actuator_button_press(buttonID):
-    print('received button press: ', buttonID)
+def handle_actuator_button_press(buttonID, state):
+    print('received actuator button press: ', buttonID, state)
 
-
+@socketio.on('tare_untare_button_press')
+def tare_untare_button_press(buttonID, state):
+    print('received tare/untare event: ', buttonID, state)
 
 @socketio.on('actuator_button_coordinates')
 def actuator_button_coordinates(get_request_or_coordinate_data):
@@ -85,13 +91,15 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
 
 
 
+
+
+# FUNCTIONS BELOW RELATE TO GETTING SENSOR DATA IN BACKGROUND THREAD
 @socketio.on('config_uploaded')
 def config_uploaded():
     global thread
     with thread_lock:
         if thread is None:   
             thread = socketio.start_background_task(background_thread)
-
 
 def background_thread():
     """Example of how to send server generated events to clients."""
@@ -104,6 +112,7 @@ def background_thread():
         socketio.emit('sensor_data', sensors_and_data)
 
 
+# Dummy data function
 def packet_sensor_data(sensors):
     a = []
     for sensor in sensors:
