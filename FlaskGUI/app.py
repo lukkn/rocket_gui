@@ -5,6 +5,7 @@ import csv
 import json
 import os
 import random
+import time
 
 import configuration
 
@@ -108,14 +109,23 @@ def background_thread():
     """Example of how to send server generated events to clients."""
     # if this delay is not here code fails
     socketio.sleep(1)
+    start_time = time.time()
+    current_time = start_time
     while True:
-        # do 0.001 for about 950hz
-        socketio.sleep(0.02)
+        
         sensors_and_data = packet_sensor_data(sensor_list)
-        socketio.emit('sensor_data', sensors_and_data)
+
+        with open("sensor_data_log", mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow([current_time] + sensors_and_data)
+
+        current_time = time.time()
+        if (current_time - start_time) >= (1/10):
+            socketio.emit('sensor_data', sensors_and_data)
+            start_time = current_time
 
 
-# Dummy data function
+# Dummy data function, this function should FETCH data from udp packet
 def packet_sensor_data(sensor_list):
     a = []
     for sensor in sensor_list:
