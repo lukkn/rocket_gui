@@ -27,7 +27,7 @@
     </table>
 
     <script>
-        // Connect to the Socket.IO server
+        // pretty sure this can just be io.connect() but im not sure
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
         // Listen for 'sensor_data' events
@@ -96,13 +96,15 @@
 
         // Function to handle tare and untare button clicks
         function handleTareUntare(sensorName, action) {
-            // You can emit to server
+            // Emit to server
             socket.emit('tare_untare_button_press', sensorName, action);
         }
         
-            </script>
-        <canvas id="myChart" style="width:100%;max-width:100%"></canvas>
-        <script>
+    </script>
+
+    
+    <canvas id="myChart" style="width:100%;max-width:100%"></canvas>
+    <script>
         const canvas = document.getElementById('myChart');
 
         const labels = [];

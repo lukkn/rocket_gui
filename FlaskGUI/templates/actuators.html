@@ -2,275 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Actuators</title>
-    <style>
-        body{
-            /*makes everything unselectable, DO NOT REMOVE, buttons will drag while locked if selected, I do not know why :(*/
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-        #messageContainer{
-            position: absolute;
-            left: 25vh;
-            text-align: left;
-            width: 15vw;
-            font-weight: bold;
-        }
-        #backgroundContainer {
-            z-index:-1;
-            height: calc(100vh - 25px);
-            width: 100vw;
-            position: fixed;
-            margin-top: 1%;    
-
-            background-image: url("{{ url_for('static', filename='HTS_PandID.png') }}");
-            background-size: contain; 
-            background-repeat: no-repeat;
-            background-origin: content-box;
-            background-position: center center;
-
-            transform: translateY(25px);
-        }
-        .collapsible-menu label {
-            display: block;
-            cursor: pointer;
-            background-color: antiquewhite;
-            text-align: center;
-            font-weight: bold;
-            width: 10vw;
-            padding: 0 10px 5px 10px;
-        }
-        input#menu {
-            display: none;
-        }
-        .guiControlButtonsContainer {
-            width: 10vw;
-            max-height: 0;
-            overflow: hidden;
-            padding: 0 10px 0 10px;
-            background-color:antiquewhite;
-            cursor: pointer;
-            align-items: center;
-        }
-        #guiControlButtons{
-            position: relative;
-            width: 10vw;
-            padding: 10px 10px;
-            margin-bottom: 10px;
-        }
-        input:checked ~ .guiControlButtonsContainer {
-            max-height: 100%;
-        }
-        .draggable {
-            width: 60px;
-            position: absolute;
-            cursor: move;
-            pointer-events: auto;
-            background-color:black;
-            border: none;
-            align-items: center;
-        }
-        .input.radio {display: inline-block;}
-        .toggleOn{
-            position : relative ;
-            display : inline-block;
-            width : 30px;
-            height : 20x;
-            background-color: white;
-            text-align: center;
-        }
-        .toggleOff{
-            position : relative ;
-            display : inline-block;
-            width : 30px;
-            height : 20x;
-            background-color: white;
-            text-align: center;
-        }
-        .checkbox:checked + .toggleOff{
-            background-color: lightcoral;
-        }
-        .checkbox:checked + .toggleOn{
-            background-color: lightgreen;
-        }
-
-        /* Checkbox vanished */
-        .checkbox {
-            display: none;
-        }
-        #buttonName{
-            position: relative;
-            color: white;
-            text-align: center;
-        }
-        .locked {
-            cursor: pointer;
-        }
-        
-    </style>
+    <title>Sensor Data Dashboard</title>
+    <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
+    <script src="{{ url_for('static', filename='Chart.js') }}"></script>
 </head>
+
+
 <body>
-<form method="post">
-    {% for button in actuator_buttons %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Actuator Name</th>
+                <th>Tare</th>
+                <th>Untare</th>
+            </tr>
+        </thead>
+        <tbody id="actuatorTableBody">
+            <!-- Sensor data rows will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <script>
+        // pretty sure this can just be io.connect() but im not sure
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        // Assuming each element in the 'data' array is an array with [sensorInfo, sensorValue]
+        var actuator_buttons = {{ actuator_buttons|tojson|safe }};
+
+
+        console.log('actuator_buttons: ', actuator_buttons);
+
+        actuator_buttons.forEach(function (actuator) {
+            var actuatorInfo = actuator
+
+            // create a new row for the actuator in the table
+            var rowId = 'row_' + actuatorInfo['P and ID'];
+
+
+            // Create new row
+            var newRow = document.createElement('tr');
+            newRow.id = rowId;
+
+            var actuatorNameCell = document.createElement('td');
+            actuatorNameCell.innerText = actuatorInfo['P and ID'];
+            newRow.appendChild(actuatorNameCell);
+
+
+
+            // Create OFF button
+            var offButtonCell = document.createElement('td');
+            var offButton = document.createElement('button');
+            offButton.innerText = 'OFF';
+            offButton.addEventListener('click', function() {
+                handleOnOff(actuatorInfo, 'off');
+            });
+            offButtonCell.appendChild(offButton);
+            newRow.appendChild(offButtonCell);
+
+            // Create ON button
+            var onButtonCell = document.createElement('td');
+            var onButton = document.createElement('button');
+            onButton.innerText = 'ON';
+            onButton.addEventListener('click', function() {
+                handleOnOff(actuatorInfo, 'on');
+            });
+            onButtonCell.appendChild(onButton);
+            newRow.appendChild(onButtonCell);
+
+            // Add the new row to the table body
+            document.getElementById('actuatorTableBody').appendChild(newRow);
+        });
+
+        // Function to handle tare and untare button clicks
+        function handleOnOff(actuatorName, action) {
+            // Emit to server
+            socket.emit('received_actuator_button_press', actuatorName, action);
+        }
         
-        </label>
-        <div id="{{ button }}" class="draggable" draggable="true">
-            <legend id="buttonName">{{button['P and ID']}}</legend>
-            <input type="radio" id="{{ button['P and ID'] }} OFF" name="{{ button }}" class="checkbox"  onclick="buttonClicked(name, 'OFF')"/><label for="{{ button['P and ID'] }} OFF" class="toggleOff">OFF</label><input type="radio" id="{{ button['P and ID'] }} ON" name="{{ button }}" class="checkbox"  onclick="buttonClicked(name, 'ON')"/><label for="{{ button['P and ID'] }} ON" class="toggleOn">ON</label>
-        </div>
-
-
-    {% endfor %}
-</form>
-
-
-<div id="backgroundContainer"></div>
-<div id="messageContainer"></div>
-<div class="collapsible-menu">
-    <input type="checkbox" id="menu">
-    <label for="menu">Menu</label>
-    <div class="guiControlButtonsContainer">
-        <button id="guiControlButtons" onclick="submitCoordinates()">Submit Coordinates</button>
-        <button id="guiControlButtons" onclick="getCoordinates()">Get Coordinates</button>
-        <button id="guiControlButtons" onclick="lockButtons()">Lock Buttons</button>
-        <button id="guiControlButtons" onclick="unlockButtons()">Unlock Buttons</button>
-    </div>
-</div>
-
-
-<script src="{{ url_for('static', filename='socket.io.js') }}"></script>
-<script type="text/javascript" charset="utf-8">
-    var socket = io();
-
-    //can we delete this?
-    //socket.on('connect', function() {
-        //socket.emit('my_event', {data: 'I\'m connected!'});
-    //});
-
-</script>
-
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        // Fetch coordinates when the page is loaded
-        getCoordinates();
-
-        let draggableElements = document.querySelectorAll('.draggable');
-        let isLocked = false;
-
-        // TODO: a proper way of locking cuz running this function is kinda stupid, GPT wrote this and idk how it works
-        lockButtons();
-
-        draggableElements.forEach(function (element) {
-            element.addEventListener('dragstart', function (e) {
-                if (isLocked) {
-                    e.preventDefault(); // Prevent dragging when locked
-                    return;
-                }
-                e.dataTransfer.setData('text/plain', element.id);
-            });
-        });
-
-        document.addEventListener('dragover', function (e) {
-            e.preventDefault();
-        });
-
-        document.addEventListener('drop', function (e) {
-            e.preventDefault();
-            if (isLocked) {
-                return; // Ignore drop when locked
-            }
-            let data = e.dataTransfer.getData('text/plain');
-            let draggedElement = document.getElementById(data);
-
-            let offsetX = e.clientX - draggedElement.offsetWidth / 2;
-            let offsetY = e.clientY - draggedElement.offsetHeight / 2;
-
-            draggedElement.style.left = offsetX + 'px';
-            draggedElement.style.top = offsetY + 'px';
-        });
-
-    });
-
-    function buttonClicked(id, state){
-        // when we unlock buttons we want to ignore any accidental clicks
-        if (!isLocked){
-            return;
-        }
-        socket.emit('received_actuator_button_press', id, state);
-    }
-
-
-
-    function submitCoordinates() {
-        textprompt="tim hates linux"
-            while(true){
-            let confirmationPhrase = prompt("Type 'tim hates linux' to confirm");
-            if (confirmationPhrase === textprompt) {
-
-                let draggableElements = document.querySelectorAll('.draggable');
-                let coordinates = [];
-
-                draggableElements.forEach(function (element) {
-                    let rect = element.getBoundingClientRect();
-                    coordinates.push({ id: element.id, x: rect.left, y: rect.top });
-                });
-
-                socket.emit('actuator_button_coordinates', coordinates);
-                return;
-
-            } else if (confirmationPhrase === null) {
-                return; //user clicked cancel
-                
-            } else {
-                alert("Confirmation failed. Incorrect phrase.");
-            }
-        }
-    }
-
-
-    function getCoordinates() {
-        socket.emit('actuator_button_coordinates', 'getCoordinates');
-        //TODO: reasearch this, may one day skip over socket.on and just not get anything on a slower computer
-        socket.on('get_actuator_button_location_config', function(coordinates) {
-            // Place the buttons at the fetched coordinates
-            coordinates.forEach(coord => {
-                let button = document.getElementById(coord.id);
-                if (button) {
-                    button.style.left = coord.x + 'px';
-                    button.style.top = coord.y + 'px';
-                }
-            });
-        });
-    }
-
-
-    function lockButtons() {
-        let draggableElements = document.querySelectorAll('.draggable');
-        draggableElements.forEach(function (element) {
-            element.classList.add('locked');
-            element.draggable = false;
-        });
-        isLocked = true;
-        messageContainer.innerText = "Button Positions are LOCKED";
-    }
-
-    function unlockButtons() {
-        let draggableElements = document.querySelectorAll('.draggable');
-        draggableElements.forEach(function (element) {
-            element.classList.remove('locked');
-            element.draggable = true;
-        });
-        isLocked = false;
-        messageContainer.innerText = "Button Positions are UNLOCKED";
-    }
-</script>
+    </script>
 
 </body>
 </html>

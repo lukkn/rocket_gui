@@ -37,6 +37,8 @@ def index():
             return redirect(url_for('actuators'))
         if buttonID == 'sensors':
             return redirect(url_for('sensors'))
+        if buttonID == 'p&idview':
+            return redirect(url_for('p&idview'))
 
     return render_template('index.html')
 
@@ -56,15 +58,23 @@ def loadconfig():
     return render_template('loadconfig.html')
 
     
-@app.route('/actuators', methods=['GET'])
-def actuators():
-    return render_template('actuators.html', actuator_buttons=actuator_buttons)  
+@app.route('/p&idview', methods=['GET'])
+def pidview():
+    #REMOVE BEFORE DEPLOYMENT
+    config_uploaded()
+    return render_template('p&idview.html', actuator_buttons=actuator_buttons, sensor_list=sensor_list)  
 
 @app.route('/sensors')
 def sensors():
     #REMOVE BEFORE DEPLOYMENT
     config_uploaded()
     return render_template('sensors.html', async_mode=socketio.async_mode)
+
+@app.route('/actuators', methods=['GET'])
+def actuators():
+    #REMOVE BEFORE DEPLOYMENT
+    config_uploaded()
+    return render_template('actuators.html', actuator_buttons=actuator_buttons)
 
 
 
@@ -80,15 +90,15 @@ def tare_untare_button_press(buttonID, state):
 @socketio.on('actuator_button_coordinates')
 def actuator_button_coordinates(get_request_or_coordinate_data):
 
-    # if actuators.html is requesting the coordinates stored in the .json
+    # if p&idview.html is requesting the coordinates stored in the .json
     if get_request_or_coordinate_data == 'getCoordinates':
         #emit coordinates
         with open(os.path.dirname(os.path.abspath(__file__)) + '/static/coordinates.json', 'r') as file:
             coordinates = json.load(file)
-            print("actuators.html is asking for coordinates from .json")
+            print("p&idview.html is requesting coordinates from .json")
         socketio.emit('get_actuator_button_location_config', coordinates)
 
-    else: # actuators.html is sending new button coordinates for saving
+    else: # p&idview.html is sending new button coordinates for saving
         with open(os.path.dirname(os.path.abspath(__file__)) + '/static/coordinates.json', 'w') as file:
             json.dump(get_request_or_coordinate_data, file)
             print("button coordinates saved to .json file")
@@ -115,12 +125,13 @@ def background_thread():
         
         sensors_and_data = packet_sensor_data(sensor_list)
 
+        # testing shows we get data at 3khz with random, 6khz with a predetermined constant; ex: 1
         with open("sensor_data_log", mode='a', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow([current_time] + sensors_and_data)
 
         current_time = time.time()
-        if (current_time - start_time) >= (1/10):
+        if (current_time - start_time) >= (1/60):
             socketio.emit('sensor_data', sensors_and_data)
             start_time = current_time
 
@@ -129,7 +140,7 @@ def background_thread():
 def packet_sensor_data(sensor_list):
     a = []
     for sensor in sensor_list:
-        a.append([sensor, 100+random.random()])
+        a.append([sensor, round(9999+random.random(), 5)])
     return a
 
 
