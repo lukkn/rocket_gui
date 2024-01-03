@@ -68,7 +68,7 @@ def pidview():
 def sensors():
     #REMOVE BEFORE DEPLOYMENT
     config_uploaded()
-    return render_template('sensors.html', async_mode=socketio.async_mode)
+    return render_template('sensors.html')
 
 @app.route('/actuators', methods=['GET'])
 def actuators():

@@ -19,22 +19,22 @@
                 <th>Unit</th>
                 <th>Tare</th>
                 <th>Untare</th>
+                <th>Graph</th>
             </tr>
         </thead>
         <tbody id="sensorTableBody">
             <!-- Sensor data rows will be dynamically added here -->
         </tbody>
     </table>
-
+    
     <script>
         // pretty sure this can just be io.connect() but im not sure
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-        // Listen for 'sensor_data' events
         socket.on('sensor_data', function (data) {
             updateSensorData(data);
-            updateChart(data);
         });
+
 
         // Function to update sensor data in the HTML table
         function updateSensorData(data) {
@@ -43,6 +43,7 @@
                 var sensorInfo = sensor[0];
                 var sensorValue = sensor[1];
 
+
                 // Update or create a new row for the sensor in the table
                 var rowId = 'row_' + sensorInfo['P and ID'];
                 var existingRow = document.getElementById(rowId);
@@ -50,6 +51,9 @@
                 if (existingRow) {
                     // Update existing row
                     existingRow.cells[1].innerText = sensorValue;
+                    if (chartList[sensorInfo["P and ID"]] != null){
+                        updateChart(chartList[sensorInfo["P and ID"]], sensorValue);
+                    }
                 } else {
                     // Create new row
                     var newRow = document.createElement('tr');
@@ -88,10 +92,21 @@
                     untareButtonCell.appendChild(untareButton);
                     newRow.appendChild(untareButtonCell);
 
+                    // Create checkbox
+                    var checkboxCell = document.createElement('td');
+                    var checkbox = document.createElement('INPUT');
+                    checkbox.type = "checkbox";
+                    checkbox.id = sensorInfo['P and ID'] + "Checkbox";
+                    checkbox.addEventListener('change', function() {
+                        handleGraphCheckbox(sensorInfo["P and ID"]);
+                    })
+                    checkboxCell.appendChild(checkbox);
+                    newRow.appendChild(checkboxCell);
+
                     // Add the new row to the table body
                     document.getElementById('sensorTableBody').appendChild(newRow);
                 }
-            });
+            }); 
         }
 
         // Function to handle tare and untare button clicks
@@ -99,46 +114,66 @@
             // Emit to server
             socket.emit('tare_untare_button_press', sensorName, action);
         }
-        
-    </script>
 
-    
-    <canvas id="myChart" style="width:100%;max-width:100%"></canvas>
-    <script>
-        const canvas = document.getElementById('myChart');
-
-        const labels = [];
-
-        const data = {
-            labels: labels,
-            datasets: [{
-                label: "sensorName",
-                borderColor: 'rgb(0,0,0)',
-                pointRadius: 0,
-                lineTension: 0,
-                fill: false,
-                data: [],
-            }]
-        };
-        const config = {
-            type: 'line',
-            data: data,
-            options: {
-                animation: false
+        function handleGraphCheckbox(sensorName) {
+            var checked = document.getElementById(sensorName + "Checkbox").checked;
+            if (checked){
+                createCanvas(sensorName);
+                createChart(sensorName);
+            } else {
+                destroyChart(sensorName);
+                destroyCanvas(sensorName);
             }
-        };
+        }
 
-        const myChart = new Chart(
-            canvas,
-            config
-        );
+        var chartList = Object.create(null);
 
-        window.setInterval(function(){
-            getNewSeries(lastDate,{
-                min:10, 
-                max: 15
-            })
-        })
+        function createCanvas(sensorName){
+            var canvas = document.createElement("canvas");
+            canvas.id = sensorName + "Chart";
+            canvas.height = "100";
+            document.body.appendChild(canvas);
+
+        }
+
+        function destroyCanvas(sensorName){
+            var canvas = document.getElementById(sensorName + "Chart");
+            document.body.removeChild(canvas);
+        }
+
+        function createChart(sensorName){
+            const canvas = document.getElementById(sensorName + "Chart");
+            const labels = [];
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: sensorName,
+                    borderColor: 'rgb(0,0,0)',
+                    pointRadius: 0,
+                    lineTension: 0,
+                    fill: false,
+                    data: [],
+                }]
+            };
+            const config = {
+                type: 'line',
+                data: data,
+                options: {
+                    animation: false
+                }
+            };
+            chartList[sensorName] = new Chart(
+                canvas,
+                config
+            );
+            console.log(chartList);
+        }
+
+        function destroyChart(sensorName){
+            chartList[sensorName].destroy();
+            chartList[sensorName] = null;
+            console.log(chartList);
+        }
 
         function addData(chart, label, data) {
             chart.data.labels.push(label);
@@ -156,12 +191,10 @@
             chart.update();
         }
 
-        function updateChart(data){
-            const newLabel = "";
-            const newData = data[0][1];
-            addData(myChart, newLabel, newData);
-            if(labels.length > 100){
-                removeData(myChart);
+        function updateChart(chart, sensorValue){
+            addData(chart, "", sensorValue);
+            if(chart.data.labels.length > 100){
+                removeData(chart);
             }
         }
     </script>
