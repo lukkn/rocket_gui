@@ -145,7 +145,7 @@ def background_thread():
         #     csv_writer.writerow([current_time] + sensors_and_data)
 
         current_time = time.time()
-        if (current_time - start_time) >= (1/1):
+        if (current_time - start_time) >= (1/30):
             socketio.emit('sensor_data', sensors_and_data)
             start_time = current_time
 
