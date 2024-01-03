@@ -5,6 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 50px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
         /* Add your styling for the armed and disarmed states */
         .armed {
             background-color: green;
@@ -15,22 +38,50 @@
             background-color: red;
             color: white;
         }
+
+        /* Style for file input and upload button */
+        input[type="file"] {
+            display: none;
+        }
+
+        .upload-button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
 <body>
 
-    <form method="post">
-        <button type="submit" name="button" value="armDisarm" id="armDisarmButton" class="{% if armed %}armed{% else %}disarmed{% endif %}">
+    <form id="myForm" method="post">
+        <button type="submit" name="button" value="armDisarm" id="armDisarmButton"
+            class="{% if armed %}armed{% else %}disarmed{% endif %}">
             {% if armed %}Armed{% else %}Disarmed{% endif %}
         </button>
         <button type="submit" name="button" value="actuators">Actuators</button>
         <button type="submit" name="button" value="sensors">Sensors</button>
         <button type="submit" name="button" value="pidview">Piping and Instrumentation Diagram View</button>
+
+        <!-- Upload buttons for two CSV files -->
+        <div>
+            <label for="csvFile1" class="upload-button">Upload CSV File 1</label>
+            <input type="file" id="csvFile1" accept=".csv" onchange="updateFileName('csvFile1')">
+            <span id="file1Name"></span>
+            <button type="button" onclick="submitCSV('csvFile1')">Submit CSV 1</button>
+        </div>
+
+        <div>
+            <label for="csvFile2" class="upload-button">Upload CSV File 2</label>
+            <input type="file" id="csvFile2" accept=".csv" onchange="updateFileName('csvFile2')">
+            <span id="file2Name"></span>
+            <button type="button" onclick="submitCSV('csvFile2')">Submit CSV 2</button>
+        </div>
     </form>
 
     <script>
-        // Add JavaScript to toggle the text and color of the button
         const armDisarmButton = document.getElementById('armDisarmButton');
 
         armDisarmButton.addEventListener('click', function () {
@@ -45,6 +96,25 @@
                 armDisarmButton.classList.add('armed');
             }
         });
+
+        function updateFileName(inputId) {
+            const fileInput = document.getElementById(inputId);
+            const file = fileInput.files[0];
+            console.log(`File ${file.name} uploaded`);
+        }
+
+
+        function submitCSV(inputId) {
+            const fileInput = document.getElementById(inputId);
+            const file = fileInput.files[0];
+
+            if (file) {
+                // You can emit the file content using socket.emit() here
+                console.log(file);
+            } else {
+                alert('Please select a file before submitting.');
+            }
+        }
     </script>
 </body>
 

@@ -1,33 +1,103 @@
 <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV File Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        #upload-container {
+            text-align: center;
+        }
+
+        #upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        #upload-btn-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+        }
+
+        #upload-btn-wrapper #upload-btn {
+            border: 2px solid gray;
+            color: gray;
+            background-color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        #upload-btn-wrapper #upload-btn:hover {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+
+        #submit-btn {
+            border: 2px solid gray;
+            color: gray;
+            background-color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            /*cursor: not-allowed;*/
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        #submit-btn.active {
+            border-color: #4CAF50;
+            color: #4CAF50;
+            cursor: pointer;
+        }
+    </style>
+</head>
 
 <body>
-    {% if config_loaded %}
-        <h1>Config loaded successfully!</h1>
-        <!-- Display additional content for a loaded config -->
-    {% else %}
-        <h1>Load Config</h1>
-        <form method="post" enctype="multipart/form-data" action="{{ url_for('loadconfig') }}">
-            <!-- Add an input field for file upload -->
-            <input type="file" name="file" accept=".csv" required>
-            <button type="submit" name="button" value="Button 1" onclick="enableButton()">Load Config</button>
-        </form>
 
-        <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
-        <script type="text/javascript" charset="utf-8">
-            var socket = io();
-        </script>
+    <div id="upload-container">
+        <div id="upload-btn-wrapper">
+            <button id="upload-btn">Choose a CSV File</button>
+            <input type="file" name="myfile" id="myfile" accept=".csv" required/>
+        </div>
+        <div>
+            <button id="submit-btn" disabled>Submit</button>
+        </div>
+    </div>
 
-        <script>
-            function enableButton() {
-                // Enable the button after uploading a file
-                document.querySelector('button[name="button"]').disabled = false;
-                //TODO: change this entire file to be better
-                socket.emit('config_uploaded');
+    <script>
+        document.getElementById('myfile').addEventListener('change', function () {
+            const submitBtn = document.getElementById('submit-btn');
+            if (this.value) {
+                submitBtn.removeAttribute('disabled');
+                submitBtn.classList.add('active');
+            } else {
+                //submitBtn.setAttribute('disabled', true);
+                //submitBtn.classList.remove('active');
             }
-        </script>
-        
-        <!-- Display additional content for when config is not loaded -->
-    {% endif %}
+        });
+
+        document.getElementById('submit-btn').addEventListener('click', function () {
+            // Add your socket.emit() functionality here
+            console.log('File submitted via socket.emit()');
+        });
+    </script>
+
 </body>
 
 </html>
