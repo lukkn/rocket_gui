@@ -1,14 +1,51 @@
 <!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Add your styling for the armed and disarmed states */
+        .armed {
+            background-color: green;
+            color: white;
+        }
+
+        .disarmed {
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
 
 <body>
+
     <form method="post">
-        <button type="submit" name="button" value="armDisarm">Arm or Disarm</button>
+        <button type="submit" name="button" value="armDisarm" id="armDisarmButton" class="{% if armed %}armed{% else %}disarmed{% endif %}">
+            {% if armed %}Armed{% else %}Disarmed{% endif %}
+        </button>
         <button type="submit" name="button" value="actuators">Actuators</button>
         <button type="submit" name="button" value="sensors">Sensors</button>
-        <button type="submit" name="button" value="p&idview">P and ID View</button>
+        <button type="submit" name="button" value="pidview">Piping and Instrumentation Diagram View</button>
     </form>
-</body>
 
+    <script>
+        // Add JavaScript to toggle the text and color of the button
+        const armDisarmButton = document.getElementById('armDisarmButton');
+
+        armDisarmButton.addEventListener('click', function () {
+            // Toggle the text and color
+            if (armDisarmButton.classList.contains('armed')) {
+                armDisarmButton.innerText = 'Disarmed';
+                armDisarmButton.classList.remove('armed');
+                armDisarmButton.classList.add('disarmed');
+            } else {
+                armDisarmButton.innerText = 'Armed';
+                armDisarmButton.classList.remove('disarmed');
+                armDisarmButton.classList.add('armed');
+            }
+        });
+    </script>
+</body>
 
 </html>
