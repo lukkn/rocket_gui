@@ -4,48 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vanilla JavaScript Chart</title>
-    <style>
-        canvas {
-            border: 1px solid #ccc;
-        }
-    </style>
 </head>
 <body>
-    <canvas id="myChart" width="1500" height="800"></canvas>
+    <canvas id="myChart" height = "400" width = "800"></canvas>
 
     <script>
         const canvas = document.getElementById('myChart');
-        const ctx = canvas.getContext('2d');
+        const context = canvas.getContext('2d');
 
         const data = [];
         const labels = [];
 
         function drawChart() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            context.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.beginPath();
-            ctx.moveTo(40, canvas.height);
-            ctx.lineTo(40, 0);
-            ctx.stroke();
+            context.beginPath();
+            context.moveTo(20, canvas.height);
+            context.lineTo(20, 0);
+            context.stroke();
 
             const dataPoints = data.map((value, index) => ({
                 x: index * (canvas.width / (data.length - 1)),
                 y: canvas.height - (value * (canvas.height / Math.max(...data)))
             }));
 
-            ctx.beginPath();
-            ctx.moveTo(dataPoints[0].x, dataPoints[0].y);
+            context.beginPath();
+            context.moveTo(dataPoints[0].x + 20, dataPoints[0].y);
 
             dataPoints.forEach(point => {
-                ctx.lineTo(point.x, point.y);
+                context.lineTo(point.x + 20, point.y);
             });
 
-            ctx.strokeStyle = 'blue';
-            ctx.stroke();
+            context.lineWidth = 1;
+            context.strokeStyle = 'black';
+            context.stroke();
 
-            ctx.fillStyle = 'black';
+            // x-axis labels
+            context.fillStyle = 'black';
             dataPoints.forEach((point, index) => {
-                ctx.fillText(labels[index], point.x, canvas.height + 15);
+                context.fillText(labels[index], point.x, canvas.height + 15);
             });
 
             // Draw y-axis labels
@@ -54,11 +51,11 @@
 
             const yStep = (maxLabel - minLabel) / 10;
 
-            ctx.fillStyle = 'black';
+            context.fillStyle = 'black';
             for (let i = 0; i <= 10; i++) {
                 const yLabel = (minLabel + i * yStep).toFixed(1);
                 const yPosition = canvas.height - (i * (canvas.height / 10));
-                ctx.fillText(yLabel, 10, yPosition);
+                context.fillText(yLabel, 0, yPosition);
             }
         }
 
