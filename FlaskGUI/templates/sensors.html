@@ -194,7 +194,7 @@
             chart.data.datasets.forEach((dataset) => {
                 dataset.data.push(data);
             });
-            chart.update();
+            //chart.update();
         }
 
         function removeData(chart) {
@@ -202,7 +202,7 @@
             chart.data.datasets.forEach((dataset) => {
                 dataset.data.shift();
             });
-            chart.update();
+            chart.update('none');
         }
 
         function updateChart(chart, sensorValue){

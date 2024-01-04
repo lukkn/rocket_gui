@@ -8,17 +8,18 @@ import random
 import time
 
 import configuration
+import webbrowser
 
 async_mode = None
 
 # GLOBAL VARIABLES
 actuator_buttons = []
 sensor_list = []
-armed = False
+armed = True
 
 # REMOVE BEFORE DEPLOYMENT
 actuator_buttons = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'VNTB'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Fuel tank vent', 'Pin': '1', 'P and ID': 'VFTV'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Ox bang-bang', 'Pin': '0', 'P and ID': 'VNTO'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Ox tank fill', 'Pin': '0', 'P and ID': 'VOTF'}]
-sensor_list = [{'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '0', 'P and ID': 'PNTB', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '1', 'P and ID': 'POTB', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '2', 'P and ID': 'PNTB2', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '3', 'P and ID': 'POTB2', 'unit': 'bar'}]
+sensor_list = [{'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '0', 'P and ID': 'PNTB', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '1', 'P and ID': 'POTB', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '2', 'P and ID': 'PNTB2', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '3', 'P and ID': 'POTB3', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '4', 'P and ID': 'PNTB4', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '5', 'P and ID': 'POTB5', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '6', 'P and ID': 'PNTB6', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '7', 'P and ID': 'POTB7', 'unit': 'bar'}]
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -28,6 +29,10 @@ thread = None
 thread_lock = Lock()
 
 
+# webbrowser.open_new('http://127.0.0.1:5000/sensors')
+# webbrowser.open_new('http://127.0.0.1:5000/actuators')
+# webbrowser.open_new('http://127.0.0.1:5000/pidview')
+# webbrowser.open_new('http://127.0.0.1:5000/')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -137,7 +142,7 @@ def background_thread():
     current_time = start_time
     while True:
         
-        sensors_and_data = packet_sensor_data(sensor_list)
+        # sensors_and_data = packet_sensor_data2(sensor_list)
 
         # testing shows we get data at 3khz with random, 6khz with a predetermined constant; ex: 1
         # with open("sensor_data_log", mode='a', newline='') as csv_file:
@@ -145,7 +150,9 @@ def background_thread():
         #     csv_writer.writerow([current_time] + sensors_and_data)
 
         current_time = time.time()
-        if (current_time - start_time) >= (1/30):
+        if (current_time - start_time) >= (1/20):
+            sensors_and_data = packet_sensor_data2(sensor_list)
+            print("we are reading: ", sensors_and_data[0][1])
             socketio.emit('sensor_data', sensors_and_data)
             start_time = current_time
 
@@ -155,6 +162,15 @@ def packet_sensor_data(sensor_list):
     a = []
     for sensor in sensor_list:
         a.append([sensor, round(9999+random.random(), 5)])
+    return a
+
+count = 0
+def packet_sensor_data2(sensor_list):
+    global count
+    a = []
+    for sensor in sensor_list:
+        a.append([sensor, count])
+    count+=1
     return a
 
 

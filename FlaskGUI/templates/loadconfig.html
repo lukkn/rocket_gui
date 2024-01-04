@@ -1,142 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vanilla JavaScript Chart</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 20px;
-        }
-
-        button {
-            margin: 10px;
-            padding: 10px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        /* Add your styling for the armed and disarmed states */
-        .armed {
-            background-color: green;
-            color: white;
-        }
-
-        .disarmed {
-            background-color: red;
-            color: white;
-        }
-
-        /* Style for file input and upload button */
-        input[type="file"] {
-            display: none;
-        }
-
-        .upload-button {
-            background-color: #3498db;
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
+        canvas {
+            border: 1px solid #ccc;
         }
     </style>
 </head>
-
 <body>
-
-    <h2>Toggle Arm/Disarm Test Stand</h2>
-
-    <form method="post">
-        <button type="submit" name="button" value="armDisarm" id="armDisarmButton"
-            class="{% if armed %}armed{% else %}disarmed{% endif %}">
-            {% if armed %}Stand is Armed<br>Click to Disarm{% else %}Stand is Disarmed<br>Click to Arm{% endif %}
-        </button>
-    </form>
-
-    <h2>Page Links</h2>
-
-    <form id="myForm" style="display: flex; justify-content: space-around;">
-        <button type="submit" name="button" value="actuators" onclick="openNewTab(this.value);">Actuators</button>
-        <button type="submit" name="button" value="sensors" onclick="openNewTab(this.value);">Sensors</button>
-        <button type="submit" name="button" value="pidview" onclick="openNewTab(this.value);">Piping and Instrumentation Diagram View</button>
-    </form>
-
-    <h2>Upload Configs</h2>
-
-    <!-- Upload buttons for two CSV files -->
-    <div>
-        <label for="csvFile1" class="upload-button">Upload CSV File 1</label>
-        <input type="file" id="csvFile1" accept=".csv" onchange="updateFileName('csvFile1')">
-        <button type="button" onclick="submitCSV('csvFile1')">Submit CSV 1</button>
-    </div>
-
-    <div>
-        <label for="csvFile2" class="upload-button">Upload CSV File 2</label>
-        <input type="file" id="csvFile2" accept=".csv" onchange="updateFileName('csvFile2')">
-        <button type="button" onclick="submitCSV('csvFile2')">Submit CSV 2</button>
-    </div>
+    <canvas id="myChart" width="1500" height="800"></canvas>
 
     <script>
-        const armDisarmButton = document.getElementById('armDisarmButton');
+        const canvas = document.getElementById('myChart');
+        const ctx = canvas.getContext('2d');
 
-        armDisarmButton.addEventListener('click', function () {
-            // Toggle the text and color
-            if (armDisarmButton.classList.contains('armed')) {
-                armDisarmButton.innerHTML = 'Stand is Disarmed<br>Click to Arm';
-                armDisarmButton.classList.remove('armed');
-                armDisarmButton.classList.add('disarmed');
-            } else {
-                armDisarmButton.innerHTML = 'Stand is Armed<br>Click to Disarm';
-                armDisarmButton.classList.remove('disarmed');
-                armDisarmButton.classList.add('armed');
-            }
-        });
+        const data = [];
+        const labels = [];
 
-        function openNewTab(page) {
-            // Open a new tab with an empty URL
-            var newTab = window.open('/' + page, '_blank');
+        function drawChart() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Update the form target to '_blank' to open in a new tab
-            document.getElementById('myForm').target = '_blank';
+            ctx.beginPath();
+            ctx.moveTo(40, canvas.height);
+            ctx.lineTo(40, 0);
+            ctx.stroke();
 
-            // Prevent focusing on the new tab
-            setTimeout(function() {
-                newTab.blur();
-                window.focus();
-            }, 0);
-        }
+            const dataPoints = data.map((value, index) => ({
+                x: index * (canvas.width / (data.length - 1)),
+                y: canvas.height - (value * (canvas.height / Math.max(...data)))
+            }));
 
+            ctx.beginPath();
+            ctx.moveTo(dataPoints[0].x, dataPoints[0].y);
 
-        function displayFileName() {
-            // Get the file input element
-            var fileInput = document.getElementById('fileInput');
+            dataPoints.forEach(point => {
+                ctx.lineTo(point.x, point.y);
+            });
 
-            // Get the file name
-            var fileName = fileInput.files[0].name;
+            ctx.strokeStyle = 'blue';
+            ctx.stroke();
 
-            // Display the file name
-            document.getElementById('fileName').innerText = 'Selected File: ' + fileName;
-        }
+            ctx.fillStyle = 'black';
+            dataPoints.forEach((point, index) => {
+                ctx.fillText(labels[index], point.x, canvas.height + 15);
+            });
 
+            // Draw y-axis labels
+            const maxLabel = Math.ceil(Math.max(...data) * 10) / 10;
+            const minLabel = Math.floor(Math.min(...data) * 10) / 10;
 
-        function submitCSV(inputId) {
-            const fileInput = document.getElementById(inputId);
-            const file = fileInput.files[0];
+            const yStep = (maxLabel - minLabel) / 10;
 
-            if (file) {
-                // You can emit the file content using socket.emit() here
-                console.log(file);
-            } else {
-                alert('Please select a file before submitting.');
+            ctx.fillStyle = 'black';
+            for (let i = 0; i <= 10; i++) {
+                const yLabel = (minLabel + i * yStep).toFixed(1);
+                const yPosition = canvas.height - (i * (canvas.height / 10));
+                ctx.fillText(yLabel, 10, yPosition);
             }
         }
+
+        function updateData(newData) {
+            data.push(newData);
+            labels.push('NewLabel');
+
+            if (data.length > 50) {
+                // Discard the oldest data points
+                data.shift();
+                labels.shift();
+            }
+
+            drawChart();
+        }
+
+        setInterval(() => {
+            const newDataPoint = Math.random();
+            updateData(newDataPoint);
+        }, 1000);
     </script>
 </body>
-
 </html>
