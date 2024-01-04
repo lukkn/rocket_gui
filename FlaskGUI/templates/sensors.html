@@ -9,24 +9,38 @@
     <script src="{{ url_for('static', filename='Chart.js') }}"></script>
 </head>
 
+<style>
+
+    #listContainer {
+        width: 37%;
+        float: left;
+    }
+    #chartContainer {
+        width: 62%;
+        float: left;
+    }
+</style>
 
 <body>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Sensor Name</th>
-                <th>Data</th>
-                <th>Unit</th>
-                <th>Tare</th>
-                <th>Untare</th>
-                <th>Graph</th>
-            </tr>
-        </thead>
-        <tbody id="sensorTableBody">
-            <!-- Sensor data rows will be dynamically added here -->
-        </tbody>
-    </table>
-    
+    <div id="listContainer">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Sensor Name</th>
+                    <th>Data</th>
+                    <th>Unit</th>
+                    <th>Tare</th>
+                    <th>Untare</th>
+                    <th>Graph</th>
+                </tr>
+            </thead>
+            <tbody id="sensorTableBody">
+                <!-- Sensor data rows will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+    <div id="chartContainer"></div>
+
     <script>
         // pretty sure this can just be io.connect() but im not sure
         var socket = io.connect('http://' + document.domain + ':' + location.port);
@@ -132,13 +146,13 @@
             var canvas = document.createElement("canvas");
             canvas.id = sensorName + "Chart";
             canvas.height = "60";
-            document.body.appendChild(canvas);
+            document.getElementById("chartContainer").appendChild(canvas);
 
         }
 
         function destroyCanvas(sensorName){
             var canvas = document.getElementById(sensorName + "Chart");
-            document.body.removeChild(canvas);
+            document.getElementById("chartContainer").removeChild(canvas);
         }
 
         function createChart(sensorName){
@@ -193,7 +207,7 @@
 
         function updateChart(chart, sensorValue){
             addData(chart, "", sensorValue);
-            if(chart.data.labels.length > 100){
+            if(chart.data.labels.length > 50){
                 removeData(chart);
             }
         }
