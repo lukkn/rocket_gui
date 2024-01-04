@@ -131,7 +131,7 @@
         function createCanvas(sensorName){
             var canvas = document.createElement("canvas");
             canvas.id = sensorName + "Chart";
-            canvas.height = "100";
+            canvas.height = "60";
             document.body.appendChild(canvas);
 
         }
@@ -159,7 +159,7 @@
                 type: 'line',
                 data: data,
                 options: {
-                    animation: false
+                    animation: false,
                 }
             };
             chartList[sensorName] = new Chart(
