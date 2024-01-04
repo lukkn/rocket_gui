@@ -4,65 +4,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV File Upload</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
         }
 
-        #upload-container {
-            text-align: center;
-        }
-
-        #upload-btn-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-        }
-
-        #upload-btn-wrapper input[type=file] {
-            font-size: 100px;
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-        }
-
-        #upload-btn-wrapper #upload-btn {
-            border: 2px solid gray;
-            color: gray;
-            background-color: white;
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
+        button {
+            margin: 10px;
+            padding: 10px;
             cursor: pointer;
-            display: inline-block;
-            transition: all 0.3s;
-        }
-
-        #upload-btn-wrapper #upload-btn:hover {
-            border-color: #4CAF50;
-            color: #4CAF50;
-        }
-
-        #submit-btn {
-            border: 2px solid gray;
-            color: gray;
-            background-color: white;
-            padding: 8px 20px;
-            border-radius: 8px;
+            border: none;
+            border-radius: 5px;
             font-size: 16px;
-            font-weight: bold;
-            /*cursor: not-allowed;*/
-            display: inline-block;
-            transition: all 0.3s;
         }
 
-        #submit-btn.active {
-            border-color: #4CAF50;
-            color: #4CAF50;
+        /* Add your styling for the armed and disarmed states */
+        .armed {
+            background-color: green;
+            color: white;
+        }
+
+        .disarmed {
+            background-color: red;
+            color: white;
+        }
+
+        /* Style for file input and upload button */
+        input[type="file"] {
+            display: none;
+        }
+
+        .upload-button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
             cursor: pointer;
         }
     </style>
@@ -70,34 +50,93 @@
 
 <body>
 
-    <div id="upload-container">
-        <div id="upload-btn-wrapper">
-            <button id="upload-btn">Choose a CSV File</button>
-            <input type="file" name="myfile" id="myfile" accept=".csv" required/>
-        </div>
-        <div>
-            <button id="submit-btn" disabled>Submit</button>
-        </div>
+    <h2>Toggle Arm/Disarm Test Stand</h2>
+
+    <form method="post">
+        <button type="submit" name="button" value="armDisarm" id="armDisarmButton"
+            class="{% if armed %}armed{% else %}disarmed{% endif %}">
+            {% if armed %}Stand is Armed<br>Click to Disarm{% else %}Stand is Disarmed<br>Click to Arm{% endif %}
+        </button>
+    </form>
+
+    <h2>Page Links</h2>
+
+    <form id="myForm" style="display: flex; justify-content: space-around;">
+        <button type="submit" name="button" value="actuators" onclick="openNewTab(this.value);">Actuators</button>
+        <button type="submit" name="button" value="sensors" onclick="openNewTab(this.value);">Sensors</button>
+        <button type="submit" name="button" value="pidview" onclick="openNewTab(this.value);">Piping and Instrumentation Diagram View</button>
+    </form>
+
+    <h2>Upload Configs</h2>
+
+    <!-- Upload buttons for two CSV files -->
+    <div>
+        <label for="csvFile1" class="upload-button">Upload CSV File 1</label>
+        <input type="file" id="csvFile1" accept=".csv" onchange="updateFileName('csvFile1')">
+        <button type="button" onclick="submitCSV('csvFile1')">Submit CSV 1</button>
+    </div>
+
+    <div>
+        <label for="csvFile2" class="upload-button">Upload CSV File 2</label>
+        <input type="file" id="csvFile2" accept=".csv" onchange="updateFileName('csvFile2')">
+        <button type="button" onclick="submitCSV('csvFile2')">Submit CSV 2</button>
     </div>
 
     <script>
-        document.getElementById('myfile').addEventListener('change', function () {
-            const submitBtn = document.getElementById('submit-btn');
-            if (this.value) {
-                submitBtn.removeAttribute('disabled');
-                submitBtn.classList.add('active');
+        const armDisarmButton = document.getElementById('armDisarmButton');
+
+        armDisarmButton.addEventListener('click', function () {
+            // Toggle the text and color
+            if (armDisarmButton.classList.contains('armed')) {
+                armDisarmButton.innerHTML = 'Stand is Disarmed<br>Click to Arm';
+                armDisarmButton.classList.remove('armed');
+                armDisarmButton.classList.add('disarmed');
             } else {
-                //submitBtn.setAttribute('disabled', true);
-                //submitBtn.classList.remove('active');
+                armDisarmButton.innerHTML = 'Stand is Armed<br>Click to Disarm';
+                armDisarmButton.classList.remove('disarmed');
+                armDisarmButton.classList.add('armed');
             }
         });
 
-        document.getElementById('submit-btn').addEventListener('click', function () {
-            // Add your socket.emit() functionality here
-            console.log('File submitted via socket.emit()');
-        });
-    </script>
+        function openNewTab(page) {
+            // Open a new tab with an empty URL
+            var newTab = window.open('/' + page, '_blank');
 
+            // Update the form target to '_blank' to open in a new tab
+            document.getElementById('myForm').target = '_blank';
+
+            // Prevent focusing on the new tab
+            setTimeout(function() {
+                newTab.blur();
+                window.focus();
+            }, 0);
+        }
+
+
+        function displayFileName() {
+            // Get the file input element
+            var fileInput = document.getElementById('fileInput');
+
+            // Get the file name
+            var fileName = fileInput.files[0].name;
+
+            // Display the file name
+            document.getElementById('fileName').innerText = 'Selected File: ' + fileName;
+        }
+
+
+        function submitCSV(inputId) {
+            const fileInput = document.getElementById(inputId);
+            const file = fileInput.files[0];
+
+            if (file) {
+                // You can emit the file content using socket.emit() here
+                console.log(file);
+            } else {
+                alert('Please select a file before submitting.');
+            }
+        }
+    </script>
 </body>
 
 </html>
