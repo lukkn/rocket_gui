@@ -19,6 +19,15 @@
     #chartContainer {
         width: 60%;
         float: left;
+        background-color:antiquewhite;
+    }
+    #addChart {
+        margin-bottom: 1%;
+    }
+    canvas {
+        border: 1px solid;
+        height: 50%;
+        width: 50%
     }
 </style>
 <body>
@@ -31,7 +40,6 @@
                     <th>Unit</th>
                     <th>Tare</th>
                     <th>Untare</th>
-                    <th>Graph</th>
                 </tr>
             </thead>
             <tbody id="sensorTableBody">
@@ -40,17 +48,18 @@
         </table>
     </div>
     <div id="chartContainer">
-        <canvas id="myChart" height = "300" width = "800"></canvas>
+        <button id="addChart" onClick = "addChart()">Add Chart</button>
     </div>
 
     <script>
+        var sensorList = [];
+        var chartCounter = 1;
 
         // pretty sure this can just be io.connect() but im not sure
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
         socket.on('sensor_data', function (data) {
             updateSensorData(data);
-            updateData("myChart", data[0][1]);
         });
 
 
@@ -61,7 +70,12 @@
                 var sensorInfo = sensor[0];
                 var sensorValue = sensor[1];
 
+                updateTable(sensorInfo, sensorValue);
+                updateList(sensorInfo);
+            }); 
+        }
 
+        function updateTable(sensorInfo, sensorValue){
                 // Update or create a new row for the sensor in the table
                 var rowId = 'row_' + sensorInfo['P and ID'];
                 var existingRow = document.getElementById(rowId);
@@ -80,7 +94,7 @@
 
                     var sensorValueCell = document.createElement('td');
                     sensorValueCell.innerText = sensorValue;
-                    sensorValueCell.style.width = '150px'; // Set the width to 150px so table doesn't move if a short number appears; this is a min width not a max width
+                    sensorValueCell.style.width = '100px'; // Set the width to 150px so table doesn't move if a short number appears; this is a min width not a max width
                     newRow.appendChild(sensorValueCell);
 
                     var sensorUnitCell = document.createElement('td');
@@ -107,21 +121,16 @@
                     untareButtonCell.appendChild(untareButton);
                     newRow.appendChild(untareButtonCell);
 
-                    // Create checkbox
-                    var checkboxCell = document.createElement('td');
-                    var checkbox = document.createElement('INPUT');
-                    checkbox.type = "checkbox";
-                    checkbox.id = sensorInfo['P and ID'] + "Checkbox";
-                    checkbox.addEventListener('change', function() {
-                        handleGraphCheckbox(sensorInfo["P and ID"]);
-                    })
-                    checkboxCell.appendChild(checkbox);
-                    newRow.appendChild(checkboxCell);
-
                     // Add the new row to the table body
                     document.getElementById('sensorTableBody').appendChild(newRow);
                 }
-            }); 
+        }
+
+        function updateList(sensorInfo){
+            sensorName = sensorInfo["P and ID"];
+            if(!sensorList.includes(sensorName)) {
+                sensorList.push(sensorName);
+            }
         }
 
         // Function to handle tare and untare button clicks
@@ -130,12 +139,16 @@
             socket.emit('tare_untare_button_press', sensorName, action);
         }
 
-        function handleGraphCheckbox(sensorName) {
-            var checked = document.getElementById(sensorName + "Checkbox").checked;
-            if (checked){
-            } else {
-            }
+
+        function addChart(){
+            var canvas = document.createElement("canvas");
+            canvas.id = "chart" + chartCounter;
+            chartCounter ++;
+            canvas.style.display = "block";
+            document.getElementById("chartContainer").appendChild(canvas);
+            createCheckboxes(canvas.id, sensorList);
         }
+
     </script>
 </body>
 </html>
