@@ -150,7 +150,6 @@ def background_thread():
         current_time = time.time()
         if (current_time - start_time) >= (1/20):
             sensors_and_data = packet_sensor_data(sensor_list)
-            print("we are reading: ", sensors_and_data[0][1])
             socketio.emit('sensor_data', sensors_and_data)
             start_time = current_time
 
