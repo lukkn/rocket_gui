@@ -2,58 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vanilla JavaScript Chart</title>
+    <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
 </head>
+
+<style>
+
+    #listContainer {
+        width: 35%;
+        float: left;
+        margin-right: 2%;
+    }
+    #chartContainer {
+        width: 60%;
+        float: left;
+    }
+</style>
 <body>
-    <canvas id="myChart" height = "400" width = "800"></canvas>
+    <div id="listContainer">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Sensor Name</th>
+                    <th>Data</th>
+                    <th>Unit</th>
+                    <th>Tare</th>
+                    <th>Untare</th>
+                    <th>Graph</th>
+                </tr>
+            </thead>
+            <tbody id="sensorTableBody">
+                <!-- Sensor data rows will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+    <div id="chartContainer">
+        <canvas id="myChart" height = "300" width = "800"></canvas>
+    </div>
 
     <script>
         const canvas = document.getElementById('myChart');
         const context = canvas.getContext('2d');
 
         const data = [];
-        const labels = [];
 
         function drawChart() {
             context.clearRect(0, 0, canvas.width, canvas.height);
 
             context.beginPath();
-            context.moveTo(20, canvas.height);
-            context.lineTo(20, 0);
+            context.moveTo(80, canvas.height);
+            context.lineTo(80, 0);
             context.stroke();
 
             const dataPoints = data.map((value, index) => ({
                 x: index * (canvas.width / (data.length - 1)),
-                y: canvas.height - (value * (canvas.height / Math.max(...data)))
+                y: canvas.height*((Math.ceil(Math.max(...data)) - value)/(Math.ceil(Math.max(...data)) - Math.floor(Math.min(...data))))
             }));
 
             context.beginPath();
-            context.moveTo(dataPoints[0].x + 20, dataPoints[0].y);
+            context.moveTo(dataPoints[0].x + 80, dataPoints[0].y);
 
             dataPoints.forEach(point => {
-                context.lineTo(point.x + 20, point.y);
+                context.lineTo(point.x + 80, point.y);
             });
 
             context.lineWidth = 1;
             context.strokeStyle = 'black';
             context.stroke();
 
-            // x-axis labels
-            context.fillStyle = 'black';
-            dataPoints.forEach((point, index) => {
-                context.fillText(labels[index], point.x, canvas.height + 15);
-            });
-
             // Draw y-axis labels
-            const maxLabel = Math.ceil(Math.max(...data) * 10) / 10;
-            const minLabel = Math.floor(Math.min(...data) * 10) / 10;
+            const maxLabel = Math.ceil(Math.max(...data));
+            const minLabel = Math.floor(Math.min(...data));
 
             const yStep = (maxLabel - minLabel) / 10;
 
             context.fillStyle = 'black';
             for (let i = 0; i <= 10; i++) {
-                const yLabel = (minLabel + i * yStep).toFixed(1);
+                const yLabel = (minLabel + i * yStep).toFixed(5);
                 const yPosition = canvas.height - (i * (canvas.height / 10));
                 context.fillText(yLabel, 0, yPosition);
             }
@@ -61,21 +88,106 @@
 
         function updateData(newData) {
             data.push(newData);
-            labels.push('NewLabel');
 
             if (data.length > 50) {
                 // Discard the oldest data points
                 data.shift();
-                labels.shift();
             }
 
             drawChart();
         }
 
-        setInterval(() => {
-            const newDataPoint = Math.random();
-            updateData(newDataPoint);
-        }, 1000);
+        // pretty sure this can just be io.connect() but im not sure
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('sensor_data', function (data) {
+            updateSensorData(data);
+            updateData(data[0][1]);
+        });
+
+
+        // Function to update sensor data in the HTML table
+        function updateSensorData(data) {
+            // Assuming each element in the 'data' array is an array with [sensorInfo, sensorValue]
+            data.forEach(function (sensor) {
+                var sensorInfo = sensor[0];
+                var sensorValue = sensor[1];
+
+
+                // Update or create a new row for the sensor in the table
+                var rowId = 'row_' + sensorInfo['P and ID'];
+                var existingRow = document.getElementById(rowId);
+
+                if (existingRow) {
+                    // Update existing row
+                    existingRow.cells[1].innerText = sensorValue;
+                } else {
+                    // Create new row
+                    var newRow = document.createElement('tr');
+                    newRow.id = rowId;
+
+                    var sensorNameCell = document.createElement('td');
+                    sensorNameCell.innerText = sensorInfo['P and ID'];
+                    newRow.appendChild(sensorNameCell);
+
+                    var sensorValueCell = document.createElement('td');
+                    sensorValueCell.innerText = sensorValue;
+                    sensorValueCell.style.width = '150px'; // Set the width to 150px so table doesn't move if a short number appears; this is a min width not a max width
+                    newRow.appendChild(sensorValueCell);
+
+                    var sensorUnitCell = document.createElement('td');
+                    sensorUnitCell.innerText = sensorInfo['unit'];
+                    newRow.appendChild(sensorUnitCell);
+
+                    // Create Tare button
+                    var tareButtonCell = document.createElement('td');
+                    var tareButton = document.createElement('button');
+                    tareButton.innerText = 'Tare';
+                    tareButton.addEventListener('click', function() {
+                        handleTareUntare(sensorInfo, 'tare');
+                    });
+                    tareButtonCell.appendChild(tareButton);
+                    newRow.appendChild(tareButtonCell);
+
+                    // Create Untare button
+                    var untareButtonCell = document.createElement('td');
+                    var untareButton = document.createElement('button');
+                    untareButton.innerText = 'Untare';
+                    untareButton.addEventListener('click', function() {
+                        handleTareUntare(sensorInfo, 'untare');
+                    });
+                    untareButtonCell.appendChild(untareButton);
+                    newRow.appendChild(untareButtonCell);
+
+                    // Create checkbox
+                    var checkboxCell = document.createElement('td');
+                    var checkbox = document.createElement('INPUT');
+                    checkbox.type = "checkbox";
+                    checkbox.id = sensorInfo['P and ID'] + "Checkbox";
+                    checkbox.addEventListener('change', function() {
+                        handleGraphCheckbox(sensorInfo["P and ID"]);
+                    })
+                    checkboxCell.appendChild(checkbox);
+                    newRow.appendChild(checkboxCell);
+
+                    // Add the new row to the table body
+                    document.getElementById('sensorTableBody').appendChild(newRow);
+                }
+            }); 
+        }
+
+        // Function to handle tare and untare button clicks
+        function handleTareUntare(sensorName, action) {
+            // Emit to server
+            socket.emit('tare_untare_button_press', sensorName, action);
+        }
+
+        function handleGraphCheckbox(sensorName) {
+            var checked = document.getElementById(sensorName + "Checkbox").checked;
+            if (checked){
+            } else {
+            }
+        }
     </script>
 </body>
 </html>
