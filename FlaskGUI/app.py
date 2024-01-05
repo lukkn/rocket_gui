@@ -148,7 +148,7 @@ def background_thread():
         #     csv_writer.writerow([current_time] + sensors_and_data)
 
         current_time = time.time()
-        if (current_time - start_time) >= (1/20):
+        if (current_time - start_time) >= (1/60):
             sensors_and_data = packet_sensor_data(sensor_list)
             print("we are reading: ", sensors_and_data[0][1])
             socketio.emit('sensor_data', sensors_and_data)
@@ -159,7 +159,7 @@ def background_thread():
 def packet_sensor_data(sensor_list):
     a = []
     for sensor in sensor_list:
-        a.append([sensor, round(9999+random.random(), 5)])
+        a.append([sensor, round(random.random(), 5)])
     return a
 
 count = 0
