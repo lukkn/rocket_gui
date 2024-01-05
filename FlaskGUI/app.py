@@ -87,6 +87,12 @@ def sensors():
     config_uploaded()
     return render_template('sensors.html')
 
+@app.route('/testgraph')
+def testgraph():
+    #REMOVE BEFORE DEPLOYMENT
+    config_uploaded()
+    return render_template('testgraph.html')
+
 @app.route('/actuators', methods=['GET'])
 def actuators():
     if armed:
