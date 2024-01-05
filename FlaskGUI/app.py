@@ -58,18 +58,10 @@ def index():
     return render_template('index.html', armed=armed)
 
 # TODO: better way than using global variables, verify config
-@app.route('/loadconfig', methods=['GET', 'POST'])
+@app.route('/loadconfig')
 def loadconfig():
-    global actuator_buttons, sensor_list
-    if request.method == 'POST':
-        buttonID = request.form.get('button')
-
-        if buttonID == 'Button 1':
-            config_bytes = request.files['file'].read()
-            actuator_buttons, sensor_list = configuration.load_config(config_bytes)
-            #print("actuator_buttons: ", actuator_buttons)
-            #print("sensors: ", sensor_list)
-
+    #REMOVE BEFORE DEPLOYMENT
+    config_uploaded()
     return render_template('loadconfig.html')
 
     
@@ -157,7 +149,7 @@ def background_thread():
 
         current_time = time.time()
         if (current_time - start_time) >= (1/20):
-            sensors_and_data = packet_sensor_data2(sensor_list)
+            sensors_and_data = packet_sensor_data(sensor_list)
             print("we are reading: ", sensors_and_data[0][1])
             socketio.emit('sensor_data', sensors_and_data)
             start_time = current_time
