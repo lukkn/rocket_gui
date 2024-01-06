@@ -84,6 +84,10 @@ def testgraph():
     config_uploaded()
     return render_template('testgraph.html')
 
+@app.route('/twographs')
+def twographs():
+    return render_template('twographs.html')
+
 @app.route('/actuators', methods=['GET'])
 def actuators():
     if armed:
