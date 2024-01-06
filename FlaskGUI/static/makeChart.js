@@ -3,10 +3,12 @@
  */
 
 
-
+var sensorList = Object.create(null);
 const data = [];
 
-function drawChart(canvasID) {
+function plotLines(canvasID) {
+    // Draws lines on canvas with name canvasID, based on sensorData
+
     const canvas = document.getElementById(canvasID);
     const context = canvas.getContext('2d');
 
@@ -32,7 +34,12 @@ function drawChart(canvasID) {
     context.lineWidth = 1;
     context.strokeStyle = 'black';
     context.stroke();
+}
 
+function defineScale(canvasID, dataList){
+    const canvas = document.getElementById(canvasID);
+    const context = canvas.getContext('2d');
+    
     // Draw y-axis labels
     const maxLabel = Math.ceil(Math.max(...data));
     const minLabel = Math.floor(Math.min(...data));
@@ -47,6 +54,33 @@ function drawChart(canvasID) {
     }
 }
 
+function createEmptyChart(canvasID, sensorList){
+    // Create empty chart in the canvas with checkboxes for each sensor
+
+    const canvas = document.getElementById(canvasID);
+    const container = document.getElementById("chartContainer");
+
+    sensorList.forEach(function (sensor) {
+        // Create checkbox
+        var checkbox = document.createElement('INPUT');
+        checkbox.type = "checkbox";
+        checkbox.id = canvas.id + sensor + "Checkbox";
+
+        var label = document.createElement('label')
+        label.htmlFor = "id";
+        label.appendChild(document.createTextNode(sensor));
+
+        checkbox.addEventListener('change', function() {
+            //handleGraphCheckbox(sensorInfo["P and ID"]);
+        })
+
+        container.appendChild(checkbox);
+        container.appendChild(label);
+        
+        console.log(checkbox.id)
+    });
+}
+
 function updateData(canvasID, newData) {
     data.push(newData);
 
@@ -54,7 +88,8 @@ function updateData(canvasID, newData) {
         // Discard the oldest data points
         data.shift();
     }
-    drawChart(canvasID);
+    plotLines(canvasID);
+    defineScale(canvasID);
 }
 
 function log(text){
