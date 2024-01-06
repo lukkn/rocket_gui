@@ -1,14 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for
 from flask_socketio import SocketIO
 from threading import Lock
-import csv
 import json
 import os
 import random
 import time
 
-import configuration
-import webbrowser
+#import webbrowser
 
 async_mode = None
 
@@ -27,6 +25,8 @@ socketio = SocketIO(app, async_mode=async_mode)
 #TODO: what should thread equal, same with async_mode at top of page
 thread = None
 thread_lock = Lock()
+
+#i am in webthocket hell
 
 
 # webbrowser.open_new('http://127.0.0.1:5000/sensors')
@@ -97,8 +97,9 @@ def actuators():
 
 
 @socketio.on('received_actuator_button_press')
-def handle_actuator_button_press(buttonID, state):
-    print('received actuator button press: ', buttonID, state)
+def handle_actuator_button_press(buttonID, state, current_time):
+    print('received actuator button press: ', buttonID, state, current_time)
+    print((time.time_ns() // 1_000_000) - current_time)
 
 @socketio.on('tare_untare_button_press')
 def tare_untare_button_press(buttonID, state):
@@ -126,32 +127,30 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
 
 
 # FUNCTIONS BELOW RELATE TO GETTING SENSOR DATA IN BACKGROUND THREAD
-@socketio.on('config_uploaded')
+#@socketio.on('config_uploaded')
 def config_uploaded():
     global thread
     with thread_lock:
         if thread is None:   
             thread = socketio.start_background_task(background_thread)
+
+
 def background_thread():
     """Example of how to send server generated events to clients."""
     # if this delay is not here code fails
     socketio.sleep(1)
-    start_time = time.time()
-    current_time = start_time
     while True:
         
-        # sensors_and_data = packet_sensor_data2(sensor_list)
-
         # testing shows we get data at 3khz with random, 6khz with a predetermined constant; ex: 1
         # with open("sensor_data_log", mode='a', newline='') as csv_file:
         #     csv_writer = csv.writer(csv_file)
         #     csv_writer.writerow([current_time] + sensors_and_data)
 
-        current_time = time.time()
-        if (current_time - start_time) >= (1/60):
-            sensors_and_data = packet_sensor_data(sensor_list)
-            socketio.emit('sensor_data', sensors_and_data)
-            start_time = current_time
+        # sleep 15 msec
+        socketio.sleep(.015)
+        sensors_and_data = packet_sensor_data2(sensor_list)
+        print("sensor is reading:", sensors_and_data[0][1])
+        socketio.emit('sensor_data', [sensors_and_data, (time.time()*1000)])
 
 
 # Dummy data function, this function should FETCH data from udp packet
@@ -169,7 +168,6 @@ def packet_sensor_data2(sensor_list):
         a.append([sensor, count])
     count+=1
     return a
-
 
 if __name__ == '__main__':
     socketio.run(app)

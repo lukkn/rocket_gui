@@ -22,6 +22,7 @@
 </style>
 
 <body>
+    <p id="variableValue4"></p>
     <div id="listContainer">
         <table border="1">
             <thead>
@@ -46,8 +47,10 @@
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
         socket.on('sensor_data', function (data) {
-            updateSensorData(data);
+            updateSensorData(data[0]);
         });
+
+
 
 
         // Function to update sensor data in the HTML table

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>P&ID VIEW</title>
     <style>
-        body{
+        body {
             /*makes everything unselectable, DO NOT REMOVE, buttons will drag while locked if selected, I do not know why :(*/
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -14,28 +15,31 @@
             -ms-user-select: none;
             user-select: none;
         }
-        #messageContainer{
+
+        #messageContainer {
             position: absolute;
             left: 25vh;
             text-align: left;
             width: 700px;
             font-weight: bold;
         }
+
         #backgroundContainer {
-            z-index:-1;
+            z-index: -1;
             height: calc(100vh - 25px);
             width: 100vw;
             position: fixed;
-            margin-top: 1%;    
+            margin-top: 1%;
 
             background-image: url("{{ url_for('static', filename='HTS_PandID.png') }}");
-            background-size: contain; 
+            background-size: contain;
             background-repeat: no-repeat;
             background-origin: content-box;
             background-position: center center;
 
             transform: translateY(25px);
         }
+
         .collapsible-menu label {
             display: block;
             cursor: pointer;
@@ -45,57 +49,69 @@
             width: 10vw;
             padding: 0 10px 5px 10px;
         }
+
         input#menu {
             display: none;
         }
+
         .guiControlButtonsContainer {
             width: 10vw;
             max-height: 0;
             overflow: hidden;
             padding: 0 10px 0 10px;
-            background-color:antiquewhite;
+            background-color: antiquewhite;
             cursor: pointer;
             align-items: center;
         }
-        #guiControlButtons{
+
+        #guiControlButtons {
             position: relative;
             width: 10vw;
             padding: 10px 10px;
             margin-bottom: 10px;
         }
-        input:checked ~ .guiControlButtonsContainer {
+
+        input:checked~.guiControlButtonsContainer {
             max-height: 100%;
         }
+
         .draggable {
             width: 70px;
             position: absolute;
             cursor: move;
             pointer-events: auto;
-            background-color:black;
+            background-color: black;
             border: none;
             align-items: center;
         }
-        .input.radio {display: inline-block;}
-        .toggleOn{
-            position : relative ;
-            display : inline-block;
-            width : 35px;
-            height : 20x;
+
+        .input.radio {
+            display: inline-block;
+        }
+
+        .toggleOn {
+            position: relative;
+            display: inline-block;
+            width: 35px;
+            height: 20x;
             background-color: white;
             text-align: center;
         }
-        .toggleOff{
-            position : relative ;
-            display : inline-block;
-            width : 35px;
-            height : 20x;
+
+        .toggleOff {
+            position: relative;
+            display: inline-block;
+            width: 35px;
+            height: 20x;
             background-color: white;
             text-align: center;
         }
-        .checkbox:checked + .toggleOff{
+
+        .checkbox:checked+.toggleOff {
             background-color: lightcoral;
         }
-        .checkbox:checked + .toggleOn{
+
+        .checkbox:checked+.toggleOn {
             background-color: lightgreen;
         }
 
@@ -103,209 +119,221 @@
         .checkbox {
             display: none;
         }
-        #sensorOrActuatorName{
+
+        #sensorOrActuatorName {
             position: relative;
             color: white;
             text-align: center;
-            font-size:small;
+            font-size: small;
         }
+
         .locked {
             cursor: pointer;
         }
-        
     </style>
 </head>
+
 <body>
-<form method="post">
-    {% for button in actuator_buttons %}
-        
+    <p id="performanceIndicator"></p>
+    <form method="post">
+        {% for button in actuator_buttons %}
+
         </label>
         <div id="{{ button }}" class="draggable" draggable="true">
             <legend id="sensorOrActuatorName">{{button['P and ID']}}</legend>
-            <input type="radio" id="{{ button['P and ID'] }} OFF" name="{{ button }}" class="checkbox"  onclick="buttonClicked(name, 'off')"/><label for="{{ button['P and ID'] }} OFF" class="toggleOff">OFF</label><input type="radio" id="{{ button['P and ID'] }} ON" name="{{ button }}" class="checkbox"  onclick="buttonClicked(name, 'on')"/><label for="{{ button['P and ID'] }} ON" class="toggleOn">ON</label>
+            <input type="radio" id="{{ button['P and ID'] }} OFF" name="{{ button }}" class="checkbox"
+                onclick="buttonClicked(name, 'off')" /><label for="{{ button['P and ID'] }} OFF"
+                class="toggleOff">OFF</label><input type="radio" id="{{ button['P and ID'] }} ON" name="{{ button }}"
+                class="checkbox" onclick="buttonClicked(name, 'on')" /><label for="{{ button['P and ID'] }} ON"
+                class="toggleOn">ON</label>
         </div>
 
 
-    {% endfor %}
-    {% for sensor in sensor_list %}
-        
+        {% endfor %}
+        {% for sensor in sensor_list %}
+
         </label>
         <div id="{{ sensor }}" class="draggable" draggable="true">
             <legend id="sensorOrActuatorName">{{sensor['P and ID']}}</legend>
-            <legend id="{{ sensor['Mote id'] }}{{ sensor['Pin'] }}sensorValueLegend" style="position: relative; color: white; text-align: center; font-size:small;"></legend>
+            <legend id="{{ sensor['Mote id'] }}{{ sensor['Pin'] }}sensorValueLegend"
+                style="position: relative; color: white; text-align: center; font-size:small;"></legend>
             <legend id="sensorOrActuatorName">{{sensor['unit']}}</legend>
-            <input type="radio" id="{{ sensor['P and ID'] }} Tare" name="{{ sensor }}" class="checkbox"  onclick="buttonClicked(name, 'tare')"/><label for="{{ sensor['P and ID'] }} Tare" class="toggleOn" style="font-size: small;">Tare</label><input type="radio" id="{{ sensor['P and ID'] }} Untare" name="{{ sensor }}" class="checkbox"  onclick="buttonClicked(name, 'untare')"/><label for="{{ sensor['P and ID'] }} Untare" class="toggleOff" style="font-size: small;">Untare</label>
+            <input type="radio" id="{{ sensor['P and ID'] }} Tare" name="{{ sensor }}" class="checkbox"
+                onclick="buttonClicked(name, 'tare')" /><label for="{{ sensor['P and ID'] }} Tare" class="toggleOn"
+                style="font-size: small;">Tare</label><input type="radio" id="{{ sensor['P and ID'] }} Untare"
+                name="{{ sensor }}" class="checkbox" onclick="buttonClicked(name, 'untare')" /><label
+                for="{{ sensor['P and ID'] }} Untare" class="toggleOff" style="font-size: small;">Untare</label>
         </div>
 
 
-    {% endfor %}
-</form>
+        {% endfor %}
+    </form>
 
 
-<div id="backgroundContainer"></div>
-<div id="messageContainer"></div>
-<div class="collapsible-menu">
-    <input type="checkbox" id="menu">
-    <label for="menu">Menu</label>
-    <div class="guiControlButtonsContainer">
-        <button id="guiControlButtons" onclick="submitCoordinates()">Submit Coordinates</button>
-        <button id="guiControlButtons" onclick="getCoordinates()">Get Coordinates</button>
-        <button id="guiControlButtons" onclick="lockButtons()">Lock Buttons</button>
-        <button id="guiControlButtons" onclick="unlockButtons()">Unlock Buttons</button>
+    <div id="backgroundContainer"></div>
+    <div id="messageContainer"></div>
+    <div class="collapsible-menu">
+        <input type="checkbox" id="menu">
+        <label for="menu">Menu</label>
+        <div class="guiControlButtonsContainer">
+            <button id="guiControlButtons" onclick="submitCoordinates()">Submit Coordinates</button>
+            <button id="guiControlButtons" onclick="getCoordinates()">Get Coordinates</button>
+            <button id="guiControlButtons" onclick="lockButtons()">Lock Buttons</button>
+            <button id="guiControlButtons" onclick="unlockButtons()">Unlock Buttons</button>
+        </div>
     </div>
-</div>
 
 
-<script src="{{ url_for('static', filename='socket.io.js') }}"></script>
-<script type="text/javascript" charset="utf-8">
-    var socket = io();
-
-    //can we delete this?
-    //socket.on('connect', function() {
-        //socket.emit('my_event', {data: 'I\'m connected!'});
-    //});
-
-</script>
+    <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
+    <script type="text/javascript" charset="utf-8">
+        var socket = io();
 
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        // Fetch coordinates when the page is loaded
-        getCoordinates();
-
-        let draggableElements = document.querySelectorAll('.draggable');
-        let isLocked = false;
-
-        // TODO: a proper way of locking cuz running this function is kinda stupid, GPT wrote this and idk how it works
-        lockButtons();
-
-        draggableElements.forEach(function (element) {
-            element.addEventListener('dragstart', function (e) {
-                if (isLocked) {
-                    e.preventDefault(); // Prevent dragging when locked
-                    return;
-                }
-                e.dataTransfer.setData('text/plain', element.id);
-            });
-        });
-
-        document.addEventListener('dragover', function (e) {
-            e.preventDefault();
-        });
-
-        document.addEventListener('drop', function (e) {
-            e.preventDefault();
-            if (isLocked) {
-                return; // Ignore drop when locked
-            }
-            let data = e.dataTransfer.getData('text/plain');
-            let draggedElement = document.getElementById(data);
-
-            let offsetX = e.clientX - draggedElement.offsetWidth / 2;
-            let offsetY = e.clientY - draggedElement.offsetHeight / 2;
-
-            draggedElement.style.left = offsetX + 'px';
-            draggedElement.style.top = offsetY + 'px';
-        });
-
-    });
-
-    function buttonClicked(id, state){
-        // when we unlock buttons we want to ignore any accidental clicks, not needed because of checkbox disable but here for extra protection
-        if (!isLocked){
-            return;
-        }
-        socket.emit('received_actuator_button_press', id, state);
-    }
+    </script>
 
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-    function submitCoordinates() {
-        textprompt="tim hates linux"
-            while(true){
-            let confirmationPhrase = prompt("Type 'tim hates linux' to confirm");
-            if (confirmationPhrase === textprompt) {
+            // Fetch coordinates when the page is loaded
+            getCoordinates();
 
-                let draggableElements = document.querySelectorAll('.draggable');
-                let coordinates = [];
+            let draggableElements = document.querySelectorAll('.draggable');
+            let isLocked = false;
 
-                draggableElements.forEach(function (element) {
-                    let rect = element.getBoundingClientRect();
-                    coordinates.push({ id: element.id, x: rect.left, y: rect.top });
+            // TODO: a proper way of locking cuz running this function is kinda stupid, GPT wrote this and idk how it works
+            lockButtons();
+
+            draggableElements.forEach(function (element) {
+                element.addEventListener('dragstart', function (e) {
+                    if (isLocked) {
+                        e.preventDefault(); // Prevent dragging when locked
+                        return;
+                    }
+                    e.dataTransfer.setData('text/plain', element.id);
                 });
+            });
 
-                socket.emit('actuator_button_coordinates', coordinates);
+            document.addEventListener('dragover', function (e) {
+                e.preventDefault();
+            });
+
+            document.addEventListener('drop', function (e) {
+                e.preventDefault();
+                if (isLocked) {
+                    return; // Ignore drop when locked
+                }
+                let data = e.dataTransfer.getData('text/plain');
+                let draggedElement = document.getElementById(data);
+
+                let offsetX = e.clientX - draggedElement.offsetWidth / 2;
+                let offsetY = e.clientY - draggedElement.offsetHeight / 2;
+
+                draggedElement.style.left = offsetX + 'px';
+                draggedElement.style.top = offsetY + 'px';
+            });
+
+        });
+
+        function buttonClicked(id, state) {
+            // when we unlock buttons we want to ignore any accidental clicks, not needed because of checkbox disable but here for extra protection
+            if (!isLocked) {
                 return;
+            }
+            socket.emit('received_actuator_button_press', id, state);
+        }
 
-            } else if (confirmationPhrase === null) {
-                return; //user clicked cancel
-                
-            } else {
-                alert("Confirmation failed. Incorrect phrase.");
+
+
+        function submitCoordinates() {
+            textprompt = "tim hates linux"
+            while (true) {
+                let confirmationPhrase = prompt("Type 'tim hates linux' to confirm");
+                if (confirmationPhrase === textprompt) {
+
+                    let draggableElements = document.querySelectorAll('.draggable');
+                    let coordinates = [];
+
+                    draggableElements.forEach(function (element) {
+                        let rect = element.getBoundingClientRect();
+                        coordinates.push({ id: element.id, x: rect.left, y: rect.top });
+                    });
+
+                    socket.emit('actuator_button_coordinates', coordinates);
+                    return;
+
+                } else if (confirmationPhrase === null) {
+                    return; //user clicked cancel
+
+                } else {
+                    alert("Confirmation failed. Incorrect phrase.");
+                }
             }
         }
-    }
 
 
-    function getCoordinates() {
-        socket.emit('actuator_button_coordinates', 'getCoordinates');
-        //TODO: reasearch this, may one day skip over socket.on and just not get anything on a slower computer
-        socket.on('get_actuator_button_location_config', function(coordinates) {
-            // Place the buttons at the fetched coordinates
-            coordinates.forEach(coord => {
-                let button = document.getElementById(coord.id);
-                if (button) {
-                    button.style.left = coord.x + 'px';
-                    button.style.top = coord.y + 'px';
-                }
+        function getCoordinates() {
+            socket.emit('actuator_button_coordinates', 'getCoordinates');
+            //TODO: reasearch this, may one day skip over socket.on and just not get anything on a slower computer
+            socket.on('get_actuator_button_location_config', function (coordinates) {
+                // Place the buttons at the fetched coordinates
+                coordinates.forEach(coord => {
+                    let button = document.getElementById(coord.id);
+                    if (button) {
+                        button.style.left = coord.x + 'px';
+                        button.style.top = coord.y + 'px';
+                    }
+                });
             });
+        }
+
+
+        function lockButtons() {
+            let draggableElements = document.querySelectorAll('.draggable');
+            draggableElements.forEach(function (element) {
+                element.classList.add('locked');
+                element.draggable = false;
+            });
+
+            var checkboxes = document.querySelectorAll('.checkbox');
+            checkboxes.forEach(function (checkbox) {
+                checkbox.disabled = false;
+            });
+
+            isLocked = true;
+            messageContainer.innerHTML = "Button Positions are LOCKED, Buttons are ARMED";
+        }
+
+        function unlockButtons() {
+            let draggableElements = document.querySelectorAll('.draggable');
+            draggableElements.forEach(function (element) {
+                element.classList.remove('locked');
+                element.draggable = true;
+            });
+
+            var checkboxes = document.querySelectorAll('.checkbox');
+            checkboxes.forEach(function (checkbox) {
+                checkbox.disabled = true;
+            });
+
+            isLocked = false;
+            messageContainer.innerHTML = "Button Positions are UNLOCKED, Buttons are DISARMED";
+        }
+    </script>
+
+    <script>
+        socket.on('sensor_data', function (data) {
+
+            data[0].forEach(function (sensor_with_data) {
+                id = sensor_with_data[0]['Mote id'] + sensor_with_data[0]['Pin'] + 'sensorValueLegend';
+                console.log(id);
+                document.getElementById(id).textContent = sensor_with_data[1];
+            });
+
+            document.getElementById("performanceIndicator").textContent = `Data is Delayed by: ${(Date.now() - data[1]).toFixed(1)} milliseconds`;
         });
-    }
-
-
-    function lockButtons() {
-        let draggableElements = document.querySelectorAll('.draggable');
-        draggableElements.forEach(function (element) {
-            element.classList.add('locked');
-            element.draggable = false;
-        });
-
-        var checkboxes = document.querySelectorAll('.checkbox');
-        checkboxes.forEach(function (checkbox) {
-            checkbox.disabled = false;
-        });
-        
-        isLocked = true;
-        messageContainer.innerHTML = "Button Positions are LOCKED, Buttons are ARMED";
-    }
-
-    function unlockButtons() {
-        let draggableElements = document.querySelectorAll('.draggable');
-        draggableElements.forEach(function (element) {
-            element.classList.remove('locked');
-            element.draggable = true;
-        });
-
-        var checkboxes = document.querySelectorAll('.checkbox');
-        checkboxes.forEach(function (checkbox) {
-            checkbox.disabled = true;
-        });
-
-        isLocked = false;
-        messageContainer.innerHTML = "Button Positions are UNLOCKED, Buttons are DISARMED";
-    }
-</script>
-
-<script>
-    socket.on('sensor_data', function (data) {
-        data.forEach(function(sensor_with_data) {
-            id = sensor_with_data[0]['Mote id'] + sensor_with_data[0]['Pin'] + 'sensorValueLegend';
-            console.log(id);
-            document.getElementById(id).textContent = sensor_with_data[1];
-        });
-    });
-</script>
+    </script>
 
 </body>
+
 </html>

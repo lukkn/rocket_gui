@@ -78,7 +78,9 @@
         // Function to handle tare and untare button clicks
         function handleOnOff(actuatorName, action) {
             // Emit to server
-            socket.emit('received_actuator_button_press', actuatorName, action);
+            current_time = Date.now()
+            console.log("current time: ", current_time)
+            socket.emit('received_actuator_button_press', actuatorName, action, current_time);
         }
         
     </script>
