@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -44,11 +45,14 @@
             padding: 8px 15px;
             border-radius: 5px;
             cursor: pointer;
+            overflow: wrap;
         }
     </style>
 </head>
 
 <body>
+
+    <p id="ping" style="float: right; margin: 0">hello world</p>
 
     <h2>Toggle Arm/Disarm Test Stand</h2>
 
@@ -61,18 +65,19 @@
 
     <h2>Page Links</h2>
 
-    <form id="myForm" style="display: flex; justify-content: space-around;">
-        <button type="submit" name="button" value="actuators" onclick="openNewTab(this.value);">Actuators</button>
-        <button type="submit" name="button" value="sensors" onclick="openNewTab(this.value);">Sensors</button>
-        <button type="submit" name="button" value="pidview" onclick="openNewTab(this.value);">Piping and Instrumentation Diagram View</button>
+    <form id="myForm" style="display: flex; justify-content: space-around;" onsubmit="return false;">
+        <button onclick="openPage('/actuators');">Actuators</button>
+        <button onclick="openPage('/sensors');">Sensors</button>
+        <button onclick="openPage('/pidview');">Piping and Instrumentation Diagram View</button>
     </form>
 
     <h2>Upload Configs</h2>
 
     <!-- Upload buttons for two CSV files -->
     <div>
+
         <label for="csvFile1" class="upload-button">Upload CSV File 1</label>
-        <input type="file" id="csvFile1" accept=".csv" onchange="updateFileName('csvFile1')">
+        <input type="file" id="csvFile2" accept=".csv" onchange="updateFileName('csvFile2')">
         <button type="button" onclick="submitCSV('csvFile1')">Submit CSV 1</button>
     </div>
 
@@ -83,6 +88,11 @@
     </div>
 
     <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        var screenWidth = window.screen.availWidth;
+        var screenHeight = window.screen.availHeight;
+
         const armDisarmButton = document.getElementById('armDisarmButton');
 
         armDisarmButton.addEventListener('click', function () {
@@ -98,18 +108,10 @@
             }
         });
 
-        function openNewTab(page) {
-            // Open a new tab with an empty URL
-            var newTab = window.open('/' + page, '_blank');
+        socket.emit('guion');
 
-            // Update the form target to '_blank' to open in a new tab
-            document.getElementById('myForm').target = '_blank';
-
-            // Prevent focusing on the new tab
-            setTimeout(function() {
-                newTab.blur();
-                window.focus();
-            }, 0);
+        function openPage(page) {
+            var myWindow = window.open(page, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=${screenWidth}, top=${screenHeight}`);
         }
 
 
@@ -131,6 +133,25 @@
                 alert('Please select a file before submitting.');
             }
         }
+
+
+        let pingTimeout;
+
+        socket.on('ping', function (time) {
+            // Update ping display
+            document.getElementById("ping").textContent = `Ping: ${(Date.now() - time).toFixed(0)} milliseconds`;
+
+            // Clear the timeout when the pong response is received
+            clearTimeout(pingTimeout);
+
+            // Set a new timeout for the next expected ping
+            pingTimeout = setTimeout(function () {
+                const a = document.getElementById("ping");
+                a.textContent = "Server not responding";
+                location.reload();
+            }, 1000 + 5); // If we get ping 5 milliseconds late attempt reload
+        });
+
     </script>
 </body>
 

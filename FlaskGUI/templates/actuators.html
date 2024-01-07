@@ -1,89 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Data Dashboard</title>
+    <title>Actuators</title>
     <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
-    <script src="{{ url_for('static', filename='Chart.js') }}"></script>
 </head>
 
-
 <body>
-    <table border="1">
+    <p id="ping" style="float: right; margin: 0"></p>
+    <h1>Actuators</h1>
+    <table border="2">
         <thead>
             <tr>
                 <th>Actuator Name</th>
                 <th>OFF</th>
                 <th>ON</th>
+                <th>Last Sent State</th>
             </tr>
         </thead>
-        <tbody id="actuatorTableBody">
-            <!-- Sensor data rows will be dynamically added here -->
+        <tbody>
+            {% for actuator in actuator_buttons %}
+                <tr>
+                    <td>{{ actuator['P and ID'] }}</td>
+                    <td><button id="{{ actuator['P and ID'] }}" onclick="buttonClicked(id, 'off')" >Off</button></td>
+                    <td><button id="{{ actuator['P and ID'] }}" onclick="buttonClicked(id, 'on')" >On</button></td>
+                    <td id="{{ actuator['P and ID'] }}_state" >{{ actuator_states_and_sensor_tare_states[actuator['P and ID']] }}</td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 
     <script>
-        // pretty sure this can just be io.connect() but im not sure
+
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-        // Assuming each element in the 'data' array is an array with [sensorInfo, sensorValue]
-        var actuator_buttons = {{ actuator_buttons|tojson|safe }};
+        function buttonClicked(id, state) {
+            const current_time = Date.now();
+            socket.emit('received_actuator_button_press', id, state, current_time);
+        }
 
 
-        console.log('actuator_buttons: ', actuator_buttons);
+        socket.on('responding_with_button_data', function (data) {
+            const buttonID = data[0]
+            const buttonState = data[1]
 
-        actuator_buttons.forEach(function (actuator) {
-            var actuatorInfo = actuator
+            const a = document.getElementById("" + buttonID + "_state");
 
-            // create a new row for the actuator in the table
-            var rowId = 'row_' + actuatorInfo['P and ID'];
+            if (buttonState === 'off'){
+                a.textContent = buttonState;
 
+            } else if (buttonState === 'on'){
+                a.textContent = buttonState;
 
-            // Create new row
-            var newRow = document.createElement('tr');
-            newRow.id = rowId;
-
-            var actuatorNameCell = document.createElement('td');
-            actuatorNameCell.innerText = actuatorInfo['P and ID'];
-            newRow.appendChild(actuatorNameCell);
-
+            } else {
+                console.log("error!!!");
+            }
 
 
-            // Create OFF button
-            var offButtonCell = document.createElement('td');
-            var offButton = document.createElement('button');
-            offButton.innerText = 'OFF';
-            offButton.addEventListener('click', function() {
-                handleOnOff(actuatorInfo, 'off');
-            });
-            offButtonCell.appendChild(offButton);
-            newRow.appendChild(offButtonCell);
-
-            // Create ON button
-            var onButtonCell = document.createElement('td');
-            var onButton = document.createElement('button');
-            onButton.innerText = 'ON';
-            onButton.addEventListener('click', function() {
-                handleOnOff(actuatorInfo, 'on');
-            });
-            onButtonCell.appendChild(onButton);
-            newRow.appendChild(onButtonCell);
-
-            // Add the new row to the table body
-            document.getElementById('actuatorTableBody').appendChild(newRow);
         });
 
-        // Function to handle tare and untare button clicks
-        function handleOnOff(actuatorName, action) {
-            // Emit to server
-            current_time = Date.now()
-            console.log("current time: ", current_time)
-            socket.emit('received_actuator_button_press', actuatorName, action, current_time);
-        }
-        
+
+        let pingTimeout;
+
+        socket.on('ping', function (time) {
+            // Update ping display
+            document.getElementById("ping").textContent = `Ping: ${(Date.now() - time).toFixed(0)} milliseconds`;
+
+            // Clear the timeout when the pong response is received
+            clearTimeout(pingTimeout);
+
+            // Set a new timeout for the next expected ping
+            pingTimeout = setTimeout(function() {
+                const a = document.getElementById("ping");
+                a.textContent = "Server not responding";
+                location.reload();
+            }, 1000 + 5); // If we get ping 5 milliseconds late attempt reload
+        });
+
     </script>
 
+
 </body>
+
 </html>

@@ -106,7 +106,7 @@
                     var tareButton = document.createElement('button');
                     tareButton.innerText = 'Tare';
                     tareButton.addEventListener('click', function() {
-                        handleTareUntare(sensorInfo, 'tare');
+                        buttonClicked(sensorInfo, 'tare');
                     });
                     tareButtonCell.appendChild(tareButton);
                     newRow.appendChild(tareButtonCell);
@@ -116,7 +116,7 @@
                     var untareButton = document.createElement('button');
                     untareButton.innerText = 'Untare';
                     untareButton.addEventListener('click', function() {
-                        handleTareUntare(sensorInfo, 'untare');
+                        buttonClicked(sensorInfo, 'untare');
                     });
                     untareButtonCell.appendChild(untareButton);
                     newRow.appendChild(untareButtonCell);
@@ -134,9 +134,9 @@
         }
 
         // Function to handle tare and untare button clicks
-        function handleTareUntare(sensorName, action) {
-            // Emit to server
-            socket.emit('tare_untare_button_press', sensorName, action);
+        function buttonClicked(id, state) {
+            const current_time = Date.now();
+            socket.emit('received_actuator_button_press', id, state, current_time);
         }
 
 

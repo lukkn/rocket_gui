@@ -1,219 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Data Dashboard</title>
+    <title>Sensor Data</title>
     <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
-    <script src="{{ url_for('static', filename='Chart.js') }}"></script>
 </head>
 
-<style>
-
-    #listContainer {
-        width: 37%;
-        float: left;
-    }
-    #chartContainer {
-        width: 62%;
-        float: left;
-    }
-</style>
-
 <body>
-    <p id="variableValue4"></p>
-    <div id="listContainer">
-        <table border="1">
-            <thead>
+    <p id="ping" style="float: right; margin: 0"></p>
+    <h1>Sensor Data</h1>
+    <table border="2">
+        <thead>
+            <tr>
+                <th>Sensor Name</th>
+                <th>Data</th>
+                <th>Units</th>
+                <th>Tare</th>
+                <th>Untare</th>
+                <th>Last Send Command</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sensor in sensor_list %}
                 <tr>
-                    <th>Sensor Name</th>
-                    <th>Data</th>
-                    <th>Unit</th>
-                    <th>Tare</th>
-                    <th>Untare</th>
-                    <th>Graph</th>
+                    <td>{{ sensor['P and ID'] }}</td>
+                    <td id="{{ sensor['P and ID'] }}_data" style="min-width: 200px; max-width: 200px; overflow-wrap: break-word;">No Data</td>
+                    <td>{{ sensor['unit'] }}</td>
+                    <td><button id="{{ sensor['P and ID'] }}" onclick="buttonClicked(id, 'tare')" >Tare</button></td>
+                    <td><button id="{{ sensor['P and ID'] }}" onclick="buttonClicked(id, 'untare')" >Untare</button></td>
+                    <td id="{{ sensor['P and ID'] }}_state" >{{ actuator_states_and_sensor_tare_states[sensor['P and ID']] }}</td>
                 </tr>
-            </thead>
-            <tbody id="sensorTableBody">
-                <!-- Sensor data rows will be dynamically added here -->
-            </tbody>
-        </table>
-    </div>
-    <div id="chartContainer"></div>
+            {% endfor %}
+        </tbody>
+    </table>
 
     <script>
-        // pretty sure this can just be io.connect() but im not sure
+
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
         socket.on('sensor_data', function (data) {
-            updateSensorData(data[0]);
+            // right now sending data as a list, index0 = data, index1 = timestamp of data and time of transmission
+            const listOfSensorIDValueTuples = data[0]
+            const timeAtTransmission = data[1]
+
+            listOfSensorIDValueTuples.forEach(function (sensorTuple) {
+                const sensorID = sensorTuple[0];
+                const sensorValue = sensorTuple[1];
+                const dataCell = document.getElementById(sensorID + '_data');
+
+                dataCell.textContent = sensorValue;
+            });
+        });
+
+        function buttonClicked(id, state) {
+            const current_time = Date.now();
+            socket.emit('received_actuator_button_press', id, state, current_time);
+        }
+
+
+        socket.on('responding_with_button_data', function (data) {
+            buttonID = data[0]
+            buttonState = data[1]
+
+            const a = document.getElementById("" + buttonID + "_state");
+
+            if (buttonState === 'untare'){
+                a.textContent = buttonState;
+
+            } else if (buttonState === 'tare'){
+                a.textContent = buttonState;
+
+            } else {
+                console.log("error!!!");
+            }
+
+
+        });
+    
+
+        let pingTimeout;
+
+        socket.on('ping', function (time) {
+            // Update ping display
+            document.getElementById("ping").textContent = `Ping: ${(Date.now() - time).toFixed(0)} milliseconds`;
+
+            // Clear the timeout when the pong response is received
+            clearTimeout(pingTimeout);
+
+            // Set a new timeout for the next expected ping
+            pingTimeout = setTimeout(function() {
+                const a = document.getElementById("ping");
+                a.textContent = "Server not responding";
+                location.reload();
+            }, 1000 + 5); // If we get ping 5 milliseconds late attempt reload
         });
 
 
-
-
-        // Function to update sensor data in the HTML table
-        function updateSensorData(data) {
-            // Assuming each element in the 'data' array is an array with [sensorInfo, sensorValue]
-            data.forEach(function (sensor) {
-                var sensorInfo = sensor[0];
-                var sensorValue = sensor[1];
-
-
-                // Update or create a new row for the sensor in the table
-                var rowId = 'row_' + sensorInfo['P and ID'];
-                var existingRow = document.getElementById(rowId);
-
-                if (existingRow) {
-                    // Update existing row
-                    existingRow.cells[1].innerText = sensorValue;
-                    if (chartList[sensorInfo["P and ID"]] != null){
-                        updateChart(chartList[sensorInfo["P and ID"]], sensorValue);
-                    }
-                } else {
-                    // Create new row
-                    var newRow = document.createElement('tr');
-                    newRow.id = rowId;
-
-                    var sensorNameCell = document.createElement('td');
-                    sensorNameCell.innerText = sensorInfo['P and ID'];
-                    newRow.appendChild(sensorNameCell);
-
-                    var sensorValueCell = document.createElement('td');
-                    sensorValueCell.innerText = sensorValue;
-                    sensorValueCell.style.width = '150px'; // Set the width to 150px so table doesn't move if a short number appears; this is a min width not a max width
-                    newRow.appendChild(sensorValueCell);
-
-                    var sensorUnitCell = document.createElement('td');
-                    sensorUnitCell.innerText = sensorInfo['unit'];
-                    newRow.appendChild(sensorUnitCell);
-
-                    // Create Tare button
-                    var tareButtonCell = document.createElement('td');
-                    var tareButton = document.createElement('button');
-                    tareButton.innerText = 'Tare';
-                    tareButton.addEventListener('click', function() {
-                        handleTareUntare(sensorInfo, 'tare');
-                    });
-                    tareButtonCell.appendChild(tareButton);
-                    newRow.appendChild(tareButtonCell);
-
-                    // Create Untare button
-                    var untareButtonCell = document.createElement('td');
-                    var untareButton = document.createElement('button');
-                    untareButton.innerText = 'Untare';
-                    untareButton.addEventListener('click', function() {
-                        handleTareUntare(sensorInfo, 'untare');
-                    });
-                    untareButtonCell.appendChild(untareButton);
-                    newRow.appendChild(untareButtonCell);
-
-                    // Create checkbox
-                    var checkboxCell = document.createElement('td');
-                    var checkbox = document.createElement('INPUT');
-                    checkbox.type = "checkbox";
-                    checkbox.id = sensorInfo['P and ID'] + "Checkbox";
-                    checkbox.addEventListener('change', function() {
-                        handleGraphCheckbox(sensorInfo["P and ID"]);
-                    })
-                    checkboxCell.appendChild(checkbox);
-                    newRow.appendChild(checkboxCell);
-
-                    // Add the new row to the table body
-                    document.getElementById('sensorTableBody').appendChild(newRow);
-                }
-            }); 
-        }
-
-        // Function to handle tare and untare button clicks
-        function handleTareUntare(sensorName, action) {
-            // Emit to server
-            socket.emit('tare_untare_button_press', sensorName, action);
-        }
-
-        function handleGraphCheckbox(sensorName) {
-            var checked = document.getElementById(sensorName + "Checkbox").checked;
-            if (checked){
-                createCanvas(sensorName);
-                createChart(sensorName);
-            } else {
-                destroyChart(sensorName);
-                destroyCanvas(sensorName);
-            }
-        }
-
-        var chartList = Object.create(null);
-
-        function createCanvas(sensorName){
-            var canvas = document.createElement("canvas");
-            canvas.id = sensorName + "Chart";
-            canvas.height = "60";
-            document.getElementById("chartContainer").appendChild(canvas);
-
-        }
-
-        function destroyCanvas(sensorName){
-            var canvas = document.getElementById(sensorName + "Chart");
-            document.getElementById("chartContainer").removeChild(canvas);
-        }
-
-        function createChart(sensorName){
-            const canvas = document.getElementById(sensorName + "Chart");
-            const labels = [];
-            const data = {
-                labels: labels,
-                datasets: [{
-                    label: sensorName,
-                    borderColor: 'rgb(0,0,0)',
-                    pointRadius: 0,
-                    lineTension: 0,
-                    fill: false,
-                    data: [],
-                }]
-            };
-            const config = {
-                type: 'line',
-                data: data,
-                options: {
-                    animation: false,
-                }
-            };
-            chartList[sensorName] = new Chart(
-                canvas,
-                config
-            );
-            console.log(chartList);
-        }
-
-        function destroyChart(sensorName){
-            chartList[sensorName].destroy();
-            chartList[sensorName] = null;
-            console.log(chartList);
-        }
-
-        function addData(chart, label, data) {
-            chart.data.labels.push(label);
-            chart.data.datasets.forEach((dataset) => {
-                dataset.data.push(data);
-            });
-            //chart.update();
-        }
-
-        function removeData(chart) {
-            chart.data.labels.shift();
-            chart.data.datasets.forEach((dataset) => {
-                dataset.data.shift();
-            });
-            chart.update('none');
-        }
-
-        function updateChart(chart, sensorValue){
-            addData(chart, "", sensorValue);
-            if(chart.data.labels.length > 50){
-                removeData(chart);
-            }
-        }
     </script>
+
 </body>
+
 </html>
