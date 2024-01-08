@@ -3,7 +3,7 @@
  */
 
 
-var sensorList = Object.create(null);
+var activeSensorsList = Object.create(null);
 const data = [];
 
 function plotLines(canvasID) {
@@ -54,35 +54,41 @@ function defineScale(canvasID, dataList){
     }
 }
 
-function createEmptyChart(canvasID, sensorList){
+function createCheckboxes(canvasID, sensorList){
     // Create empty chart in the canvas with checkboxes for each sensor
-
     const canvas = document.getElementById(canvasID);
     const container = document.getElementById("chartContainer");
 
     sensorList.forEach(function (sensor) {
-        // Create checkbox
+        // Create checkboxes
         var checkbox = document.createElement('INPUT');
         checkbox.type = "checkbox";
         checkbox.id = canvas.id + sensor + "Checkbox";
+        checkbox.addEventListener('change', function() {
+            handleGraphCheckbox(checkbox.id);
+        })
 
         var label = document.createElement('label')
         label.htmlFor = "id";
         label.appendChild(document.createTextNode(sensor));
 
-        checkbox.addEventListener('change', function() {
-            //handleGraphCheckbox(sensorInfo["P and ID"]);
-        })
-
         container.appendChild(checkbox);
-        container.appendChild(label);
-        
-        console.log(checkbox.id)
+        container.appendChild(label);  
     });
+
+    // Create entry in dictionary for current chart
+    activeSensorsList[canvas.id] = [];
 }
 
-function updateData(canvasID, newData) {
-    data.push(newData);
+function updateData(canvasID, Data) {
+
+    newData.forEach (function (sensor) {
+        if (activeSensorsList[canvasID].includes(sensor)) {
+
+        }
+    });
+
+    data.push(Data);
 
     if (data.length > 50) {
         // Discard the oldest data points
@@ -92,6 +98,11 @@ function updateData(canvasID, newData) {
     defineScale(canvasID);
 }
 
-function log(text){
-    console.log(text);
+function handleGraphCheckbox(checkboxID){
+    checkbox = document.getElementById(checkboxID);
+    if (checkbox.checked){
+        //display line
+    } else {
+        //remove line
+    }
 }

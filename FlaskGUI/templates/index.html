@@ -47,6 +47,7 @@
             cursor: pointer;
             overflow: wrap;
         }
+
     </style>
 </head>
 
@@ -77,17 +78,19 @@
 
     <!-- Upload buttons for two CSV files -->
     <div>
-
         <label for="csvFile1" class="upload-button">Upload CSV File 1</label>
-        <input type="file" id="csvFile2" accept=".csv" onchange="updateFileName('csvFile2')">
+        <input type="file" id="csvFile1" accept=".csv" onchange="updateFileName('csvFile1')">
         <button type="button" onclick="submitCSV('csvFile1')">Submit CSV 1</button>
     </div>
-
+    <div id="csvFile1Message" class= "fileName"></div>
+    <br>
+    <br>
     <div>
         <label for="csvFile2" class="upload-button">Upload CSV File 2</label>
         <input type="file" id="csvFile2" accept=".csv" onchange="updateFileName('csvFile2')">
         <button type="button" onclick="submitCSV('csvFile2')">Submit CSV 2</button>
     </div>
+    <div id="csvFile2Message" class= "fileName"></div>
 
     <script>
         var socket = io.connect('http://' + document.domain + ':' + location.port);
@@ -126,6 +129,9 @@
             const fileInput = document.getElementById(inputId);
             const file = fileInput.files[0];
             console.log(`File ${file.name} uploaded`);
+
+            const fileMessage = document.getElementById(inputId + "Message");
+            fileMessage.innerHTML = `File ${file.name} uploaded`;
         }
 
 
@@ -136,6 +142,8 @@
             if (file) {
                 // You can emit the file content using socket.emit() here
                 console.log(file);
+                const fileMessage = document.getElementById(inputId + "Message");
+                fileMessage.innerHTML = `File ${file.name} submitted`;
             } else {
                 alert('Please select a file before submitting.');
             }
@@ -155,8 +163,8 @@
             pingTimeout = setTimeout(function () {
                 const a = document.getElementById("ping");
                 a.textContent = "Server not responding";
-                alert("Server Disconnected, Close This Page Before Restart!!!");
-            }, 1000 + 5); // If we get ping 5 milliseconds late attempt reload
+                location.reload();
+            }, 1000 + 10); // If we get ping 5 milliseconds late attempt reload
         });
 
     </script>
