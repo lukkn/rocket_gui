@@ -18,11 +18,9 @@ function plotLines(canvasID) {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     context.beginPath();
-    context.moveTo(80, canvas.height);
-    context.lineTo(80, 0);
+    context.moveTo(40, canvas.height);
+    context.lineTo(40, 0);
     context.stroke();
-
-    console.log(activeSensors);
 
     activeSensors.forEach (function (sensor) {
         const data = dataDict[sensor];
@@ -33,10 +31,10 @@ function plotLines(canvasID) {
         }));
     
         context.beginPath();
-        context.moveTo(dataPoints[0].x + 80, dataPoints[0].y);
+        context.moveTo(dataPoints[0].x + 40, dataPoints[0].y);
     
         dataPoints.forEach(point => {
-            context.lineTo(point.x + 80, point.y);
+            context.lineTo(point.x + 40, point.y);
         });
     
         context.lineWidth = 1;
@@ -88,12 +86,14 @@ function createCheckboxes(canvasID, sensorList){
         // Create checkboxes
         var checkbox = document.createElement('INPUT');
         checkbox.type = "checkbox";
+        checkbox.class = canvas.id;
         checkbox.id = canvas.id + sensor + "Checkbox";
         checkbox.addEventListener('change', function() {
             handleGraphCheckbox(canvas.id, checkbox.id, sensor);
         })
 
         var label = document.createElement('label')
+        label.id = canvas.id + sensor + "Label";
         label.htmlFor = "id";
         label.appendChild(document.createTextNode(sensor));
 
@@ -103,6 +103,19 @@ function createCheckboxes(canvasID, sensorList){
 
     // Create entry in dictionary for current chart
     activeSensorsList[canvas.id] = [];
+}
+
+function removeCheckboxes(canvasID, sensorList){
+    const canvas = document.getElementById(canvasID);
+    const container = document.getElementById("chartContainer");
+
+    sensorList.forEach(function (sensor) {
+        const checkbox = document.getElementById(canvasID + sensor + "Checkbox");
+        const label = document.getElementById(canvasID + sensor + "Label");
+
+        container.removeChild(checkbox);
+        container.removeChild(label);
+    });
 }
 
 function updateData(canvasID, sensorTupleList) {
