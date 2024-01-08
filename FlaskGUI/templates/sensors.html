@@ -12,12 +12,12 @@
 
 <style>
     #listContainer {
-        width: 45%;
+        width: 30%;
         float: left;
         margin-right: 2%;
     }
     #chartContainer {
-        width: 50%;
+        width: 65%;
         float: left;
         background-color:antiquewhite;
     }
@@ -43,18 +43,18 @@
                     <th>Units</th>
                     <th>Tare</th>
                     <th>Untare</th>
-                    <th>Last Send Command</th>
+                    <th>Last Sent <br> Command</th>
                 </tr>
             </thead>
             <tbody>
                 {% for sensor in sensor_list %}
                     <tr>
                         <td>{{ sensor['P and ID'] }}</td>
-                        <td id="{{ sensor['P and ID'] }}_data" style="min-width: 200px; max-width: 200px; overflow-wrap: break-word;">No Data</td>
+                        <td id="{{ sensor['P and ID'] }}_data" style="min-width: 100px; max-width: 100px; overflow-wrap: break-word;">No Data</td>
                         <td>{{ sensor['unit'] }}</td>
                         <td><button id="{{ sensor['P and ID'] }}" onclick="buttonClicked(id, 'tare')" >Tare</button></td>
                         <td><button id="{{ sensor['P and ID'] }}" onclick="buttonClicked(id, 'untare')" >Untare</button></td>
-                        <td id="{{ sensor['P and ID'] }}_state" >{{ actuator_states_and_sensor_tare_states[sensor['P and ID']] }}</td>
+                        <td id="{{ sensor['P and ID'] }}_state" style="min-width: 50px; max-width: 50px; overflow-wrap: break-word;">{{ actuator_states_and_sensor_tare_states[sensor['P and ID']] }}</td>
                         <script> sensorList.push("{{ sensor['P and ID'] }}") </script>
                     </tr>
                 {% endfor %}
@@ -82,11 +82,14 @@
                 dataCell.textContent = sensorValue;
             });
 
-            // update each existing chart
-            const canvasList = document.getElementsByTagName('canvas');
+            // update data for charts
+            updateData(listOfSensorIDValueTuples);
 
+            // plot updated data for each chart
+            const canvasList = document.getElementsByTagName('canvas'); 
             for (canvas of canvasList){
-                updateData(canvas.id, listOfSensorIDValueTuples);
+                defineScale(canvas.id);
+                plotLines(canvas.id);
             }
         });
 

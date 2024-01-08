@@ -10,6 +10,7 @@ var minLabel = 0;
 
 function plotLines(canvasID) {
     // Draws lines on canvas with name canvasID, based on sensorData
+    console.log("plot lines " + canvasID);
 
     const canvas = document.getElementById(canvasID);
     const context = canvas.getContext('2d');
@@ -118,24 +119,19 @@ function removeCheckboxes(canvasID, sensorList){
     });
 }
 
-function updateData(canvasID, sensorTupleList) {
-    const activeSensors = activeSensorsList[canvasID];
-
+function updateData(sensorTupleList) {
     sensorTupleList.forEach (function (sensorTuple) {
         const sensorName = sensorTuple[0];
         const sensorValue = sensorTuple[1];
-        if (activeSensors.includes(sensorName)) {
-            var data = dataDict[sensorName];
-            data.push(sensorValue);
-            if (data.length > 50) {
-                // Discard the oldest data points
-                data.shift();
-            }
-        }
-    });
 
-    defineScale(canvasID);
-    plotLines(canvasID);   
+        var data = dataDict[sensorName];
+        data.push(sensorValue);
+
+        if (data.length > 50) {
+            // Discard the oldest data points
+            data.shift();
+        }
+    });  
 }
  
 function handleGraphCheckbox(canvasID, checkboxID, sensor){
