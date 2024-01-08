@@ -93,7 +93,7 @@
             pingTimeout = setTimeout(function() {
                 const a = document.getElementById("ping");
                 a.textContent = "Server not responding";
-                location.reload();
+                try{close();}catch{location.reload();}
             }, 1000 + 5); // If we get ping 5 milliseconds late attempt reload
         });
 

@@ -7,10 +7,10 @@ import random
 import time
 import csv
 import webbrowser
-
-#import webbrowser
+import uuid
 
 async_mode = None
+sessionid = str(random.random())[2:]
 
 # GLOBAL VARIABLES
 actuator_buttons = []
@@ -38,9 +38,9 @@ thread_lock2 = Lock()
 # webbrowser.open_new('http://127.0.0.1:5000/sensors')
 # webbrowser.open_new('http://127.0.0.1:5000/actuators')
 # webbrowser.open_new('http://127.0.0.1:5000/pidview')
-webbrowser.open_new('http://127.0.0.1:5000/')
+webbrowser.open_new('http://127.0.0.1:5000/' + sessionid)
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/' + sessionid, methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         buttonID = request.form.get('button')

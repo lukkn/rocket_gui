@@ -52,7 +52,9 @@
 
 <body>
 
-    <p id="ping" style="float: right; margin: 0">hello world</p>
+    <div style="margin-left: auto;">
+        <p id="ping" style="float: right; margin: 0"></p>
+    </div>
 
     <h2>Toggle Arm/Disarm Test Stand</h2>
 
@@ -110,6 +112,11 @@
 
         socket.emit('guion');
 
+        window.open(`/actuators`, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=0, top=0`);
+        //window.open(`/sensors`, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=${screenWidth}, top=${screenHeight}`);
+        //window.open(`/pidview`, `_blank`, `width=${screenWidth / 4}, height=${screenHeight / 4}`);
+
+
         function openPage(page) {
             var myWindow = window.open(page, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=${screenWidth}, top=${screenHeight}`);
         }
@@ -148,7 +155,7 @@
             pingTimeout = setTimeout(function () {
                 const a = document.getElementById("ping");
                 a.textContent = "Server not responding";
-                location.reload();
+                alert("Server Disconnected, Close This Page Before Restart!!!");
             }, 1000 + 5); // If we get ping 5 milliseconds late attempt reload
         });
 
