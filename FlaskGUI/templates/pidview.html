@@ -354,8 +354,7 @@
 
         socket.on('sensor_data', function (data) {
             // right now sending data as a list, index0 = data, index1 = timestamp of data and time of transmission
-            listOfSensorIDValueTuples = data[0]
-            timeAtTransmission = data[1]
+            const listOfSensorIDValueTuples = data
 
             listOfSensorIDValueTuples.forEach(function (sensorTuple) {
                 const sensorID = sensorTuple[0]+'sensorValueLegend';

@@ -59,9 +59,8 @@
 
     <h2>Toggle Arm/Disarm Test Stand</h2>
 
-    <form method="post">
-        <button type="submit" name="button" value="armDisarm" id="armDisarmButton"
-            class="{% if armed %}armed{% else %}disarmed{% endif %}">
+    <form onsubmit="return false;">
+        <button id="armDisarmButton" name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
             {% if armed %}Stand is Armed<br>Click to Disarm{% else %}Stand is Disarmed<br>Click to Arm{% endif %}
         </button>
     </form>
@@ -98,24 +97,27 @@
         var screenWidth = window.screen.availWidth;
         var screenHeight = window.screen.availHeight;
 
-        const armDisarmButton = document.getElementById('armDisarmButton');
 
-        armDisarmButton.addEventListener('click', function () {
-            // Toggle the text and color
-            if (armDisarmButton.classList.contains('armed')) {
-                armDisarmButton.innerHTML = 'Stand is Disarmed<br>Click to Arm';
-                armDisarmButton.classList.remove('armed');
-                armDisarmButton.classList.add('disarmed');
-            } else {
-                armDisarmButton.innerHTML = 'Stand is Armed<br>Click to Disarm';
+        document.addEventListener('DOMContentLoaded', function() {
+            socket.emit('guion');
+
+            // update the button color on page load or reload
+            // TODO: make this dependent on something more robust
+            const armDisarmButton = document.getElementById('armDisarmButton');
+            if (armDisarmButton.innerText.includes('Armed')) {
                 armDisarmButton.classList.remove('disarmed');
                 armDisarmButton.classList.add('armed');
-            }
+            } else if (armDisarmButton.innerText.includes('Disarmed')) {
+                armDisarmButton.classList.remove('armed');
+                armDisarmButton.classList.add('disarmed');
+            } else {console.log('button text is invalid', armDisarmButton.innerHTML);}
+
+            
         });
 
-        socket.emit('guion');
 
-        window.open(`/actuators`, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=0, top=0`);
+
+        //window.open(`/actuators`, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=0, top=0`);
         //window.open(`/sensors`, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=${screenWidth}, top=${screenHeight}`);
         //window.open(`/pidview`, `_blank`, `width=${screenWidth / 4}, height=${screenHeight / 4}`);
 
@@ -150,6 +152,23 @@
         }
 
 
+        socket.on('armOrDisarmResponse', function (boolean_state) {
+            const armDisarmButton = document.getElementById('armDisarmButton');
+            // Toggle the text and color
+            if (boolean_state) {
+                console.log("stand is armed, trying to update button");
+                armDisarmButton.innerHTML = 'Stand is Armed<br>Click to Disarm';
+                armDisarmButton.classList.remove('disarmed');
+                armDisarmButton.classList.add('armed');
+            } else {
+                console.log("stand is disarmed, trying to update button");
+                armDisarmButton.innerHTML = 'Stand is Disarmed<br>Click to Arm';
+                armDisarmButton.classList.remove('armed');
+                armDisarmButton.classList.add('disarmed');
+            }
+        });
+
+
         let pingTimeout;
 
         socket.on('ping', function (time) {
@@ -164,7 +183,7 @@
                 const a = document.getElementById("ping");
                 a.textContent = "Server not responding";
                 location.reload();
-            }, 1000 + 10); // If we get ping 5 milliseconds late attempt reload
+            }, 1000 + 1); // If we get ping 5 milliseconds late attempt reload
         });
 
     </script>

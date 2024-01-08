@@ -41,10 +41,10 @@
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
         socket.on('sensor_data', function (data) {
+            console.log('sensor_data emit contents: ', data)
             // right now sending data as a list, index0 = data, index1 = timestamp of data and time of transmission
-            const listOfSensorIDValueTuples = data[0]
-            const timeAtTransmission = data[1]
-
+            const listOfSensorIDValueTuples = data
+            
             listOfSensorIDValueTuples.forEach(function (sensorTuple) {
                 const sensorID = sensorTuple[0];
                 const sensorValue = sensorTuple[1];
