@@ -40,28 +40,8 @@ thread_lock2 = Lock()
 # webbrowser.open_new('http://127.0.0.1:5000/pidview')
 webbrowser.open_new('http://127.0.0.1:5000/' + sessionid)
 
-@app.route('/' + sessionid, methods=['GET', 'POST'])
+@app.route('/' + sessionid, methods=['GET'])
 def index():
-    if request.method == 'POST':
-        buttonID = request.form.get('button')
-
-        if buttonID == 'armDisarm':
-            global armed
-            if not armed:
-                armed = True
-                print("Stand is ARMED")
-            else:
-                armed = False
-                print("Stand is DISARMED")
-
-        elif buttonID == 'actuators':
-            return redirect(url_for('actuators'))
-        elif buttonID == 'sensors':
-            return redirect(url_for('sensors'))
-        elif buttonID == 'pidview':
-            return redirect(url_for('pidview'))
-        else:
-            pass
     return render_template('index.html', armed=armed)
 
 # TODO: better way than using global variables, verify config
@@ -74,15 +54,15 @@ def loadconfig():
 def pidview():
     return render_template('pidview.html', actuator_buttons=actuator_buttons, sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
 
-@app.route('/sensors')
+@app.route('/sensors', methods=['GET'])
 def sensors():
     return render_template('sensors.html', sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
 
-@app.route('/testgraph')
+@app.route('/testgraph', methods=['GET'])
 def testgraph():
     return render_template('testgraph.html')
 
-@app.route('/twographs')
+@app.route('/twographs', methods=['GET'])
 def twographs():
     return render_template('twographs.html')
 
