@@ -6,42 +6,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sensor Data</title>
     <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
+    <script src="{{ url_for('static', filename='makeChart.js') }}"></script>
+    <script> var sensorList = []; </script>
 </head>
+
+<style>
+
+    #listContainer {
+        width: 45%;
+        float: left;
+        margin-right: 2%;
+    }
+    #chartContainer {
+        width: 50%;
+        float: left;
+        background-color:antiquewhite;
+    }
+    #addChart {
+        margin-bottom: 1%;
+    }
+    canvas {
+        border: 1px solid;
+        height: 100%;
+        width: 100%
+    }
+</style>
 
 <body>
     <p id="ping" style="float: right; margin: 0"></p>
     <h1>Sensor Data</h1>
-    <table border="2">
-        <thead>
-            <tr>
-                <th>Sensor Name</th>
-                <th>Data</th>
-                <th>Units</th>
-                <th>Tare</th>
-                <th>Untare</th>
-                <th>Last Send Command</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for sensor in sensor_list %}
+    <div id = "listContainer">
+        <table border="2" id="sensorsTable">
+            <thead>
                 <tr>
-                    <td>{{ sensor['P and ID'] }}</td>
-                    <td id="{{ sensor['P and ID'] }}_data" style="min-width: 200px; max-width: 200px; overflow-wrap: break-word;">No Data</td>
-                    <td>{{ sensor['unit'] }}</td>
-                    <td><button id="{{ sensor['P and ID'] }}" onclick="buttonClicked(id, 'tare')" >Tare</button></td>
-                    <td><button id="{{ sensor['P and ID'] }}" onclick="buttonClicked(id, 'untare')" >Untare</button></td>
-                    <td id="{{ sensor['P and ID'] }}_state" >{{ actuator_states_and_sensor_tare_states[sensor['P and ID']] }}</td>
+                    <th>Sensor Name</th>
+                    <th>Data</th>
+                    <th>Units</th>
+                    <th>Tare</th>
+                    <th>Untare</th>
+                    <th>Last Send Command</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for sensor in sensor_list %}
+                    <tr>
+                        <td>{{ sensor['P and ID'] }}</td>
+                        <td id="{{ sensor['P and ID'] }}_data" style="min-width: 200px; max-width: 200px; overflow-wrap: break-word;">No Data</td>
+                        <td>{{ sensor['unit'] }}</td>
+                        <td><button id="{{ sensor['P and ID'] }}" onclick="buttonClicked(id, 'tare')" >Tare</button></td>
+                        <td><button id="{{ sensor['P and ID'] }}" onclick="buttonClicked(id, 'untare')" >Untare</button></td>
+                        <td id="{{ sensor['P and ID'] }}_state" >{{ actuator_states_and_sensor_tare_states[sensor['P and ID']] }}</td>
+                        <script> sensorList.push("{{ sensor['P and ID'] }}") </script>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div id="chartContainer">
+        <button id="addChart" onClick = "addChart()">Add Chart</button>
+    </div>
 
     <script>
 
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
         socket.on('sensor_data', function (data) {
-            console.log('sensor_data emit contents: ', data)
+            //console.log('sensor_data emit contents: ', data)
             // right now sending data as a list, index0 = data, index1 = timestamp of data and time of transmission
             const listOfSensorIDValueTuples = data
             
@@ -52,6 +82,13 @@
 
                 dataCell.textContent = sensorValue;
             });
+
+            // update each existing chart
+            const canvasList = document.getElementsByTagName('canvas');
+
+            for (canvas of canvasList){
+                updateData(canvas.id, listOfSensorIDValueTuples);
+            }
         });
 
         function buttonClicked(id, state) {
@@ -75,9 +112,21 @@
             } else {
                 console.log("error!!!");
             }
-
-
         });
+
+        var chartCounter = 1;
+        
+
+        function addChart(){
+            // create new canvas in chartContainer
+            var canvas = document.createElement("canvas");
+            canvas.id = "chart" + chartCounter;
+            chartCounter ++;
+            canvas.style.display = "block";
+            document.getElementById("chartContainer").appendChild(canvas);
+
+            createEmptyChart(canvas.id, sensorList);
+        }
     
 
         let pingTimeout;
@@ -94,7 +143,7 @@
                 const a = document.getElementById("ping");
                 a.textContent = "Server not responding";
                 try{close();}catch{location.reload();}
-            }, 1000 + 5); // If we get ping 5 milliseconds late attempt reload
+            }, 1000 + 50); // If we get ping 5 milliseconds late attempt reload
         });
 
 

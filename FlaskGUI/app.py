@@ -138,7 +138,7 @@ def sensor_data_thread():
     while True:
         socketio.sleep(.05)
         # sensors_and_data is a list of tuples containing (sensorID, value)
-        sensors_and_data = packet_sensor_data2(sensor_list)
+        sensors_and_data = packet_sensor_data(sensor_list)
         
         # testing shows we get data at 3khz with random, 6khz with a predetermined constant; ex: 1
         # with open("sensor_data_log", mode='a', newline='') as csv_file:
