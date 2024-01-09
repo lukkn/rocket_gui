@@ -7,7 +7,6 @@ import random
 import time
 import csv
 import webbrowser
-import uuid
 
 async_mode = None
 sessionid = str(random.random())[2:]
