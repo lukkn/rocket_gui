@@ -136,9 +136,13 @@ def sensor_data_thread():
     # if this delay is not here code fails
     socketio.sleep(1)
     while True:
-        socketio.sleep(1/60)
+        socketio.sleep(5)
         # sensors_and_data is a list of tuples containing (sensorID, value)
         sensors_and_data = packet_sensor_data(sensor_list)
+
+        # test what happens with different scales
+
+        sensors_and_data[0][1] = random.random()*10
         
         # testing shows we get data at 3khz with random, 6khz with a predetermined constant; ex: 1
         # with open("sensor_data_log", mode='a', newline='') as csv_file:
@@ -159,7 +163,7 @@ def ping_thread():
 def packet_sensor_data(sensor_list):
     a = []
     for sensor in sensor_list:
-        a.append((sensor['P and ID'], round(random.random(), 5)))
+        a.append([sensor['P and ID'], round(random.random(), 5)])
     return a
 
 count = 0

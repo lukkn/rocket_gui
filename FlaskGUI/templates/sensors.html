@@ -92,7 +92,9 @@
                 plotLines(canvas.id);
             }
 
-            console.log("time from back to front is: ", Date.now()-timestamp);
+            const a = document.getElementById("ping");
+            a.textContent = `Time from back to front is: ${Date.now() - timestamp} milliseconds`;
+
         });
 
         function buttonClicked(id, state) {
