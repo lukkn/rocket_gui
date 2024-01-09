@@ -9,11 +9,11 @@ const dataCapacity = 1800;
 var sensorColors = Object.create(null);
 var activeSensorsList = Object.create(null); // key: canvasID    value: array of active sensor plots
 var dataDict = Object.create(null);
-var maxLabel = 1
-var minLabel = 0;
+var maxLabel = -Infinity;
+var minLabel = Infinity;
 
 function plotLines(canvasID) {
-    // defineScale(canvasID);
+    defineScale(canvasID);
 
     const canvas = document.getElementById(canvasID);
     const context = canvas.getContext('2d');
@@ -85,17 +85,26 @@ function mapDataPoints(data, height, width){
 }
 
 function defineScale(canvasID){
-
-    // Find the data range of all active plots on the canvas
     const activeSensors = activeSensorsList[canvasID];
-    const activeData = [];
+    var max = -Infinity;
+    var min = Infinity;
 
     activeSensors.forEach(function (sensor) {
-        activeData.push.apply(activeData, dataDict[sensor]);
+        if (dataDict[sensor].max > max){
+            max = dataDict[sensor].max;
+        }
+        if (dataDict[sensor].min < min){
+            min = dataDict[sensor].min;
+        }
     });
     
-    maxLabel = Math.ceil(Math.max(...activeData));
-    minLabel = Math.floor(Math.min(...activeData));
+    maxLabel = Math.ceil(max);
+    minLabel = Math.floor(min);
+
+    console.log("max: " + max);
+    console.log("min: " + min);
+    console.log("maxLabel: " + maxLabel);
+    console.log("minLabel: " + minLabel);
 }
 
 function createEmptyChart(canvasID, sensorsList){
