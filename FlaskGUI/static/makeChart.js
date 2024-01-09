@@ -53,7 +53,7 @@ function plotLines(canvasID) {
         const data = dataDict[sensor];
 
         const dataPoints = data.map((value, index) => ({
-            x: index * (canvas.width / (data.length - 1)),
+            x: index * ((canvas.width - 40) / (data.length-1)),
             y: canvas.height*((maxLabel - value)/(maxLabel - minLabel))
         }));
     
