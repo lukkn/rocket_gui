@@ -118,6 +118,46 @@
 
 
         });
+
+        var chartCounter = 1;
+        
+
+        function addChart(){
+            const chartNumber = chartCounter;
+            chartCounter ++;
+
+            // create new canvas in chartContainer
+            var canvas = document.createElement("canvas");
+            canvas.id = "chart" + chartNumber;
+            console.log("add: " + canvas.id);
+            canvas.width = 600;
+            canvas.height = 300;
+            canvas.style.display = "block";
+            document.getElementById("chartContainer").appendChild(canvas);
+
+            
+            var removeButton = document.createElement("button");
+            removeButton.id = "removeButton" + chartNumber;
+            removeButton.textContent = "Remove Chart";
+            removeButton.addEventListener('click', function() {
+                removeChart(chartNumber);
+            });
+            document.getElementById("chartContainer").appendChild(removeButton);
+
+            createEmptyChart(canvas.id, sensorList);
+        }
+
+        function removeChart(chartNumber){
+            canvasID = "chart" + chartNumber;
+            console.log("remove: " + canvasID);
+            const canvas = document.getElementById(canvasID);
+            document.getElementById("chartContainer").removeChild(canvas);
+
+            const removeButton = document.getElementById("removeButton" + chartNumber);
+            document.getElementById("chartContainer").removeChild(removeButton);
+
+            removeCheckboxes(canvasID, sensorList);
+        }
     
 
         // let pingTimeout;
