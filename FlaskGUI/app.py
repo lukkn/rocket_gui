@@ -136,7 +136,7 @@ def sensor_data_thread():
     # if this delay is not here code fails
     socketio.sleep(1)
     while True:
-        socketio.sleep(.05)
+        socketio.sleep(1/60)
         # sensors_and_data is a list of tuples containing (sensorID, value)
         sensors_and_data = packet_sensor_data(sensor_list)
         
@@ -145,14 +145,14 @@ def sensor_data_thread():
         #     csv_writer = csv.writer(csv_file)
         #     csv_writer.writerow(sensors_and_data)
 
-        #print("sensor is reading:", sensors_and_data[0][1])
-        socketio.emit('sensor_data', sensors_and_data)
+        print("sensor is reading:", sensors_and_data[0][1])
+        socketio.emit('sensor_data', [sensors_and_data, time.time_ns() // 1000000])
 
 def ping_thread():
     while True:
         socketio.sleep(1)
         socketio.emit("ping", time.time_ns() // 1000000)
-        print('ping', time.time())
+        #print('ping', time.time())
 
 
 # Dummy data function, this function should FETCH data from udp packet

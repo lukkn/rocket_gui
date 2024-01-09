@@ -73,7 +73,8 @@
             //console.log('sensor_data emit contents: ', data)
             //console.log('sensor_data emit contents: ', data)
             // right now sending data as a list, index0 = data, index1 = timestamp of data and time of transmission
-            const listOfSensorIDValueTuples = data
+            const listOfSensorIDValueTuples = data[0]
+            const timestamp = data[1]
 
             listOfSensorIDValueTuples.forEach(function (sensorTuple) {
                 const sensorID = sensorTuple[0];
@@ -92,6 +93,8 @@
                 defineScale(canvas.id);
                 plotLines(canvas.id);
             }
+
+            console.log("time from back to front is: ", Date.now()-timestamp);
         });
 
         function buttonClicked(id, state) {
