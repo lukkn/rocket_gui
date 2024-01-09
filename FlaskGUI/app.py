@@ -152,6 +152,7 @@ def ping_thread():
     while True:
         socketio.sleep(1)
         socketio.emit("ping", time.time_ns() // 1000000)
+        print('ping', time.time())
 
 
 # Dummy data function, this function should FETCH data from udp packet

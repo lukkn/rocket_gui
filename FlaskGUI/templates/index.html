@@ -151,7 +151,7 @@
             }
         }
 
-
+ 
         socket.on('armOrDisarmResponse', function (boolean_state) {
             const armDisarmButton = document.getElementById('armDisarmButton');
             // Toggle the text and color
@@ -169,22 +169,22 @@
         });
 
 
-        let pingTimeout;
+        // let pingTimeout;
 
-        socket.on('ping', function (time) {
-            // Update ping display
-            document.getElementById("ping").textContent = `Ping: ${(Date.now() - time).toFixed(0)} milliseconds`;
+        // socket.on('ping', function (time) {
+        //     // Update ping display
+        //     document.getElementById("ping").textContent = `Ping: ${(Date.now() - time).toFixed(0)} milliseconds`;
 
-            // Clear the timeout when the pong response is received
-            clearTimeout(pingTimeout);
+        //     // Clear the timeout when the pong response is received
+        //     clearTimeout(pingTimeout);
 
-            // Set a new timeout for the next expected ping
-            pingTimeout = setTimeout(function () {
-                const a = document.getElementById("ping");
-                a.textContent = "Server not responding";
-                location.reload();
-            }, 1000 + 1); // If we get ping 5 milliseconds late attempt reload
-        });
+        //     // Set a new timeout for the next expected ping
+        //     pingTimeout = setTimeout(function () {
+        //         const a = document.getElementById("ping");
+        //         a.textContent = "Server not responding";
+        //         location.reload();
+        //     }, 1000 + 1000); // If we get ping 1 second late attempt reload
+        // });
 
     </script>
 </body>

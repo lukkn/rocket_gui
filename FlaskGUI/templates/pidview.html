@@ -189,7 +189,7 @@
     <script>
         // fetch all button states as a variable
         var actuatorStatesAndSensorTareStates = {{ actuator_states_and_sensor_tare_states | tojson | safe }};
-        console.log("actuatorStatesAndSensorTareStates: ", actuatorStatesAndSensorTareStates);
+        //console.log("actuatorStatesAndSensorTareStates: ", actuatorStatesAndSensorTareStates);
 
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -373,22 +373,22 @@
         });
 
 
-        let pingTimeout;
+        // let pingTimeout;
 
-        socket.on('ping', function (time) {
-            // Update ping display
-            document.getElementById("ping").textContent = `Ping: ${(Date.now() - time).toFixed(0)} milliseconds`;
+        // socket.on('ping', function (time) {
+        //     // Update ping display
+        //     document.getElementById("ping").textContent = `Ping: ${(Date.now() - time).toFixed(0)} milliseconds`;
 
-            // Clear the timeout when the pong response is received
-            clearTimeout(pingTimeout);
+        //     // Clear the timeout when the pong response is received
+        //     clearTimeout(pingTimeout);
 
-            // Set a new timeout for the next expected ping
-            pingTimeout = setTimeout(function() {
-                const a = document.getElementById("ping");
-                a.textContent = "Server not responding";
-                try{close();}catch{location.reload();}
-            }, 1000 + 5); // If we get ping 5 milliseconds late attempt reload
-        });
+        //     // Set a new timeout for the next expected ping
+        //     pingTimeout = setTimeout(function() {
+        //         const a = document.getElementById("ping");
+        //         a.textContent = "Server not responding";
+        //         try{close();}catch{location.reload();}
+        //     }, 1000 + 5); // If we get ping 5 milliseconds late attempt reload
+        // });
 
     </script>
 
