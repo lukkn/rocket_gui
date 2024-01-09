@@ -1,9 +1,10 @@
-class CircularBuffer {
+class doublyLinkedList {
     constructor(capacity) {
         this.capacity = capacity;
         this.size = 0;
         this.head = null; 
         this.tail = null; 
+
     }
 
     popFirst(){
@@ -39,7 +40,10 @@ class CircularBuffer {
     
         this.tail = newNode;
         this.size ++;
-    }   
+
+        //updateMinMax(value);
+    }  
+    
 }
 
 class Node {

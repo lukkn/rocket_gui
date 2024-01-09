@@ -141,7 +141,7 @@ def sensor_data_thread():
 
         # test what happens with different scales
 
-        sensors_and_data[0][1] = random.random()*10
+        # sensors_and_data[0][1] = random.random()*10
         
         # testing shows we get data at 3khz with random, 6khz with a predetermined constant; ex: 1
         # with open("sensor_data_log", mode='a', newline='') as csv_file:

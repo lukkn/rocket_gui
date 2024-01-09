@@ -5,14 +5,15 @@
 //const colors = ["#D2691E", "CD5C5C", "#DB7093", "#FA8072", "F4A460", "DAA520", "9ACD32", "556B2F", "008080", "87CEEB", "4682B4", "6A5ACD", "EE82EE"];
 // chocolate, indianred, palevioletred, salmon, sandybrown, goldenrod, yellowgreen,  darkolivegreen, teal, skyblue, steelblue, slateblue, violet
 const colors = ['red', 'blue', 'green', 'orange', 'violet', 'brown', 'salmon', 'purple' ];
+const dataCapacity = 1800;
 var sensorColors = Object.create(null);
 var activeSensorsList = Object.create(null); // key: canvasID    value: array of active sensor plots
 var dataDict = Object.create(null);
-var maxLabel = 0;
+var maxLabel = 1
 var minLabel = 0;
 
 function plotLines(canvasID) {
-    defineScale(canvasID);
+    // defineScale(canvasID);
 
     const canvas = document.getElementById(canvasID);
     const context = canvas.getContext('2d');
@@ -52,10 +53,7 @@ function plotLines(canvasID) {
     activeSensors.forEach (function (sensor) {
         const data = dataDict[sensor];
 
-        const dataPoints = data.map((value, index) => ({
-            x: index * ((canvas.width - 40) / (data.length-1)),
-            y: canvas.height*((maxLabel - value)/(maxLabel - minLabel))
-        }));
+        const dataPoints = mapDataPoints(data, canvas.height, canvas.width);
     
         context.beginPath();
         context.moveTo(dataPoints[0].x + 40, dataPoints[0].y);
@@ -68,6 +66,22 @@ function plotLines(canvasID) {
         context.strokeStyle = sensorColors[sensor];
         context.stroke();
     });
+}
+
+function mapDataPoints(data, height, width){
+    var dataPoints = [];
+    var index = 0;
+    var node = data.head;
+    while(node!= null){ 
+        dataPoints.push({
+            x: index * ((width - 40) / (data.size-1)),
+            y: height*((maxLabel - node.value)/(maxLabel - minLabel))
+        });
+        index++;
+        node = node.next;
+    }
+    console.log(dataPoints);
+    return dataPoints; 
 }
 
 function defineScale(canvasID){
@@ -88,8 +102,9 @@ function createEmptyChart(canvasID, sensorsList){
     createCheckboxes(canvasID, sensorsList);
     activeSensorsList[canvasID] = [];
     sensorsList.forEach(function(sensorName) {
-        dataDict[sensorName] = [];
+        dataDict[sensorName] = new doublyLinkedList(dataCapacity);
     });  
+    
 }
 
 function createCheckboxes(canvasID, sensorList){
@@ -145,14 +160,7 @@ function updateData(sensorTupleList) {
         const sensorValue = sensorTuple[1];
 
         var data = dataDict[sensorName];
-        // TODO: circular buffer class
         data.push(sensorValue);
-
-        if (data.length > 60*30) {
-            // Discard the oldest data points
-            // TODO: circlular buffer class, make data.length a parameter of this function
-            data.shift();
-        }
     });  
 }
  
