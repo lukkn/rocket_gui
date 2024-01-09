@@ -30,12 +30,22 @@ function plotLines(canvasID) {
 
     const yStep = (maxLabel - minLabel) / 10;
 
-    // Draw y-axis labels
+    // Draw grid and y-axis labels
     context.fillStyle = 'black';
     for (let i = 0; i <= 10; i++) {
-        const yLabel = (minLabel + i * yStep).toFixed(5);
+        // determine position
         const yPosition = canvas.height - (i * (canvas.height / 10));
+
+        // draw labels
+        const yLabel = (minLabel + i * yStep).toFixed(5);
         context.fillText(yLabel, 0, yPosition);
+
+        // draw grid lines
+        context.beginPath();
+        context.moveTo(40, yPosition);
+        context.lineTo(canvas.width, yPosition);
+        context.strokeStyle = 'LightGray';
+        context.stroke();
     }
 
     // plot lines
