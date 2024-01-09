@@ -19,7 +19,6 @@
     #chartContainer {
         width: 65%;
         float: left;
-        background-color:antiquewhite;
     }
     #addChart {
         margin-bottom: 1%;
@@ -89,7 +88,6 @@
             // plot updated data for each chart
             const canvasList = document.getElementsByTagName('canvas'); 
             for (canvas of canvasList){
-                defineScale(canvas.id);
                 plotLines(canvas.id);
             }
         });

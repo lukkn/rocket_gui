@@ -2,27 +2,43 @@
  * makeChart.js v0.0.1
  */
 
-
+//const colors = ["#D2691E", "CD5C5C", "#DB7093", "#FA8072", "F4A460", "DAA520", "9ACD32", "556B2F", "008080", "87CEEB", "4682B4", "6A5ACD", "EE82EE"];
+// chocolate, indianred, palevioletred, salmon, sandybrown, goldenrod, yellowgreen,  darkolivegreen, teal, skyblue, steelblue, slateblue, violet
+const colors = ['red', 'blue', 'green', 'orange', 'violet', 'brown', 'salmon', 'purple' ];
+var sensorColors = Object.create(null);
 var activeSensorsList = Object.create(null); // key: canvasID    value: array of active sensor plots
 var dataDict = Object.create(null);
 var maxLabel = 0;
 var minLabel = 0;
 
 function plotLines(canvasID) {
-    // Draws lines on canvas with name canvasID, based on sensorData
-    console.log("plot lines " + canvasID);
+    defineScale(canvasID);
 
     const canvas = document.getElementById(canvasID);
     const context = canvas.getContext('2d');
     const activeSensors = activeSensorsList[canvasID];
 
+    // clear canvas
     context.clearRect(0, 0, canvas.width, canvas.height);
 
+    // draw y-axis line
     context.beginPath();
     context.moveTo(40, canvas.height);
     context.lineTo(40, 0);
+    context.strokeStyle = 'black';
     context.stroke();
 
+    const yStep = (maxLabel - minLabel) / 10;
+
+    // Draw y-axis labels
+    context.fillStyle = 'black';
+    for (let i = 0; i <= 10; i++) {
+        const yLabel = (minLabel + i * yStep).toFixed(5);
+        const yPosition = canvas.height - (i * (canvas.height / 10));
+        context.fillText(yLabel, 0, yPosition);
+    }
+
+    // plot lines
     activeSensors.forEach (function (sensor) {
         const data = dataDict[sensor];
 
@@ -39,14 +55,12 @@ function plotLines(canvasID) {
         });
     
         context.lineWidth = 1;
-        context.strokeStyle = 'black';
+        context.strokeStyle = sensorColors[sensor];
         context.stroke();
     });
 }
 
 function defineScale(canvasID){
-    const canvas = document.getElementById(canvasID);
-    const context = canvas.getContext('2d');
 
     // Find the data range of all active plots on the canvas
     const activeSensors = activeSensorsList[canvasID];
@@ -58,16 +72,6 @@ function defineScale(canvasID){
     
     maxLabel = Math.ceil(Math.max(...activeData));
     minLabel = Math.floor(Math.min(...activeData));
-
-    const yStep = (maxLabel - minLabel) / 10;
-
-     // Draw y-axis labels
-    context.fillStyle = 'black';
-    for (let i = 0; i <= 10; i++) {
-        const yLabel = (minLabel + i * yStep).toFixed(5);
-        const yPosition = canvas.height - (i * (canvas.height / 10));
-        context.fillText(yLabel, 0, yPosition);
-    }
 }
 
 function createEmptyChart(canvasID, sensorsList){
@@ -82,8 +86,13 @@ function createCheckboxes(canvasID, sensorList){
     // Create empty chart in the canvas with checkboxes for each sensor
     const canvas = document.getElementById(canvasID);
     const container = document.getElementById("chartContainer");
+    var index = 0;
 
     sensorList.forEach(function (sensor) {
+        // Assgin colors
+        sensorColors[sensor] = colors[index];
+        index++;
+
         // Create checkboxes
         var checkbox = document.createElement('INPUT');
         checkbox.type = "checkbox";
@@ -96,6 +105,7 @@ function createCheckboxes(canvasID, sensorList){
         var label = document.createElement('label')
         label.id = canvas.id + sensor + "Label";
         label.htmlFor = "id";
+        label.style.color = sensorColors[sensor];
         label.appendChild(document.createTextNode(sensor));
 
         container.appendChild(checkbox);
