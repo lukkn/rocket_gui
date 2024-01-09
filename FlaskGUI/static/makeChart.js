@@ -5,7 +5,7 @@
 //const colors = ["#D2691E", "CD5C5C", "#DB7093", "#FA8072", "F4A460", "DAA520", "9ACD32", "556B2F", "008080", "87CEEB", "4682B4", "6A5ACD", "EE82EE"];
 // chocolate, indianred, palevioletred, salmon, sandybrown, goldenrod, yellowgreen,  darkolivegreen, teal, skyblue, steelblue, slateblue, violet
 const colors = ['red', 'blue', 'green', 'orange', 'violet', 'brown', 'salmon', 'purple' ];
-const dataCapacity = 1800;
+const dataCapacity = 20*15;
 var sensorColors = Object.create(null);
 var activeSensorsList = Object.create(null); // key: canvasID    value: array of active sensor plots
 var dataDict = Object.create(null);
@@ -80,7 +80,6 @@ function mapDataPoints(data, height, width){
         index++;
         node = node.next;
     }
-    console.log(dataPoints);
     return dataPoints; 
 }
 
@@ -100,11 +99,6 @@ function defineScale(canvasID){
     
     maxLabel = Math.ceil(max);
     minLabel = Math.floor(min);
-
-    console.log("max: " + max);
-    console.log("min: " + min);
-    console.log("maxLabel: " + maxLabel);
-    console.log("minLabel: " + minLabel);
 }
 
 function createEmptyChart(canvasID, sensorsList){

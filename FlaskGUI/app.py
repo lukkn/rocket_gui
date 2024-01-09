@@ -135,7 +135,7 @@ def sensor_data_thread():
     # if this delay is not here code fails
     socketio.sleep(1)
     while True:
-        socketio.sleep(5)
+        socketio.sleep(1/20)
         # sensors_and_data is a list of tuples containing (sensorID, value)
         sensors_and_data = packet_sensor_data(sensor_list)
 

@@ -85,6 +85,7 @@
             });
 
             // update data for charts
+            const startTime = performance.now();
             updateData(listOfSensorIDValueTuples);
 
             // plot updated data for each chart
@@ -92,6 +93,9 @@
             for (canvas of canvasList){
                 plotLines(canvas.id);
             }
+            const endTime = performance.now();
+
+            console.log('performance.now() showing difference of: ', endTime - startTime);
 
             const a = document.getElementById("ping");
             a.textContent = `Time from back to front is: ${Date.now() - timestamp} milliseconds`;
