@@ -5,7 +5,6 @@
 //const colors = ["#D2691E", "CD5C5C", "#DB7093", "#FA8072", "F4A460", "DAA520", "9ACD32", "556B2F", "008080", "87CEEB", "4682B4", "6A5ACD", "EE82EE"];
 // chocolate, indianred, palevioletred, salmon, sandybrown, goldenrod, yellowgreen,  darkolivegreen, teal, skyblue, steelblue, slateblue, violet
 const colors = ['red', 'blue', 'green', 'orange', 'violet', 'brown', 'salmon', 'purple' ];
-const dataCapacity = 20*15;
 var sensorColors = Object.create(null);
 var activeSensorsList = Object.create(null); // key: canvasID    value: array of active sensor plots
 var dataDict = Object.create(null);
@@ -53,7 +52,10 @@ function plotLines(canvasID) {
     activeSensors.forEach (function (sensor) {
         const data = dataDict[sensor];
 
-        const dataPoints = mapDataPoints(data, canvas.height, canvas.width);
+        const dataPoints = data.map((value, index) => ({
+            x: index * (canvas.width / (data.length - 1)),
+            y: canvas.height*((maxLabel - value)/(maxLabel - minLabel))
+        }));
     
         context.beginPath();
         context.moveTo(dataPoints[0].x + 40, dataPoints[0].y);
@@ -68,44 +70,25 @@ function plotLines(canvasID) {
     });
 }
 
-function mapDataPoints(data, height, width){
-    var dataPoints = [];
-    var index = 0;
-    var node = data.head;
-    while(node!= null){ 
-        dataPoints.push({
-            x: index * ((width - 40) / (data.size-1)),
-            y: height*((maxLabel - node.value)/(maxLabel - minLabel))
-        });
-        index++;
-        node = node.next;
-    }
-    return dataPoints; 
-}
-
 function defineScale(canvasID){
+
+    // Find the data range of all active plots on the canvas
     const activeSensors = activeSensorsList[canvasID];
-    var max = -Infinity;
-    var min = Infinity;
+    const activeData = [];
 
     activeSensors.forEach(function (sensor) {
-        if (dataDict[sensor].max > max){
-            max = dataDict[sensor].max;
-        }
-        if (dataDict[sensor].min < min){
-            min = dataDict[sensor].min;
-        }
+        activeData.push.apply(activeData, dataDict[sensor]);
     });
     
-    maxLabel = Math.ceil(max);
-    minLabel = Math.floor(min);
+    maxLabel = Math.ceil(Math.max(...activeData));
+    minLabel = Math.floor(Math.min(...activeData));
 }
 
 function createEmptyChart(canvasID, sensorsList){
     createCheckboxes(canvasID, sensorsList);
     activeSensorsList[canvasID] = [];
     sensorsList.forEach(function(sensorName) {
-        dataDict[sensorName] = new doublyLinkedList(dataCapacity);
+        dataDict[sensorName] = [];
     });  
     
 }
