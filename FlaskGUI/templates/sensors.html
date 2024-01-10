@@ -137,7 +137,6 @@
             // create new canvas in chartContainer
             var canvas = document.createElement("canvas");
             canvas.id = "chart" + chartNumber;
-            console.log("add: " + canvas.id);
             canvas.width = 600;
             canvas.height = 300;
             canvas.style.display = "block";
@@ -157,7 +156,6 @@
 
         function removeChart(chartNumber){
             canvasID = "chart" + chartNumber;
-            console.log("remove: " + canvasID);
             const canvas = document.getElementById(canvasID);
             document.getElementById("chartContainer").removeChild(canvas);
 
