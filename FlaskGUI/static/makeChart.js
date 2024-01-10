@@ -148,7 +148,7 @@ function updateData(sensorTupleList) {
         // TODO: circular buffer class
         data.push(sensorValue);
 
-        if (data.length > 60*30) {
+        if (data.length > 20*15) {
             // Discard the oldest data points
             // TODO: circlular buffer class, make data.length a parameter of this function
             data.shift();
