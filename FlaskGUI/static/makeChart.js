@@ -164,6 +164,12 @@ function updateData(sensorTupleList) {
 
         var data = dataDict[sensorName];
         data.push(sensorValue);
+
+        if (data.length > 20*15) {
+            // Discard the oldest data points
+            // TODO: circlular buffer class, make data.length a parameter of this function
+            data.shift();
+        }
     });  
 }
  
