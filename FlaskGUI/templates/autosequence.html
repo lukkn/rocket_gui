@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
+    <script src="{{ url_for('static', filename='papaparse.js') }}"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            height: 95vh;
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px;
+            cursor: pointer;
+            border: none; 
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        /* Style for file input and upload button */
+        input[type="file"] {
+            display: none;
+        }
+        #configButtons{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #csvFileMessage{
+            height: 5%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #configContents {
+            margin: auto;
+            height: 80%;
+            width: 90%;
+        }
+        #launchButton {
+            background-color: green;
+            font-size: 20px;
+            width: 100%;
+            height: 10%;
+            margin: 0;
+        }
+        #launchContents {
+            border: 2px solid;
+            margin: auto;
+            height: 90%;
+            width: 100%;
+        }
+        #abortButton {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            background-color: red;
+            padding: 20px;
+            font-size: 30px;
+            width: 100%;
+            height: 15%;
+            margin: 0;
+        }
+        .container {
+            float: left;
+            height: 80%;
+            width: 50%;
+        }
+
+        .upload-button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            overflow: wrap;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="configContainer" class="container">
+        <div id="configButtons">
+            <label for="csvFile" class="upload-button">Upload CSV File</label>
+            <input type="file" id="csvFile" accept=".csv" onchange="updateFileName('csvFile')">
+            <button type="button" onclick="submitCSV('csvFile')">Submit CSV</button>
+        </div>
+        <div id="csvFileMessage" class= "fileName"></div>
+        <div id="configContents"></div>
+    </div>
+
+    <div id="launchContainer" class="container">
+        <form onsubmit="return false;">
+            <button id="launchButton" onclick="socket.emit('armOrDisarmRequest');">
+               LAUNCH
+            </button>
+        </form>
+        <div id="launchContents">
+
+        </div>
+    </div>
+    
+    <form onsubmit="return false;">
+        <button id="abortButton">
+           ABORT
+        </button>
+    </form>
+
+    <script>
+        function updateFileName(inputId) {
+            const fileInput = document.getElementById(inputId);
+            const file = fileInput.files[0];
+            console.log(`File ${file.name} uploaded`);
+
+            const fileMessage = document.getElementById(inputId + "Message");
+            fileMessage.innerHTML = `File ${file.name} uploaded`;
+        }
+
+
+        function submitCSV(inputId) {
+            const fileInput = document.getElementById(inputId);
+            const file = fileInput.files[0];
+
+            if (file) {
+                // You can emit the file content using socket.emit() here
+                console.log(file);
+                const fileMessage = document.getElementById(inputId + "Message");
+                fileMessage.innerHTML = `File ${file.name} submitted`;
+                displayCSV(file);
+            } else {
+                alert('Please select a file before submitting.');
+            }
+        } 
+
+        function displayCSV(file){
+            const container = document.getElementById("configContents");
+            Papa.parse(file, {
+                complete: function(results) {
+                    const table = createTable(results.data, container);
+                }
+            });
+            
+        }
+
+        function createTable(tableData, container) {
+            var table = document.createElement('table');
+            var tableBody = document.createElement('tbody');
+
+            tableData.forEach(function(rowData) {
+                var row = document.createElement('tr');
+
+                rowData.forEach(function(cellData) {
+                var cell = document.createElement('td');
+                cell.appendChild(document.createTextNode(cellData));
+                row.appendChild(cell);
+                });
+
+                tableBody.appendChild(row);
+            });
+
+            table.align = "center";
+            //table.border = "1px";
+            table.width = "100%";
+
+            table.appendChild(tableBody);
+            container.appendChild(table);
+        }
+    </script>
+</body>
+
+</html>

@@ -44,9 +44,9 @@ def index():
     return render_template('index.html', armed=armed)
 
 # TODO: better way than using global variables, verify config
-@app.route('/loadconfig')
-def loadconfig():
-    return render_template('loadconfig.html')
+@app.route('/autosequence')
+def autosequence():
+    return render_template('autosequence.html')
 
     
 @app.route('/pidview', methods=['GET'])
@@ -57,13 +57,6 @@ def pidview():
 def sensors():
     return render_template('sensors.html', sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
 
-@app.route('/testgraph', methods=['GET'])
-def testgraph():
-    return render_template('testgraph.html')
-
-@app.route('/twographs', methods=['GET'])
-def twographs():
-    return render_template('twographs.html')
 
 @app.route('/actuators', methods=['GET'])
 def actuators():
@@ -108,14 +101,6 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
             json.dump(get_request_or_coordinate_data, file)
             print("button coordinates saved to .json file")
 
-
-def getSensorNames(sensor_list):
-    name_list = []
-    for sensor in sensor_list:
-        name_list.append(sensor["P and ID"])
-    return name_list
-
-
 # FUNCTIONS BELOW RELATE TO GETTING SENSOR DATA IN BACKGROUND THREAD
 @socketio.on('guion')
 def guion():
@@ -148,7 +133,7 @@ def sensor_data_thread():
         #     csv_writer = csv.writer(csv_file)
         #     csv_writer.writerow(sensors_and_data)
 
-        print("sensor is reading:", sensors_and_data[0][1])
+        # print("sensor is reading:", sensors_and_data[0][1])
         socketio.emit('sensor_data', [sensors_and_data, time.time_ns() // 1000000])
 
 def ping_thread():
