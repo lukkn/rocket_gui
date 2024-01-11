@@ -4,7 +4,12 @@
 
 //const colors = ["#D2691E", "CD5C5C", "#DB7093", "#FA8072", "F4A460", "DAA520", "9ACD32", "556B2F", "008080", "87CEEB", "4682B4", "6A5ACD", "EE82EE"];
 // chocolate, indianred, palevioletred, salmon, sandybrown, goldenrod, yellowgreen,  darkolivegreen, teal, skyblue, steelblue, slateblue, violet
-const colors = ['red', 'blue', 'green', 'orange', 'violet', 'brown', 'salmon', 'purple' ];
+//const colors = ['red', 'blue', 'green'];
+const colors = [
+    'red', 'blue', 'green', 'orange', 'violet', 'brown', 'salmon', 'purple',
+    'cyan', 'pink', 'teal', 'maroon', 'olive', 'navy', 'magenta', 'turquoise',
+    'indigo', 'lime', 'gold', 'silver', 'orchid', 'sienna', 'slategray', 'peru'
+  ]; 
 var sensorColors = Object.create(null);
 var activeSensorsList = Object.create(null); // key: canvasID    value: array of active sensor plots
 var dataDict = Object.create(null);
@@ -50,7 +55,7 @@ function plotLines(canvasID) {
 
     // plot lines
     activeSensors.forEach (function (sensor) {
-        const data = dataDict[sensor];
+        let data = dataDict[sensor];
 
         const dataPoints = data.map((value, index) => ({
             x: index * (canvas.width / (data.length - 1)),
@@ -97,15 +102,15 @@ function createCheckboxes(canvasID, sensorList){
     // Create empty chart in the canvas with checkboxes for each sensor
     const canvas = document.getElementById(canvasID);
     const container = document.getElementById("chartContainer");
-    var index = 0;
+    let index = 0;
 
     sensorList.forEach(function (sensor) {
         // Assgin colors
-        sensorColors[sensor] = colors[index];
+        sensorColors[sensor] = colors[index % colors.length];
         index++;
 
         // Create checkboxes
-        var checkbox = document.createElement('INPUT');
+        let checkbox = document.createElement('INPUT');
         checkbox.type = "checkbox";
         checkbox.class = canvas.id;
         checkbox.id = canvas.id + sensor + "Checkbox";
@@ -113,7 +118,7 @@ function createCheckboxes(canvasID, sensorList){
             handleGraphCheckbox(canvas.id, checkbox.id, sensor);
         })
 
-        var label = document.createElement('label')
+        let label = document.createElement('label')
         label.id = canvas.id + sensor + "Label";
         label.htmlFor = "id";
         label.style.color = sensorColors[sensor];
@@ -140,24 +145,24 @@ function removeCheckboxes(canvasID, sensorList){
     });
 }
 
-function updateData(sensorTupleList) {
+function updateData(sensorTupleList, dataLength) {
     sensorTupleList.forEach (function (sensorTuple) {
         const sensorName = sensorTuple[0];
         const sensorValue = sensorTuple[1];
 
-        var data = dataDict[sensorName];
+        let data = dataDict[sensorName];
         data.push(sensorValue);
 
-        if (data.length > 20*15) {
+        if (data.length > dataLength) {
             // Discard the oldest data points
-            // TODO: circlular buffer class, make data.length a parameter of this function
+            // TODO: next ambitious person should make a circlular buffer class
             data.shift();
         }
     });  
 }
  
 function handleGraphCheckbox(canvasID, checkboxID, sensor){
-    var activeSensors = activeSensorsList[canvasID]
+    let activeSensors = activeSensorsList[canvasID]
 
     checkbox = document.getElementById(checkboxID);
     if (checkbox.checked){

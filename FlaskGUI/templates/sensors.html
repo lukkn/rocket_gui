@@ -86,7 +86,9 @@
 
             // update data for charts
             const startTime = performance.now();
-            updateData(listOfSensorIDValueTuples);
+
+            // second param is number of data points to store for graphing
+            updateData(listOfSensorIDValueTuples, 20*15);
 
             // plot updated data for each chart
             const canvasList = document.getElementsByTagName('canvas'); 
