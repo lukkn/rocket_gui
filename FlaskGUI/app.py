@@ -18,6 +18,9 @@ sensor_list = []
 actuator_states_and_sensor_tare_states = {}
 armed = False
 
+autosequence_commands = []
+start_time = 0
+
 # REMOVE BEFORE DEPLOYMENT
 actuator_buttons = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'VNTB'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Fuel tank vent', 'Pin': '1', 'P and ID': 'VFTV'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Ox bang-bang', 'Pin': '0', 'P and ID': 'VNTO'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Ox tank fill', 'Pin': '0', 'P and ID': 'VOTF'}]
 sensor_list = [{'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '0', 'P and ID': 'PNTB', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '1', 'P and ID': 'POTB', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '2', 'P and ID': 'PNTB2', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '3', 'P and ID': 'POTB3', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '4', 'P and ID': 'PNTB4', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '5', 'P and ID': 'POTB5', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '6', 'P and ID': 'PNTB6', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '7', 'P and ID': 'POTB7', 'unit': 'bar'}]
@@ -32,6 +35,7 @@ thread_lock = Lock()
 thread_lock2 = Lock()
 
 #i am in webthocket hell
+#lmao skill issue
 
 
 # webbrowser.open_new('http://127.0.0.1:5000/sensors')
@@ -47,7 +51,6 @@ def index():
 @app.route('/autosequence')
 def autosequence():
     return render_template('autosequence.html')
-
     
 @app.route('/pidview', methods=['GET'])
 def pidview():
@@ -101,6 +104,28 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
             json.dump(get_request_or_coordinate_data, file)
             print("button coordinates saved to .json file")
 
+@socketio.on('autosequence')
+def handle_autoseqeunce(file):
+    print("Received file") 
+
+    # clean data
+    global autosequence_commands
+    autosequence_commands = [line.split(",")[:-1] for line in file.decode("utf-8").splitlines()][1:]
+    print(autosequence_commands)
+
+
+@socketio.on('launch_request')
+def handle_launch_request():
+    print("launch request received")
+
+    for i in range(len(autosequence_commands)):
+        socketio.emit('command', autosequence_commands[i])
+
+        if (i < len(autosequence_commands)-1):
+            sleep_time = (int(autosequence_commands[i+1][2])-int(autosequence_commands[i][2]))/1000
+
+            socketio.sleep(sleep_time)
+        
 # FUNCTIONS BELOW RELATE TO GETTING SENSOR DATA IN BACKGROUND THREAD
 @socketio.on('guion')
 def guion():
