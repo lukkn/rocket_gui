@@ -81,12 +81,14 @@
                 const sensorValue = sensorTuple[1];
                 const dataCell = document.getElementById(sensorID + '_data');
 
-                dataCell.textContent = sensorValue;
+                dataCell.textContent = sensorValue.toFixed(3);
             });
 
             // update data for charts
             const startTime = performance.now();
-            updateData(listOfSensorIDValueTuples);
+
+            // second param is number of data points to store for graphing
+            updateData(listOfSensorIDValueTuples, 20*15);
 
             // plot updated data for each chart
             const canvasList = document.getElementsByTagName('canvas'); 

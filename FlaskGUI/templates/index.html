@@ -142,8 +142,8 @@
             const file = fileInput.files[0];
 
             if (file) {
-                // You can emit the file content using socket.emit() here
-                console.log(file);
+                //console.log(file);
+                socket.emit('configFile', [inputId, file]);
                 const fileMessage = document.getElementById(inputId + "Message");
                 fileMessage.innerHTML = `File ${file.name} submitted`;
             } else {
