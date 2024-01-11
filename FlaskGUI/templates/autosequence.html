@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            height: 95vh;
+            background-color: #21262d;
         }
 
         button {
@@ -19,6 +19,19 @@
             border: none; 
             border-radius: 5px;
             font-size: 16px;
+        }
+
+        table, th, td {
+            align-items: center;
+            border: 1px solid;
+            border-color: #ecf2f8;
+            border-collapse: collapse;
+            color: #ecf2f8;
+            padding: 5px;
+        }
+
+        table {
+            width: 100%;
         }
 
         /* Style for file input and upload button */
@@ -35,21 +48,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #ecf2f8;
         }
         #configContents {
             margin: auto;
             width: 90%;
         }
         #countdown{
-            font-size: 10vh;
-            height: 10vh;
-            width: 10%;
-            float: left;
-            text-align: center;
-            margin: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            font-size: 50px;
+            padding: 5px 10px;
+            margin: 10px;
+            border-radius: 5px;
+            background-color: #77bdfb;
+            
         }
         #launchButton {
-            background-color: green;
+            background-color: #7ce38b;
             font-size: 20px;
             width: 100%;
             padding: 10px;
@@ -61,7 +78,7 @@
             position: fixed;
             bottom: 0;
             left: 0;
-            background-color: red;
+            background-color: #fa7970;
             padding: 20px;
             font-size: 30px;
             width: 100%;
@@ -72,8 +89,9 @@
             width: 100%;
             margin-bottom: 100px;
         }
+        
         .upload-button {
-            background-color: #3498db;
+            background-color: #77bdfb;
             color: #fff;
             padding: 8px 15px;
             border-radius: 5px;
@@ -86,6 +104,7 @@
 
 <body>
     <div id="configContainer">
+        <div id="countdown">5000ms</div>
         <div id="configButtons">
             <label for="csvFile" class="upload-button">Upload CSV File</label>
             <input type="file" id="csvFile" accept=".csv" onchange="updateFileName('csvFile')">
@@ -97,7 +116,9 @@
             LAUNCH
             </button>
         </form>
-        <div id="configContents"></div>
+        <div id="configContents">
+            <table id="configTable"></table>
+        </div>
     </div>
 
     
@@ -125,7 +146,6 @@
 
             if (file) {
                 // You can emit the file content using socket.emit() here
-                console.log(file);
                 const fileMessage = document.getElementById(inputId + "Message");
                 fileMessage.innerHTML = `File ${file.name} submitted`;
                 displayCSV(file);
@@ -145,25 +165,39 @@
         }
 
         function createTable(tableData, container) {
-            var table = document.createElement('table');
+            var table = document.getElementById("configTable");
             var tableBody = document.createElement('tbody');
+            var tableHead = document.createElement('thead');
 
-            tableData.forEach(function(rowData) {
+            const headData = tableData[0];
+            const bodyData = tableData.slice(1,-1)
+
+            // create table head
+            var headRow = document.createElement('tr');
+            headData.forEach(function(headData){
+                var cell = document.createElement('th');
+                cell.border = "1px solid #ecf2f8";
+                cell.color = "#ecf2f8";
+                cell.appendChild(document.createTextNode(headData));
+                headRow.appendChild(cell);
+            });
+            tableHead.appendChild(headRow);
+            table.appendChild(tableHead);
+
+            // create table body
+            bodyData.forEach(function(rowData) {
                 var row = document.createElement('tr');
 
                 rowData.forEach(function(cellData) {
-                var cell = document.createElement('td');
-                cell.appendChild(document.createTextNode(cellData));
-                row.appendChild(cell);
+                    var cell = document.createElement('td');
+                    cell.color = "#ecf2f8";
+                    cell.appendChild(document.createTextNode(cellData));
+                    row.appendChild(cell);
                 });
 
                 tableBody.appendChild(row);
             });
-
-            table.align = "center";
-            table.border = "1px";
-            table.width = "100%";
-
+            
             table.appendChild(tableBody);
             container.appendChild(table);
         }
