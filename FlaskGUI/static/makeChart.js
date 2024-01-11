@@ -37,13 +37,14 @@ function plotLines(canvasID) {
 
     // Draw grid and y-axis labels
     context.fillStyle = 'black';
+    context.font = 'bold 12px Arial';
     for (let i = 0; i <= 10; i++) {
         // determine position
         const yPosition = canvas.height - (i * (canvas.height / 10));
 
         // draw labels
-        const yLabel = (minLabel + i * yStep).toFixed(5);
-        context.fillText(yLabel, 0, yPosition);
+        const yLabel = (minLabel + i * yStep).toFixed(1);
+        context.fillText(yLabel, 10, yPosition);
 
         // draw grid lines
         context.beginPath();

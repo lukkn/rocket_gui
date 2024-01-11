@@ -81,7 +81,7 @@
                 const sensorValue = sensorTuple[1];
                 const dataCell = document.getElementById(sensorID + '_data');
 
-                dataCell.textContent = sensorValue;
+                dataCell.textContent = sensorValue.toFixed(3);
             });
 
             // update data for charts
