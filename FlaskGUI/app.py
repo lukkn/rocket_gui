@@ -50,8 +50,10 @@ def index():
     return render_template('index.html', armed=armed)
 
 # TODO: better way than using global variables, verify config
-@app.route('/autosequence')
+@app.route('/autosequence', methods=['GET'])
 def autosequence():
+    global autosequence_commands
+    autosequence_commands = []
     return render_template('autosequence.html')
     
 @app.route('/pidview', methods=['GET'])
@@ -157,6 +159,8 @@ def handle_abort_request(abort_sequence_file):
 @socketio.on('cancel_request')
 def handle_cancel_request():
     print("Received cancel request") 
+    global autosequence_commands
+    autosequence_commands = []
     socketio.emit('cancel')
     global cancel 
     cancel = True
