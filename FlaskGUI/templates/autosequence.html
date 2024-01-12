@@ -68,7 +68,16 @@
         #launchButton {
             background-color: #7ce38b;
             font-size: 20px;
-            width: 100%;
+            width: 50%;
+            padding: 10px;
+            margin: 0;
+            margin-bottom: 20px;
+            float: left;
+        }
+        #cancelButton {
+            background-color: #77bdfb;
+            font-size: 20px;
+            width: 50%;
             padding: 10px;
             margin: 0;
             margin-bottom: 20px;
@@ -108,7 +117,7 @@
 
 <body>
     <div id="configContainer">
-        <div id="timer">0.0 s</div>
+        <div id="timer">0 s</div>
         <div id="configButtons">
             <label for="csvFile" class="upload-button">Upload CSV File</label>
             <input type="file" id="csvFile" accept=".csv" onchange="updateFileName('csvFile')">
@@ -120,22 +129,25 @@
             LAUNCH
             </button>
         </form>
+        <form onsubmit="return false;">
+            <button id="cancelButton" onclick="cancel()">
+               CANCEL
+            </button>
+        </form>
         <div id="configContents">
             <table id="configTable"></table>
         </div>
     </div>
-
-    
-    
     <form onsubmit="return false;">
-        <button id="abortButton">
+        <button id="abortButton" onclick="abort()">
            ABORT
         </button>
     </form>
 
     <script>
         var socket = io.connect('http://' + document.domain + ':' + location.port);
-        var time = 0.0;
+        var startTime = 0;
+        var time = 0;
 
         function updateFileName(inputId) {
             const fileInput = document.getElementById(inputId);
@@ -172,7 +184,7 @@
             Papa.parse(file, {
                 complete: function(results) {
                     const table = createTable(results.data);
-                    const startTime = results.data[1][2];
+                    startTime = results.data[1][2];
                     time = parseInt(startTime)/1000;
                     const timer = document.getElementById("timer");
                     timer.innerText = time + " s";
@@ -217,25 +229,45 @@
             table.appendChild(tableBody);
         }
 
+        function cancel(){
+            resetTimer();
+            socket.emit('cancel_request');
+        }
+
+        function abort(){
+            resetTimer();
+            socket.emit('abort_request');
+        }
+
         function launch(){
             startTimer();
             socket.emit('launch_request');
         }
 
+
         function startTimer(){
+            resetTimer();
+
+            const timer = document.getElementById("timer");
             var interval = 100; // ms
             var expected = Date.now() + interval;
             setTimeout(step, interval);
             function step() {
                 var dt = Date.now() - expected; // the drift (positive for overshooting)
                 
+                
                 time += 0.1;
-                const timer = document.getElementById("timer");
-                timer.innerText = time.toFixed(1) + " s";
+                timer.innerText = time.toFixed(0) + " s";
 
                 expected += interval;
                 setTimeout(step, Math.max(0, interval - dt)); //take into account drift
             }
+        }
+
+        function resetTimer() {
+            time = parseInt(startTime)/1000;
+            const timer = document.getElementById("timer");
+            timer.innerText = time + " s";
         }
 
         socket.on('command', function (command) {

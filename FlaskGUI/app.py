@@ -21,6 +21,7 @@ armed = False
 
 autosequence_commands = []
 start_time = 0
+cancel = False
 
 # REMOVE BEFORE DEPLOYMENT
 #actuator_buttons = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'VNTB'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Fuel tank vent', 'Pin': '1', 'P and ID': 'VFTV'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Ox bang-bang', 'Pin': '0', 'P and ID': 'VNTO'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Ox tank fill', 'Pin': '0', 'P and ID': 'VOTF'}]
@@ -79,10 +80,6 @@ def loadConfigFile(CSVFileAndFileContents):
         sensor_list, actuator_buttons = configuration.load_config(fileContents)
         print(sensor_list)
 
-
-
-
-
 @socketio.on('armOrDisarmRequest')
 def armDisarm():
     global armed
@@ -132,16 +129,35 @@ def handle_autoseqeunce(file):
 
 @socketio.on('launch_request')
 def handle_launch_request():
-    print("launch request received")
+    print("Received launch request")
+    global cancel 
+    cancel = False
 
     for i in range(len(autosequence_commands)):
+        if (cancel):
+            print("Launch cancelled")
+            break
+
         socketio.emit('command', autosequence_commands[i])
 
         if (i < len(autosequence_commands)-1):
             sleep_time = (int(autosequence_commands[i+1][2])-int(autosequence_commands[i][2]))/1000
-
             socketio.sleep(sleep_time)
         
+
+@socketio.on('abort_request')
+def handle_abort_request(abort_sequence_file):
+    print("Received abort request") 
+    socketio.emit('abort', abort_sequence_file)
+
+@socketio.on('cancel_request')
+def handle_cancel_request():
+    print("Received cancel request") 
+    global cancel 
+    cancel = True
+    
+
+
 # FUNCTIONS BELOW RELATE TO GETTING SENSOR DATA IN BACKGROUND THREAD
 @socketio.on('guion')
 def guion():
