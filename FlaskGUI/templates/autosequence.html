@@ -241,7 +241,6 @@
         }
 
         function launch(){
-            startTimer();
             socket.emit('launch_request');
         }
 
@@ -279,6 +278,18 @@
             var tableRow = document.getElementById(commandID);
             tableRow.className = "activeRow";
         });
+
+        socket.on('no_config', function(){
+            alert ("Please submit an autosequence file.")
+        })
+
+        socket.on('launch', function(){
+            startTimer();
+        })
+
+        socket.on('cancel', function(){
+            alert("Launch cancelled");
+        })
     </script>
 </body>
 

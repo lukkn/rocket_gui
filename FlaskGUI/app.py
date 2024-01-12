@@ -130,20 +130,24 @@ def handle_autoseqeunce(file):
 @socketio.on('launch_request')
 def handle_launch_request():
     print("Received launch request")
+
     global cancel 
-    cancel = False
+    cancel = False  
 
-    for i in range(len(autosequence_commands)):
-        if (cancel):
-            print("Launch cancelled")
-            break
-
-        socketio.emit('command', autosequence_commands[i])
-
-        if (i < len(autosequence_commands)-1):
-            sleep_time = (int(autosequence_commands[i+1][2])-int(autosequence_commands[i][2]))/1000
-            socketio.sleep(sleep_time)
-        
+    # check for config file
+    if not autosequence_commands:
+        socketio.emit('no_config')
+    else:
+        socketio.emit('launch')
+        for i in range(len(autosequence_commands)):
+            socketio.emit('command', autosequence_commands[i])
+            if (cancel):
+                print("Launch cancelled")
+                break
+            if (i < len(autosequence_commands)-1):
+                sleep_time = (int(autosequence_commands[i+1][2])-int(autosequence_commands[i][2]))/1000
+                socketio.sleep(sleep_time)
+            
 
 @socketio.on('abort_request')
 def handle_abort_request(abort_sequence_file):
@@ -153,6 +157,7 @@ def handle_abort_request(abort_sequence_file):
 @socketio.on('cancel_request')
 def handle_cancel_request():
     print("Received cancel request") 
+    socketio.emit('cancel')
     global cancel 
     cancel = True
     
