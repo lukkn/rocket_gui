@@ -2,6 +2,9 @@
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
     <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -73,15 +76,17 @@
         <button onclick="openPage('/pidview');">Piping and Instrumentation Diagram View</button>
     </form>
 
-    <h2>Upload Configs</h2>
+    <h2>Upload Config</h2>
 
     <!-- Upload buttons for two CSV files -->
     <div>
-        <label for="csvFile1" class="upload-button">Upload CSV File 1</label>
+        <label for="csvFile1" class="upload-button">Upload Sensors and Actuators Config</label>
         <input type="file" id="csvFile1" accept=".csv" onchange="updateFileName('csvFile1')">
-        <button type="button" onclick="submitCSV('csvFile1')">Submit CSV 1</button>
+        <button type="button" onclick="submitCSV('csvFile1')">Submit CSV File</button>
     </div>
     <div id="csvFile1Message" class= "fileName"></div>
+
+    <!-- reserved for future use DO NOT DELETE
     <br>
     <br>
     <div>
@@ -90,12 +95,15 @@
         <button type="button" onclick="submitCSV('csvFile2')">Submit CSV 2</button>
     </div>
     <div id="csvFile2Message" class= "fileName"></div>
+    -->
+
 
     <script>
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-        var screenWidth = window.screen.availWidth;
-        var screenHeight = window.screen.availHeight;
+        // used to get screen dimensions for opening small windows
+        // var screenWidth = window.screen.availWidth;
+        // var screenHeight = window.screen.availHeight;
 
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -123,7 +131,8 @@
 
 
         function openPage(page) {
-            var myWindow = window.open(page, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=${screenWidth}, top=${screenHeight}`);
+            //var myWindow = window.open(page, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=${screenWidth}, top=${screenHeight}`);
+            var myWindow = window.open(page, `_blank`);
         }
 
 

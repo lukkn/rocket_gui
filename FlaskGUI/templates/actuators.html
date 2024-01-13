@@ -21,7 +21,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for actuator in actuator_buttons %}
+            {% for actuator in actuator_list %}
                 <tr>
                     <td>{{ actuator['P and ID'] }}</td>
                     <td><button id="{{ actuator['P and ID'] }}" onclick="buttonClicked(id, 'off')" >Off</button></td>
@@ -75,7 +75,7 @@
             pingTimeout = setTimeout(function() {
                 const a = document.getElementById("ping");
                 a.textContent = "Server not responding";
-                try{close();}catch{location.reload();}
+                location.reload();
             }, 2000 + 1000); // If we get ping 1 second late attempt reload
         });
 

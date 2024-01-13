@@ -131,7 +131,7 @@
         <p id="performanceIndicator" style="float: right; clear: both; margin: 0;"></p>
     </div>
     <form method="post">
-        {% for button in actuator_buttons %}
+        {% for button in actuator_list %}
 
         </label>
         <div id="{{ button['P and ID'] }}" class="draggable" draggable="true">
@@ -386,7 +386,7 @@
             pingTimeout = setTimeout(function() {
                 const a = document.getElementById("ping");
                 a.textContent = "Server not responding";
-                try{close();}catch{location.reload();}
+                location.reload();
             }, 2000 + 1000); // If we get ping 1 second late attempt reload
         });
 

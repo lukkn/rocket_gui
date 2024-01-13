@@ -1,22 +1,38 @@
-from flask import Flask, render_template
-from flask_socketio import SocketIO
+# these libraries located in the folder named: 'python_flask_and_flaskio_libraries'
+# dot notation is used to navigate to the next folder
+from python_flask_and_flaskio_libraries.flask import Flask, render_template
+from python_flask_and_flaskio_libraries.flask_socketio import SocketIO
+
+#from flask import Flask, render_template
+#from flask_socketio import SocketIO
+
+# part of the python standard library
 from threading import Lock
 import json
 import os
 import random
 import time
-import csv
 import webbrowser
+
+# configuration file tim wrote
 import configuration
 
+
+# not quite sure what this does but leave it here anyway
 async_mode = None
+
+# could use used to make unique id's for webpages
 sessionid = str(random.random())[2:]
 
-# GLOBAL VARIABLES
-actuator_buttons = []
+# TODO: better way than using global variables, verify config file
+# GLOBAL VARIABLES for sensors and actuators
+actuator_list = []
 sensor_list = []
 
+# dictionary of modified states for sensors + actuators
 actuator_states_and_sensor_tare_states = {}
+
+# Global Variable that determines if stand is armed
 armed = False
 
 autosequence_commands = []
@@ -24,13 +40,12 @@ start_time = 0
 cancel = False
 
 # REMOVE BEFORE DEPLOYMENT
-#actuator_buttons = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'VNTB'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Fuel tank vent', 'Pin': '1', 'P and ID': 'VFTV'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Ox bang-bang', 'Pin': '0', 'P and ID': 'VNTO'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Ox tank fill', 'Pin': '0', 'P and ID': 'VOTF'}]
+#actuator_list = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'VNTB'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Fuel tank vent', 'Pin': '1', 'P and ID': 'VFTV'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Ox bang-bang', 'Pin': '0', 'P and ID': 'VNTO'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Ox tank fill', 'Pin': '0', 'P and ID': 'VOTF'}]
 #sensor_list = [{'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '0', 'P and ID': 'PNTB', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '1', 'P and ID': 'POTB', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '2', 'P and ID': 'PNTB2', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '3', 'P and ID': 'POTB3', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '4', 'P and ID': 'PNTB4', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '5', 'P and ID': 'POTB5', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '6', 'P and ID': 'PNTB6', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '7', 'P and ID': 'POTB7', 'unit': 'bar'}]
 
 
 app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app, async_mode=async_mode)
-#TODO: what should thread equal, same with async_mode at top of page
 thread = None
 thread2 = None
 thread_lock = Lock()
@@ -43,13 +58,14 @@ thread_lock2 = Lock()
 # webbrowser.open_new('http://127.0.0.1:5000/sensors')
 # webbrowser.open_new('http://127.0.0.1:5000/actuators')
 # webbrowser.open_new('http://127.0.0.1:5000/pidview')
-webbrowser.open_new('http://127.0.0.1:5000/' + sessionid)
+webbrowser.open_new('http://127.0.0.1:5000/') # + sessionID here if needed
 
-@app.route('/' + sessionid, methods=['GET'])
+
+# flask routes for webpages
+@app.route('/', methods=['GET']) # + sessionID here if needed
 def index():
     return render_template('index.html', armed=armed)
 
-# TODO: better way than using global variables, verify config
 @app.route('/autosequence', methods=['GET'])
 def autosequence():
     global autosequence_commands
@@ -58,28 +74,27 @@ def autosequence():
     
 @app.route('/pidview', methods=['GET'])
 def pidview():
-    return render_template('pidview.html', actuator_buttons=actuator_buttons, sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
+    return render_template('pidview.html', actuator_list=actuator_list, sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
 
 @app.route('/sensors', methods=['GET'])
 def sensors():
     return render_template('sensors.html', sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
 
-
 @app.route('/actuators', methods=['GET'])
 def actuators():
-    return render_template('actuators.html', actuator_buttons=actuator_buttons, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
+    return render_template('actuators.html', actuator_list=actuator_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
 
 
+# methods to listen for client events
 @socketio.on('configFile')
 def loadConfigFile(CSVFileAndFileContents):
     CSVFile = CSVFileAndFileContents[0]
     fileContents = CSVFileAndFileContents[1]
-
     if CSVFile == 'csvFile1':
         global sensor_list
-        global actuator_buttons
+        global actuator_list
         #print(fileContents)
-        sensor_list, actuator_buttons = configuration.load_config(fileContents)
+        sensor_list, actuator_list = configuration.load_config(fileContents)
         print(sensor_list)
 
 @socketio.on('armOrDisarmRequest')
@@ -105,7 +120,6 @@ def handle_button_press(buttonID, state, current_time):
 
 @socketio.on('actuator_button_coordinates')
 def actuator_button_coordinates(get_request_or_coordinate_data):
-
     # if pidview.html is requesting the coordinates stored in the .json
     if get_request_or_coordinate_data == 'getCoordinates':
         #emit coordinates
@@ -113,7 +127,6 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
             coordinates = json.load(file)
             print("pidview.html is requesting coordinates from .json")
         socketio.emit('get_actuator_button_location_config', coordinates)
-
     else: # pidview.html is sending new button coordinates for saving
         with open(os.path.dirname(os.path.abspath(__file__)) + '/static/coordinates.json', 'w') as file:
             json.dump(get_request_or_coordinate_data, file)
@@ -176,11 +189,9 @@ def guion():
     with thread_lock:
         if thread is None:   
             thread = socketio.start_background_task(sensor_data_thread)
-    
     with thread_lock2:
         if thread2 is None:
             thread2 = socketio.start_background_task(ping_thread)
-
 
 def sensor_data_thread():
     # if this delay is not here code fails
@@ -206,7 +217,7 @@ def ping_thread():
     while True:
         socketio.sleep(2)
         socketio.emit("ping", time.time_ns() // 1000000)
-        print('ping', time.time())
+        #print('ping', time.time())
 
 
 # Dummy data function, this function should FETCH data from udp packet
@@ -225,5 +236,7 @@ def packet_sensor_data2(sensor_list):
     count+=1
     return a
 
+
+# start the app
 if __name__ == '__main__':
     socketio.run(app)
