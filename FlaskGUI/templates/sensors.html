@@ -106,7 +106,7 @@
 
         function buttonClicked(id, state) {
             const current_time = Date.now();
-            socket.emit('received_actuator_button_press', id, state, current_time);
+            socket.emit('received_button_press', id, state, current_time);
         }
 
 

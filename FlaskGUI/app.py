@@ -94,10 +94,10 @@ def armDisarm():
     socketio.emit('armOrDisarmResponse', armed)
     print('variable armed is now: ', armed)
 
-@socketio.on('received_actuator_button_press')
-def handle_actuator_button_press(buttonID, state, current_time):
+@socketio.on('received_button_press')
+def handle_button_press(buttonID, state, current_time):
     if armed:
-        print('received actuator button press: ', buttonID, state, 'Delay:',(time.time_ns() // 1_000_000) - current_time)
+        print('received button press: ', buttonID, state, 'Delay:',(time.time_ns() // 1_000_000) - current_time)
         actuator_states_and_sensor_tare_states[buttonID] = state
         socketio.emit('responding_with_button_data', [buttonID, state])
     else:
