@@ -59,7 +59,7 @@ thread_lock2 = Lock()
 # webbrowser.open_new('http://127.0.0.1:5000/sensors')
 # webbrowser.open_new('http://127.0.0.1:5000/actuators')
 # webbrowser.open_new('http://127.0.0.1:5000/pidview')
-webbrowser.open_new('http://127.0.0.1:5000/') # + sessionID here if needed
+webbrowser.open_new('http://127.0.0.1:5001/') # + sessionID here if needed
 
 
 # flask routes for webpages
@@ -240,4 +240,4 @@ def packet_sensor_data2(sensor_list):
 
 # start the app
 if __name__ == '__main__':
-    socketio.run(app, debug=False)
+    socketio.run(app, port=5001, debug=False)
