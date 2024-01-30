@@ -4,3 +4,4 @@ testgraph.html
 samplepage.html
 FlaskGUI/test.py
 .gitignore
+FlaskGUI/__pycache__/
