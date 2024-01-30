@@ -10,10 +10,11 @@ import numpy as np
 import re
 import random
 
-
-from gi.repository import GLib, Gtk, Gdk, GObject
 import gi
 gi.require_version('Gtk', '3.0')
+
+from gi.repository import GLib, Gtk, Gdk, GObject
+
 from matplotlib.backends.backend_gtk3agg import (
     FigureCanvasGTK3Agg as FigureCanvas)
 from matplotlib.figure import Figure
