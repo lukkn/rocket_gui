@@ -12,8 +12,6 @@ faulthandler.enable()
 
 if __name__ == '__main__':
 
-    
-
     actuators, sensors = load_config()
     #networking.send_config_to_mote(sensors)
 
