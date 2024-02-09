@@ -131,16 +131,16 @@
         <p id="performanceIndicator" style="float: right; clear: both; margin: 0;"></p>
     </div>
     <form method="post">
-        {% for button in actuator_list %}
+        {% for actuator in actuator_list %}
 
         </label>
-        <div id="{{ button['P and ID'] }}" class="draggable" draggable="true">
-            <legend id="sensorOrActuatorName">{{button['P and ID']}}</legend>
+        <div id="{{ actuator['P and ID'] }}" class="draggable" draggable="true">
+            <legend id="sensorOrActuatorName">{{actuator['P and ID']}}</legend>
 
-            <input type="radio" id="{{ button['P and ID'] }} OFF" name="{{ button['P and ID'] }}" class="checkbox"
-                onclick="buttonClicked(name, 'off')" /><label id="{{ button['P and ID'] }} off background" for="{{ button['P and ID'] }} OFF"
-                class="toggleOff">OFF</label><input type="radio" id="{{ button['P and ID'] }} ON" name="{{ button['P and ID'] }}"
-                class="checkbox" onclick="buttonClicked(name, 'on')" /><label id="{{ button['P and ID'] }} on background" for="{{ button['P and ID'] }} ON"
+            <input type="radio" id="{{ actuator['P and ID'] }} OFF" name="{{ actuator['P and ID'] }}" class="checkbox"
+                onclick="buttonClicked(name, 'off')" /><label id="{{ actuator['P and ID'] }} off background" for="{{ actuator['P and ID'] }} OFF"
+                class="toggleOff">OFF</label><input type="radio" id="{{ actuator['P and ID'] }} ON" name="{{ actuator['P and ID'] }}"
+                class="checkbox" onclick="buttonClicked(name, 'on')" /><label id="{{ actuator['P and ID'] }} on background" for="{{ actuator['P and ID'] }} ON"
                 class="toggleOn">ON</label>
         </div>
 
