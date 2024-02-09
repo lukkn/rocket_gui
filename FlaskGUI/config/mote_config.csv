@@ -1,0 +1,14 @@
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit,min,max
+2,sensor,Teensy ADC,Teensy ADC,14,TNSY,None,0,200
+2,sensor,i2c ADC 1ch,Pressure Transducer PNNP,10,PNNP,Volts,0,200
+2,sensor,i2c ADC 1ch,Pressure Transducer PNND,11,PNND,Volts,0,200
+2,sensor,i2c ADC 1ch,Pressure Transducer PFPI,12,PFPI,Volts,0,200
+2,sensor,i2c ADC 1ch,Pressure Transducer POPI,13,POPI,Volts,0,200
+2,sensor,i2c ADC 1ch,Pressure Transducer PNEO,2,PNEO,Volts,0,200
+2,sensor,i2c ADC 1ch,Pressure Transducer PNEF,3,PNEF,Volts,0,200
+2,actuator,Binary GPIO,12V DUMMY PWR,22,VOPB PWR,None,None,None
+2,actuator,servoPWM_12V,12V Servo VOPB,6,VOPB,None,None,None
+2,actuator,Binary GPIO,Solenoid VNND,32,VNND,None,None,None
+2,actuator,Binary GPIO,Solenoid VNNP,31,VNNP,None,None,None
+2,actuator,Binary GPIO,Solenoid VNMO,23,VXND,None,None,None
+2,actuator,Binary GPIO,Solenoid VNMF,37,VNMF,None,None,None

@@ -1,0 +1,508 @@
+{
+    "Server_IP_Address": "192.168.90.55",
+    "Arduino_IP_Address": "192.168.90.9",
+    "Box Number": 1,
+    "Sensors": [
+        {
+            "ID": 1,
+            "Mnemonic": "LMCC",
+            "Description": "Main Combustion Chamber Thrust",
+            "Value": 0,
+            "Unit": "lbs",
+            "Sensor": "Load Cell",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 2,
+            "Mnemonic": "de2",
+            "Description": "DE2: Unused",
+            "Value": 0,
+            "Unit": "lbs",
+            "Sensor": "Load Cell",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 3,
+            "Mnemonic": "LOTM",
+            "Description": "Ox Tank Mass",
+            "Value": 0,
+            "Unit": "lbs",
+            "Sensor": "Load Cell",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 4,
+            "Mnemonic": "LFTM",
+            "Description": "Fuel Tank Mass",
+            "Value": 0,
+            "Unit": "lbs",
+            "Sensor": "Load Cell",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 5,
+            "Mnemonic": "VFTV",
+            "Description": "Fuel Tank Vent",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 6,
+            "Mnemonic": "VNEP",
+            "Description": "Nitrogen Engine Purge",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 7,
+            "Mnemonic": "VOTV",
+            "Description": "Ox Tank Vent",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 8,
+            "Mnemonic": "VXXX",
+            "Description": "Unused Servo 4",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 9,
+            "Mnemonic": "VOTF",
+            "Description": "Ox Tank FIll",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 10,
+            "Mnemonic": "VVVV",
+            "Description": "Ox Tank Vent",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 11,
+            "Mnemonic": "VOHB",
+            "Description": "Ox Tank Side Bleed",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 12,
+            "Mnemonic": "VFPV",
+            "Description": "Fuel Prevalve",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 13,
+            "Mnemonic": "SOBB",
+            "Description": "Ox Bang Bang",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 14,
+            "Mnemonic": "SFBB",
+            "Description": "Fuel Bang Bang",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 15,
+            "Mnemonic": "SOMV",
+            "Description": "Ox Main alve Piolet",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 16,
+            "Mnemonic": "SFMV",
+            "Description": "Fuel Main Valve Pilot",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 17,
+            "Mnemonic": "VOPV",
+            "Description": "Ox Prevalve",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 18,
+            "Mnemonic": "VOTD",
+            "Description": "Ox Tank Drain Pneu",
+            "Value": 0,
+            "Unit": "Degrees",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 19,
+            "Mnemonic": "PFIM",
+            "Description": "Fuel Injector Manifold Pressure",
+            "Value": 0,
+            "Unit": "PSI",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 20,
+            "Mnemonic": "PFMV",
+            "Description": "Fuel Main alve Inlet Pressure",
+            "Value": 0,
+            "Unit": "PSI",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 21,
+            "Mnemonic": "PFRM",
+            "Description": "Fuel Regen Manifold Pressure",
+            "Value": 0,
+            "Unit": "PSI",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 22,
+            "Mnemonic": "PFRT",
+            "Description": "Fuel Run Tank Pressure",
+            "Value": 0,
+            "Unit": "PSI",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 23,
+            "Mnemonic": "PMCC",
+            "Description": "Main Cumbustion Chamber Pressure",
+            "Value": 0,
+            "Unit": "PSI",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 24,
+            "Mnemonic": "POMV",
+            "Description": "Ox Main Valve Inlet Pressure",
+            "Value": 0,
+            "Unit": "PSI",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 25,
+            "Mnemonic": "POIM",
+            "Description": "Ox Injector Manifold Pressure",
+            "Value": 0,
+            "Unit": "PSI",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 26,
+            "Mnemonic": "PNSB",
+            "Description": "Nitrogen Storage Bottle Pressure",
+            "Value": 0,
+            "Unit": "PSI",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 27,
+            "Mnemonic": "PORT",
+            "Description": "Ox Run Tak Pressure",
+            "Value": 0,
+            "Unit": "PSI",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 28,
+            "Mnemonic": "POSB",
+            "Description": "Ox Storage Bottle Pressure",
+            "Value": 0,
+            "Unit": "PSI",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 29,
+            "Mnemonic": "POPN",
+            "Description": "Ox Pneumatics Pressure",
+            "Value": 0,
+            "Unit": "PSI",
+            "Sensor": "Vale State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 30,
+            "Mnemonic": "PFPN",
+            "Description": "Fuel Pneumatics Pressure",
+            "Unit": "PSI",
+            "Sensor": "1k Pressure Transducer",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 31,
+            "Mnemonic": "POPP",
+            "Description": "Ox Prevalve Press Pressure",
+            "Unit": "PSI",
+            "Sensor": "5k Pressure Transducer",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 32,
+            "Mnemonic": "POTD",
+            "Description": "Ox Prevalve Press Pressure",
+            "Unit": "PSI",
+            "Sensor": "1k Pressure Transducer",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 33,
+            "Mnemonic": "PXXX",
+            "Description": "Ox Prevalve Press Pressure",
+            "Unit": "PSI",
+            "Sensor": "1k Pressure Transducer",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 34,
+            "Mnemonic": "PYYY",
+            "Description": "Ox Prevalve Press Pressure",
+            "Unit": "PSI",
+            "Sensor": "1k Pressure Transducer",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 35,
+            "Mnemonic": "TOTL",
+            "Description": "Ox Run Tank Liquid Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 36,
+            "Mnemonic": "TMCC-1",
+            "Description": "Main Combustion Chamber Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 37,
+            "Mnemonic": "TMCC-2",
+            "Description": "Main Combustion Chamber Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 38,
+            "Mnemonic": "TMCC-3",
+            "Description": "Main Combustion Chamber Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 39,
+            "Mnemonic": "TMCC-4",
+            "Description": "Main Combustion Chamber Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 40,
+            "Mnemonic": "TMCC-5",
+            "Description": "Main Combustion Chamber Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 41,
+            "Mnemonic": "TMCC-6",
+            "Description": "Main Combustion Chamber Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 42,
+            "Mnemonic": "TMCC-7",
+            "Description": "Main Combustion Chamber Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 43,
+            "Mnemonic": "TMCC-8",
+            "Description": "Main Combustion Chamber Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 44,
+            "Mnemonic": "TMCC-9",
+            "Description": "Main Combustion Chamber Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 45,
+            "Mnemonic": "TFIM",
+            "Description": "Fuel Injector Manifold Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 46,
+            "Mnemonic": "TFRM",
+            "Description": "Fuel Regen Manifold Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 47,
+            "Mnemonic": "TC-Unused-1",
+            "Description": "Unused Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 48,
+            "Mnemonic": "TOMV",
+            "Description": "Ox Prevalve Temperature",
+            "Unit": "C",
+            "Sensor": "Thermocouple",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 49,
+            "Mnemonic": "gse_bat_voltage",
+            "Description": "GSE Battery Voltage",
+            "Unit": "no unit",
+            "Sensor": "Miscellaneous",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 50,
+            "Mnemonic": "gse_temp",
+            "Description": "GSE Temp",
+            "Unit": "no unit",
+            "Sensor": "Miscellaneous",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 51,
+            "Mnemonic": "igniter_state",
+            "Description": "Igniter State",
+            "Unit": "no unit",
+            "Sensor": "Miscellaneous",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 52,
+            "Mnemonic": "go_pro",
+            "Description": "GoPro State",
+            "Unit": "no unit",
+            "Sensor": "Miscellaneous",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 53,
+            "Mnemonic": "ox_control_state",
+            "Description": "Ox Controller State",
+            "Unit": "no unit",
+            "Sensor": "Controller State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 54,
+            "Mnemonic": "fuel_control_state",
+            "Description": "Fuel Controller State",
+            "Unit": "no unit",
+            "Sensor": "Controller State",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 55,
+            "Mnemonic": "fs_arm_state",
+            "Description": "Fire Suppression Arm State",
+            "Unit": "no unit",
+            "Sensor": "Miscellaneous",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 56,
+            "Mnemonic": "FFMS",
+            "Description": "Fuel Flowmeter",
+            "Unit": "gpm",
+            "Sensor": "Flow Meter",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 57,
+            "Mnemonic": "FOMS",
+            "Description": "Ox Flowmeter",
+            "Unit": "gpm",
+            "Sensor": "Flow Meter",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 58,
+            "Mnemonic": "t0_time",
+            "Description": "T0 Time",
+            "Unit": "no unit",
+            "Sensor": "Miscellaneous",
+            "Board": "Arduino Uno"
+        },
+        {
+            "ID": 59,
+            "Mnemonic": "servo_pwr_state",
+            "Description": "Servo Power State",
+            "Unit": "no unit",
+            "Sensor": "Miscellaneous",
+            "Board": "Arduino Uno"
+        }
+    ]
+}

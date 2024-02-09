@@ -7,7 +7,6 @@ import time
 import webbrowser
 import sys
 
-# configuration file tim wrote
 import configuration
 import networking
 
@@ -46,7 +45,7 @@ autosequence_occuring = False # this will be used to block most functions while 
 #actuator_list = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'VNTB'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Fuel tank vent', 'Pin': '1', 'P and ID': 'VFTV'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Ox bang-bang', 'Pin': '0', 'P and ID': 'VNTO'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Ox tank fill', 'Pin': '0', 'P and ID': 'VOTF'}]
 #sensor_list = [{'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '0', 'P and ID': 'PNTB', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '1', 'P and ID': 'POTB', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '2', 'P and ID': 'PNTB2', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '3', 'P and ID': 'POTB3', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '4', 'P and ID': 'PNTB4', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '5', 'P and ID': 'POTB5', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '6', 'P and ID': 'PNTB6', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '7', 'P and ID': 'POTB7', 'unit': 'bar'}]
 
-actuator_list = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'IGNTN'}]
+#actuator_list = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'IGNTN'}]
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -99,7 +98,7 @@ def loadConfigFile(CSVFileAndFileContents):
         global sensor_list
         global actuator_list
         #print(fileContents)
-        sensor_list, actuator_list = configuration.load_config(fileContents)
+        actuator_list, sensor_list = configuration.load_config(fileContents)
         socketio.emit('sensor_and_actuator_config_uploaded')
 
 @socketio.on('armOrDisarmRequest')
@@ -115,11 +114,15 @@ def armDisarm():
     print('variable armed is now: ', armed)
 
 @socketio.on('received_button_press')
-def handle_button_press(buttonID, state, current_time):
+def handle_button_press(buttonID, state, time):
+    buttonInfo = [actuator for actuator in actuator_list if actuator['P and ID'] == buttonID][0]
+    print(buttonInfo)
+
     if armed or (buttonID not in [actuator['P and ID'] for actuator in actuator_list]): # if disarmed then only allow button presses for sensors
-        print('received button press: ', buttonID, state, 'Delay:',(time.time_ns() // 1_000_000) - current_time)
+        print('received button press: ', buttonID, state)
         actuator_states_and_sensor_tare_states[buttonID] = state
         socketio.emit('responding_with_button_data', [buttonID, state])
+        send_actuator_command(buttonInfo['Mote id'], buttonInfo['Pin'], state, interface_type='Binary GPIO')
     else:
         print("stand is disarmed!!! " + buttonID + " was not set to " + state)
 
@@ -141,9 +144,6 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
 def handle_autoseqeunce(file):
     print("Received file") 
     global autosequence_commands
-    global sleep_times_list
-    # returns a list of lists, each sublist containing a line from the config file
-    #TODO: look into this parsing, is it robust?
     autosequence_commands = [line.split(",")[:-1] for line in file.decode("utf-8").splitlines()][1:]
     sleep_times_list = [abs(int(autosequence_commands[i][2]) - int(autosequence_commands[i+1][2])) for i in range(len(autosequence_commands)-1)] + [0] # 0 on the end so we dont go out of range and instead delay for 0 seconds after autoseq is finished
     print("differences =", sleep_times_list)
