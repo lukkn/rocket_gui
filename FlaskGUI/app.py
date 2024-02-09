@@ -38,12 +38,15 @@ actuator_states_and_sensor_tare_states = {}
 armed = False
 
 autosequence_commands = []
-start_time = 0
-cancel = False
+sleep_times_list = [] # generated from difference in times between commands in autosequence_commands
+cancel = False # has cancel button been pressed
+autosequence_occuring = False # this will be used to block most functions while autosequence is occuring
 
 # REMOVE BEFORE DEPLOYMENT
 #actuator_list = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'VNTB'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Fuel tank vent', 'Pin': '1', 'P and ID': 'VFTV'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Ox bang-bang', 'Pin': '0', 'P and ID': 'VNTO'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Ox tank fill', 'Pin': '0', 'P and ID': 'VOTF'}]
 #sensor_list = [{'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '0', 'P and ID': 'PNTB', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '1', 'P and ID': 'POTB', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '2', 'P and ID': 'PNTB2', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '3', 'P and ID': 'POTB3', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '4', 'P and ID': 'PNTB4', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '5', 'P and ID': 'POTB5', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '6', 'P and ID': 'PNTB6', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '7', 'P and ID': 'POTB7', 'unit': 'bar'}]
+
+actuator_list = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'IGNTN'}]
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -60,7 +63,7 @@ thread_lock2 = Lock()
 # webbrowser.open_new('http://127.0.0.1:5000/sensors')
 # webbrowser.open_new('http://127.0.0.1:5000/actuators')
 # webbrowser.open_new('http://127.0.0.1:5000/pidview')
-webbrowser.open_new('http://127.0.0.1:5001/') # + sessionID here if needed
+# webbrowser.open_new('http://127.0.0.1:5001/') # + sessionID here if needed
 
 
 # flask routes for webpages
@@ -97,6 +100,7 @@ def loadConfigFile(CSVFileAndFileContents):
         global actuator_list
         #print(fileContents)
         sensor_list, actuator_list = configuration.load_config(fileContents)
+        socketio.emit('sensor_and_actuator_config_uploaded')
 
 @socketio.on('armOrDisarmRequest')
 def armDisarm():
@@ -112,7 +116,7 @@ def armDisarm():
 
 @socketio.on('received_button_press')
 def handle_button_press(buttonID, state, current_time):
-    if armed:
+    if armed or (buttonID not in [actuator['P and ID'] for actuator in actuator_list]): # if disarmed then only allow button presses for sensors
         print('received button press: ', buttonID, state, 'Delay:',(time.time_ns() // 1_000_000) - current_time)
         actuator_states_and_sensor_tare_states[buttonID] = state
         socketio.emit('responding_with_button_data', [buttonID, state])
@@ -136,33 +140,49 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
 @socketio.on('autosequence')
 def handle_autoseqeunce(file):
     print("Received file") 
-
-    # clean data
     global autosequence_commands
+    global sleep_times_list
+    # returns a list of lists, each sublist containing a line from the config file
+    #TODO: look into this parsing, is it robust?
     autosequence_commands = [line.split(",")[:-1] for line in file.decode("utf-8").splitlines()][1:]
-    print(autosequence_commands)
+    sleep_times_list = [abs(int(autosequence_commands[i][2]) - int(autosequence_commands[i+1][2])) for i in range(len(autosequence_commands)-1)] + [0] # 0 on the end so we dont go out of range and instead delay for 0 seconds after autoseq is finished
+    print("differences =", sleep_times_list)
+    print("autoseq commands =", autosequence_commands)
 
 
 @socketio.on('launch_request')
 def handle_launch_request():
-    print("Received launch request")
-
-    global cancel 
-    cancel = False  
-
-    # check for config file
-    if not autosequence_commands:
-        socketio.emit('no_config')
+    global autosequence_occuring
+    if autosequence_occuring:
+        print("Autosequence is already running")
     else:
-        send_launch_request_to_mote() # Networking function
-        for i in range(len(autosequence_commands)):
-            socketio.emit('command', autosequence_commands[i])
-            if (cancel):
-                print("Launch cancelled")
-                break
-            if (i < len(autosequence_commands)-1):
-                sleep_time = (int(autosequence_commands[i+1][2])-int(autosequence_commands[i][2]))/1000
-                socketio.sleep(sleep_time)
+        print("Received launch request")
+
+        autosequence_occuring = True
+
+        global cancel 
+        cancel = False  
+
+        # check for config file
+        if not autosequence_commands:
+            socketio.emit('no_config')
+        else:
+            send_launch_request_to_mote() # Networking function ### i think we should move this a few lines down and have it be just an actuator press
+            sleep_list_iterator = 0 # iterate over a list of times to sleep, starting at index 0
+            for command in autosequence_commands:
+                buttonID = command[0]
+                booleanState = command[1] # true false convention used in autoseq file. This is a string as .csv files are parsed as strings
+                stringState = 'on' if booleanState == 'True' else 'off' # on/off state used in webpages
+                time = command[2] # not used in app.py; sent to autosequence.html to create rowID, used in case we toggle an actuator :: True, False, True :: then rows would be identical
+                socketio.emit('responding_with_button_data', [buttonID, stringState])
+                socketio.emit('command', [buttonID, booleanState, time])
+                # send actuator to mote #
+                if (cancel):
+                    print("Launch cancelled")
+                    break
+                socketio.sleep(sleep_times_list[sleep_list_iterator]/1000) # socketio.sleep() expects seconds as input
+                sleep_list_iterator += 1
+        autosequence_occuring = False
 
 
 @socketio.on('connect_request')

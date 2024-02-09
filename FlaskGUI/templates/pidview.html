@@ -367,9 +367,11 @@
 
 
         socket.on('responding_with_button_data', function (data) {
-
             updateButtonColor(data);
-
+        });
+        
+        socket.on('sensor_and_actuator_config_uploaded', function() {
+            location.reload();
         });
 
 

@@ -128,6 +128,10 @@
 
         });
 
+        socket.on('sensor_and_actuator_config_uploaded', function() {
+            location.reload();
+        });
+
         var chartCounter = 1;
         
 
