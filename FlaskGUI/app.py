@@ -122,7 +122,7 @@ def handle_button_press(buttonID, state, time):
         print('received button press: ', buttonID, state)
         actuator_states_and_sensor_tare_states[buttonID] = state
         socketio.emit('responding_with_button_data', [buttonID, state])
-        send_actuator_command(buttonInfo['Mote id'], buttonInfo['Pin'], state, interface_type='Binary GPIO')
+        networking.send_actuator_command(buttonInfo['Mote id'], buttonInfo['Pin'], state, interface_type='Binary GPIO')
     else:
         print("stand is disarmed!!! " + buttonID + " was not set to " + state)
 
@@ -167,7 +167,7 @@ def handle_launch_request():
         if not autosequence_commands:
             socketio.emit('no_config')
         else:
-            send_launch_request_to_mote() # Networking function ### i think we should move this a few lines down and have it be just an actuator press
+            networking.send_launch_request_to_mote() # Networking function ### i think we should move this a few lines down and have it be just an actuator press
             sleep_list_iterator = 0 # iterate over a list of times to sleep, starting at index 0
             for command in autosequence_commands:
                 buttonID = command[0]
