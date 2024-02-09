@@ -1,4 +1,0 @@
-P and ID,State,Time(ms),Comments
-VNNP,False,-3000,Initializing Solenoid
-VNNP,True,0,Opening Solenoid
-VNNP,False,3000,Closing Solenoid

@@ -1,8 +1,0 @@
-P and ID,State,Time(ms),Comments
-NULL,False,-10000,Start Sequence
-VNMO,True,-9000,Bullshit Solenoid
-STATE_TESTING,True,-5000,Enter Test State
-STATE_IDLE,True,5000,Exit Test State
-NULL,False,10000,End Sequence
-
-

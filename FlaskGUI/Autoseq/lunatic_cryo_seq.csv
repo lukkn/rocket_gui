@@ -1,4 +1,0 @@
-P and ID,State,Time(ms),Comments
-NULL,False,-5000,Autoseq Start
-VNMO,True,0,Opening Valve
-VNMO,False,1000,Closing Valve

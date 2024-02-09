@@ -1,4 +1,0 @@
-P and ID,State,Time(ms),Comments
-IGNTN,True,-5000,Start Countdown
-VNNF,True,0,Open VNNF
-VNNF,False,5000,Close VNNF

@@ -1,2 +1,0 @@
-Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit,min,max
-10,sensor,i2c ADC 2ch,AIN0,AIN1-AIN0,AIN0,Volts,0,5

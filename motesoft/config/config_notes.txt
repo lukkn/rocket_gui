@@ -1,4 +1,0 @@
-Spreadsheet with all components found here:
-https://docs.google.com/spreadsheets/d/1thmBCXt51pdb-lDczYVI7NMO4nz0p3LYw5bA1uRQ-AM/edit?usp=sharing
-
-Pin numbers are not shown on this spreadsheet, a pin number of -1 in a config file means the number is unknown.

@@ -1,8 +1,0 @@
-P and ID,State,Time(ms),Comments
-VXND,True,-5000,Autosequence Start
-VPTE,True,-3000,Open Valve VPTE
-VNNP,True,0,Open Valve VNNP
-VNNP,False,2000,Close Valve VNNP
-VPTE,False,2500,Close Valve VPTE
-
-
