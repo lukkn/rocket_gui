@@ -105,7 +105,7 @@ def send_config_to_mote(sensors):
     print(sensors)
 
     for m in range(1, 4):
-        reset_command = bytearray(2)
+        reset_command = bytearray(2) 
         reset_command[0] = 0
         reset_command[1] |= 0b00000000
         reset_command[1] |= 0b00111111 & get_interface_type_number('Clear_Config')

@@ -9,6 +9,7 @@ import sys
 
 # configuration file tim wrote
 import configuration
+import networking
 
 # temporarily append our library directory to sys.path so we can use eventlet. DO NOT REMOVE
 sys.path.append(os.path.abspath("./python_flask_and_flaskio_and_eventlet_libraries"))
@@ -87,7 +88,7 @@ def actuators():
 
 
 # methods to listen for client events
-@socketio.on('configFile')
+@socketio.on('uploadConfigFile')
 def loadConfigFile(CSVFileAndFileContents):
     CSVFile = CSVFileAndFileContents[0]
     fileContents = CSVFileAndFileContents[1]
@@ -154,7 +155,7 @@ def handle_launch_request():
     if not autosequence_commands:
         socketio.emit('no_config')
     else:
-        socketio.emit('launch')
+        send_launch_request_to_mote() # Networking function
         for i in range(len(autosequence_commands)):
             socketio.emit('command', autosequence_commands[i])
             if (cancel):
@@ -163,19 +164,25 @@ def handle_launch_request():
             if (i < len(autosequence_commands)-1):
                 sleep_time = (int(autosequence_commands[i+1][2])-int(autosequence_commands[i][2]))/1000
                 socketio.sleep(sleep_time)
+
+
+@socketio.on('connect_request')
+def handle_connect_request(config_file):
+    print("Received connect request to MoTE")
+    send_config_to_mote(sensor_list) # Networking function
             
 
 @socketio.on('abort_request')
 def handle_abort_request(abort_sequence_file):
     print("Received abort request") 
-    socketio.emit('abort', abort_sequence_file)
+    send_abort_request_to_mote() #Networking function
 
 @socketio.on('cancel_request')
 def handle_cancel_request():
     print("Received cancel request") 
     global autosequence_commands
     autosequence_commands = []
-    socketio.emit('cancel')
+    send_cancel_request_to_mote()
     global cancel 
     cancel = True
     

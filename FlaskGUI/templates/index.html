@@ -51,6 +51,11 @@
             overflow: wrap;
         }
 
+        #connectButton {
+            background-color: red;
+            font-size: 20px;
+        }
+
     </style>
 </head>
 
@@ -86,6 +91,11 @@
         <button type="button" onclick="submitCSV('csvFile1')">Submit CSV File</button>
     </div>
     <div id="csvFile1Message" class= "fileName"></div>
+
+
+    <div>
+        <button id = "connectButton" onclick="connectToMote('csvFile1');">Connect</button>
+    </div>
 
     <!-- reserved for future use DO NOT DELETE
     <br>
@@ -152,13 +162,17 @@
             const file = fileInput.files[0];
 
             if (file) {
-                //console.log(file);
-                socket.emit('configFile', [inputId, file]);
+                socket.emit("uploadConfigFile", [inputId, file]);
                 const fileMessage = document.getElementById(inputId + "Message");
                 fileMessage.innerHTML = `File ${file.name} submitted`;
             } else {
                 alert('Please select a file before submitting.');
             }
+        }
+
+        function connectToMote(){
+            const configFile = document.getElementById(inputId).files[0];
+            socket.emit("connect_request", [inputId, file]);
         }
 
  

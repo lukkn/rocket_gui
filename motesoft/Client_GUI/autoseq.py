@@ -17,7 +17,7 @@ autoseq_threads = [None, None, None, None]
 
 abort_mutex = Lock()
 kill_countdown = False
-
+ 
 def run_test_sequence(button, idx, actuators, path_key, is_abort=False):
     global autoseq_threads
 
