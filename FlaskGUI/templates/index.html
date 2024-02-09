@@ -94,8 +94,10 @@
 
 
     <div>
-        <button id = "connectButton" onclick="connectToMote('csvFile1');">Connect</button>
+        <button id = "connectButton" onclick="connectToMote()">Connect</button>
     </div>
+
+    <div></div>
 
     <!-- reserved for future use DO NOT DELETE
     <br>
@@ -171,8 +173,7 @@
         }
 
         function connectToMote(){
-            const configFile = document.getElementById(inputId).files[0];
-            socket.emit("connect_request", [inputId, file]);
+            socket.emit("connect_request");
         }
 
  

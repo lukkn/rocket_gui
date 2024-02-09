@@ -281,6 +281,10 @@
             timerStopped = true;
         }
 
+        function showAbortSequence() {
+            // TODO: display abort sequence 
+        }
+
         socket.on('command', function (command) {
             commandID = command[0] + command[1] + command[2];
             var tableRow = document.getElementById(commandID);
@@ -297,6 +301,10 @@
 
         socket.on('cancel', function(){
             alert("Launch cancelled");
+        })
+
+        socket,on('abort', function(){
+            showAbortSequence();
         })
     </script>
 </body>

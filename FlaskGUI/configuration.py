@@ -30,18 +30,19 @@ def get_interface_type_number(interface_name):
 
 
 
-def load_config(file_name=CONFIG_FILE):
+def load_config(file=CONFIG_FILE):
     actuators = []
     sensors = []
-    with open(file_name, 'r') as f:
-        for row in csv.DictReader(f):
-            if row['Sensor or Actuator'] == 'actuator':
-                actuators.append(row)
-            elif row['Sensor or Actuator'] == 'sensor':
-                sensors.append(row)
-            else:
-                print('Error parsing CSV sensor or actuator column')
-                print(row)
+    decoded_string = file.decode('utf-8')
+    lines = decoded_string.strip().split('\n')
+    for row in csv.DictReader(lines):
+        if row['Sensor or Actuator'] == 'actuator':
+            actuators.append(row)
+        elif row['Sensor or Actuator'] == 'sensor':
+            sensors.append(row)
+        else:
+            print('Error parsing CSV sensor or actuator column')
+            print(row)
     return actuators, sensors
 
 def load_auto_test(file_name):

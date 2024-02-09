@@ -9,7 +9,7 @@ import sys
 
 # configuration file tim wrote
 import configuration
-import networking
+from networking import *
 
 # temporarily append our library directory to sys.path so we can use eventlet. DO NOT REMOVE
 sys.path.append(os.path.abspath("./python_flask_and_flaskio_and_eventlet_libraries"))
@@ -97,7 +97,6 @@ def loadConfigFile(CSVFileAndFileContents):
         global actuator_list
         #print(fileContents)
         sensor_list, actuator_list = configuration.load_config(fileContents)
-        print(sensor_list)
 
 @socketio.on('armOrDisarmRequest')
 def armDisarm():
@@ -167,9 +166,9 @@ def handle_launch_request():
 
 
 @socketio.on('connect_request')
-def handle_connect_request(config_file):
+def handle_connect_request():
     print("Received connect request to MoTE")
-    send_config_to_mote(sensor_list) # Networking function
+    send_config_to_mote(sensor_list, actuator_list) # Networking function
             
 
 @socketio.on('abort_request')
