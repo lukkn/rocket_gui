@@ -1,0 +1,16 @@
+teensy needs to just spit out 100 hz but receiving packets is not time sensitive
+hard os deadline for sending data (i.e. cancel commands needs to be sent within 100 ms)
+    debate tcp or udp for sending commands to gurantee delivery?
+however, soft deadline for receiving data packets
+
+there might be discreprenancy between python sending enum and arduino sending c struct
+
+create a readme, needs a requirements.txt to keep track what packages needed
+
+need a list of functions that benk needs to create
+need a list of all types of sensors: 
+
+debate between using gui: pygobject3 or tk. 
+
+teensy adc and i2c: two communication protocols
+

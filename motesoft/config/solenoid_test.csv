@@ -1,0 +1,11 @@
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit,min,max
+3,sensor,Teensy ADC,Teensy ADC,14,TNSY,None,0,200
+3,actuator,Binary GPIO,Solenoid J30,31,CTRL1,None,None,None
+3,actuator,Binary GPIO,Solenoid J33,32,CTRL2,None,None,None
+3,actuator,Binary GPIO,Solenoid J34,23,CTRL3,None,None,None
+3,actuator,Binary GPIO,Solenoid J31,22,CTRL4,None,None,None
+3,actuator,Binary GPIO,Solenoid J32,21,CTRL5,None,None,None
+3,actuator,Binary GPIO,Solenoid J35,20,CTRL6,None,None,None
+3,actuator,Binary GPIO,Solenoid J7,37,CTRL5,None,None,None
+3,actuator,Binary GPIO,Solenoid J5,36,CTRL5,None,None,None
+3,actuator,servoPWM,Servo,9,SRVO,None,None,None

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data</title>
+    <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
+    <script src="{{ url_for('static', filename='makeChart.js') }}"></script>
+    <script> var sensorList = []; </script>
+</head>
+
+<style>
+    #listContainer {
+        width: 30%;
+        float: left;
+        margin-right: 2%;
+    }
+    #chartContainer {
+        width: 65%;
+        float: left;
+    }
+    #addChart {
+        margin-bottom: 1%;
+    }
+    canvas {
+        border: 1px solid;
+        height: 100%;
+        margin-top: 10px;
+    }
+</style>
+
+<body>
+    <p id="ping" style="float: right; margin: 0"></p>
+    <h1>Sensor Data</h1>
+    <div id = "listContainer">
+        <table border="2" id="sensorsTable">
+            <thead>
+                <tr>
+                    <th>Sensor Name</th>
+                    <th>Data</th>
+                    <th>Units</th>
+                    <th>Tare</th>
+                    <th>Untare</th>
+                    <th>Last Sent <br> Command</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sensor in sensor_list %}
+                    <tr>
+                        <td>{{ sensor['P and ID'] }}</td>
+                        <td id="{{ sensor['P and ID'] }}_data" style="min-width: 100px; max-width: 100px; overflow-wrap: break-word;">No Data</td>
+                        <td>{{ sensor['unit'] }}</td>
+                        <td><button id="{{ sensor['P and ID'] }}" onclick="buttonClicked(id, 'tare')" >Tare</button></td>
+                        <td><button id="{{ sensor['P and ID'] }}" onclick="buttonClicked(id, 'untare')" >Untare</button></td>
+                        <td id="{{ sensor['P and ID'] }}_state" style="min-width: 50px; max-width: 50px; overflow-wrap: break-word;">{{ actuator_states_and_sensor_tare_states[sensor['P and ID']] }}</td>
+                        <script> sensorList.push("{{ sensor['P and ID'] }}") </script>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div id="chartContainer">
+        <button id="addChart" onClick = "addChart()">Add Chart</button>
+    </div>
+
+    <script>
+
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('sensor_data', function (data) {
+            //console.log('sensor_data emit contents: ', data)
+            //console.log('sensor_data emit contents: ', data)
+            // right now sending data as a list, index0 = data, index1 = timestamp of data and time of transmission
+            const listOfSensorIDValueTuples = data[0]
+            const timestamp = data[1]
+
+            listOfSensorIDValueTuples.forEach(function (sensorTuple) {
+                const sensorID = sensorTuple[0];
+                const sensorValue = sensorTuple[1];
+                const dataCell = document.getElementById(sensorID + '_data');
+
+                dataCell.textContent = sensorValue.toFixed(3);
+            });
+
+            // update data for charts
+            const startTime = performance.now();
+
+            // second param is number of data points to store for graphing
+            updateData(listOfSensorIDValueTuples, 20*15);
+
+            // plot updated data for each chart
+            const canvasList = document.getElementsByTagName('canvas'); 
+            for (canvas of canvasList){
+                plotLines(canvas.id);
+            }
+            const endTime = performance.now();
+
+            console.log('performance.now() showing difference of: ', endTime - startTime);
+
+            const a = document.getElementById("ping");
+            a.textContent = `Time from back to front is: ${Date.now() - timestamp} milliseconds`;
+
+        });
+
+        function buttonClicked(id, state) {
+            const current_time = Date.now();
+            socket.emit('received_button_press', id, state, current_time);
+        }
+
+
+        socket.on('responding_with_button_data', function (data) {
+            buttonID = data[0]
+            buttonState = data[1]
+
+            const a = document.getElementById("" + buttonID + "_state");
+
+            if (buttonState === 'untare'){
+                a.textContent = buttonState;
+
+            } else if (buttonState === 'tare'){
+                a.textContent = buttonState;
+
+            } else {
+                console.log("error!!!");
+            }
+
+
+        });
+
+        socket.on('sensor_and_actuator_config_uploaded', function() {
+            location.reload();
+        });
+
+        var chartCounter = 1;
+        
+
+        function addChart(){
+            const chartNumber = chartCounter;
+            chartCounter ++;
+
+            // create new canvas in chartContainer
+            var canvas = document.createElement("canvas");
+            canvas.id = "chart" + chartNumber;
+            canvas.width = 600;
+            canvas.height = 300;
+            canvas.style.display = "block";
+            document.getElementById("chartContainer").appendChild(canvas);
+
+            
+            var removeButton = document.createElement("button");
+            removeButton.id = "removeButton" + chartNumber;
+            removeButton.textContent = "Remove Chart";
+            removeButton.addEventListener('click', function() {
+                removeChart(chartNumber);
+            });
+            document.getElementById("chartContainer").appendChild(removeButton);
+
+            createEmptyChart(canvas.id, sensorList);
+        }
+
+        function removeChart(chartNumber){
+            canvasID = "chart" + chartNumber;
+            const canvas = document.getElementById(canvasID);
+            document.getElementById("chartContainer").removeChild(canvas);
+
+            const removeButton = document.getElementById("removeButton" + chartNumber);
+            document.getElementById("chartContainer").removeChild(removeButton);
+
+            removeCheckboxes(canvasID, sensorList);
+        }
+    
+
+        let pingTimeout;
+
+        socket.on('ping', function (time) {
+            // Update ping display
+            document.getElementById("ping").textContent = `Ping: ${(Date.now() - time).toFixed(0)} milliseconds`;
+
+            // Clear the timeout when the pong response is received
+            clearTimeout(pingTimeout);
+
+            // Set a new timeout for the next expected ping
+            pingTimeout = setTimeout(function() {
+                const a = document.getElementById("ping");
+                a.textContent = "Server not responding";
+                location.reload();
+            }, 2000 + 1000); // If we get ping 1 second late attempt reload
+        });
+
+
+    </script>
+
+</body>
+
+</html>

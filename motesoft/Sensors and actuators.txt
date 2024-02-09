@@ -1,0 +1,22 @@
+### Sensors
+teensy ADC  :2    read ignition cap and battery voltage/4
+thermocouple:10   ADC
+pressure td.:3  ?? Pneumatics Pannel
+load cell   :1    ??
+flowmeter   :2    zener reg to interrput. AC voltage pulse, freq prop to vol flow
+
+### Actuators
+servo:       4 PWM
+solenoid    :    4 MOSFET - Pneumatics Pannel
+pump        :1    ??
+ignitor     :1    arm/charge cap w/ MOSTFET, led/pizo alert, discharge w/ MOSFET. model number TS-LCI100
+
+
+List of c++ functions:
+read (read sensors):
+-Teensy's ADC
+-i2c ADC
+-flowmeter counter
+write (control actuators):
+-servo (pwm)
+-GPIO (binary on/off)

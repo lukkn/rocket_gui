@@ -1,0 +1,37 @@
+# Quick Startup Guide to Teensy
+
+This is a quick guide for new and future members to getting started teensy board, which control servos and collect sensor data from the rocket propulsion testing stand. We will accomplish installation, setting up, and running basic application for the board in this guide.
+## Required Materials
+* Computer (Windows, Linux, MacOS)
+* Teensy Board (3.6 currently as of writing this guide)
+* Micro-B USB Cable
+## 	Installation
+1. Install the Arduino IDE: [Arduino Link](https://www.arduino.cc/en/software). Installation of Arduino IDE setups basic environment and installs necessary libraries. 
+
+2. Install Teensyduino IDE addon: [PJRC link](https://www.pjrc.com/teensy/td_download.html). We will still need Teensyduino to program exclusively on Teensy. Fortunately, all stardard Arduino libraries and programs work Teensyduino. 
+
+## Connecting Your Board
+
+1. Connect USB cable from Teensy to computer
+2. Open Teensyduino 
+3. Select serial port the cable have connected with board. Select entry from **Tools > Port**. If you are not sure, the entry should be a path name indicated **(Teensy)**
+4. Select board that is connected. Select entry from  **Tools > Board**. As of writing this, we are using Teensy 3.6. To determine what version of Teensy, look at the model number displayed on its chip and refer to the list:  [Model List](https://www.pjrc.com/teensy/index.html). (**Teensy 3.6: MK66FX1M0**)
+
+## Run Your First Application!
+We will be using the conveniently prewritten blink application for Teensy. 
+1. Navigate to **File > 01.Basics > Blink**
+2. Compile and upload program to board by clicking on the right arrow located top left hand corner of the window. 
+3. Watch the results of LED blinking on and off every second
+
+Note: Loader window will pop when uploading your first program/sketch. You can upload hex files by manually clicking on the button (There are more steps from their website [Loader Window](https://www.pjrc.com/teensy/loader_mac.html).
+However, clicking the arrow from the IDE will automatically reboot your board then compile and upload your sketch. 
+
+## References
+* [PJRC Website](https://www.pjrc.com/teensy/tutorial.html)
+* [Sparkfun](https://learn.sparkfun.com/tutorials/getting-started-with-the-teensy/programming)
+* [YouTube(1)](https://www.youtube.com/watch?v=vFpsvTtddnc&ab_channel=CoreElectronics)
+* [YouTube(2)](https://www.youtube.com/watch?v=5yjdPbCac9g&ab_channel=GreatScott!)
+
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbNTQxNTU3MjAxXX0=
+-->

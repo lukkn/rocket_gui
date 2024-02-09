@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P&ID VIEW</title>
+    <style>
+        body {
+            /*makes everything unselectable, DO NOT REMOVE, buttons will drag while locked if selected, I do not know why :(*/
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        #messageContainer {
+            position: absolute;
+            left: 25vh;
+            text-align: left;
+            width: 700px;
+            font-weight: bold;
+        }
+
+        #backgroundContainer {
+            z-index: -1;
+            height: calc(100vh - 25px);
+            width: 100vw;
+            position: fixed;
+            margin-top: 1%;
+
+            background-image: url("{{ url_for('static', filename='HTS_PandID.png') }}");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-origin: content-box;
+            background-position: center center;
+
+            transform: translateY(25px);
+        }
+
+        .collapsible-menu label {
+            display: block;
+            cursor: pointer;
+            background-color: antiquewhite;
+            text-align: center;
+            font-weight: bold;
+            width: 10vw;
+            padding: 0 10px 5px 10px;
+        }
+
+        input#menu {
+            display: none;
+        }
+
+        .guiControlButtonsContainer {
+            width: 10vw;
+            max-height: 0;
+            overflow: hidden;
+            padding: 0 10px 0 10px;
+            background-color: antiquewhite;
+            cursor: pointer;
+            align-items: center;
+        }
+
+        #guiControlButtons {
+            position: relative;
+            width: 10vw;
+            padding: 10px 10px;
+            margin-bottom: 10px;
+        }
+
+        input:checked~.guiControlButtonsContainer {
+            max-height: 100%;
+        }
+
+        .draggable {
+            width: 70px;
+            position: absolute;
+            cursor: move;
+            pointer-events: auto;
+            background-color: black;
+            border: none;
+            align-items: center;
+        }
+
+        .input.radio {
+            display: inline-block;
+        }
+
+        .toggleOn {
+            position: relative;
+            display: inline-block;
+            width: 35px;
+            height: 20x;
+            background-color: white;
+            text-align: center;
+        }
+
+        .toggleOff {
+            position: relative;
+            display: inline-block;
+            width: 35px;
+            height: 20x;
+            background-color: white;
+            text-align: center;
+        }
+
+        /* Checkbox vanished */
+        .checkbox {
+            display: none;
+        }
+
+        #sensorOrActuatorName {
+            position: relative;
+            color: white;
+            text-align: center;
+            font-size: small;
+        }
+
+        .locked {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="float-container" style="float: right; margin: 0;">
+        <p id="ping" style="float: right; margin: 0;"></p>
+        <p id="performanceIndicator" style="float: right; clear: both; margin: 0;"></p>
+    </div>
+    <form method="post">
+        {% for actuator in actuator_list %}
+
+        </label>
+        <div id="{{ actuator['P and ID'] }}" class="draggable" draggable="true">
+            <legend id="sensorOrActuatorName">{{actuator['P and ID']}}</legend>
+
+            <input type="radio" id="{{ actuator['P and ID'] }} OFF" name="{{ actuator['P and ID'] }}" class="checkbox"
+                onclick="buttonClicked(name, 'off')" /><label id="{{ actuator['P and ID'] }} off background" for="{{ actuator['P and ID'] }} OFF"
+                class="toggleOff">OFF</label><input type="radio" id="{{ actuator['P and ID'] }} ON" name="{{ actuator['P and ID'] }}"
+                class="checkbox" onclick="buttonClicked(name, 'on')" /><label id="{{ actuator['P and ID'] }} on background" for="{{ actuator['P and ID'] }} ON"
+                class="toggleOn">ON</label>
+        </div>
+
+
+        {% endfor %}
+        {% for sensor in sensor_list %}
+
+        </label>
+        <div id="{{ sensor['P and ID'] }}" class="draggable" draggable="true">
+            <legend id="sensorOrActuatorName">{{sensor['P and ID']}}</legend>
+            <legend id="{{ sensor['P and ID'] }}sensorValueLegend"
+                style="position: relative; color: white; text-align: center; font-size:small;"></legend>
+            <legend id="sensorOrActuatorName">{{sensor['unit']}}</legend>
+
+            <input type="radio" id="{{ sensor['P and ID'] }} Tare" name="{{ sensor['P and ID'] }}" class="checkbox"
+                onclick="buttonClicked(name, 'tare')" /><label id="{{ sensor['P and ID'] }} tare background" for="{{ sensor['P and ID'] }} Tare" class="toggleOn"
+                style="font-size: small;">Tare</label><input type="radio" id="{{ sensor['P and ID'] }} Untare"
+                name="{{ sensor['P and ID'] }}" class="checkbox" onclick="buttonClicked(name, 'untare')" /><label id="{{ sensor['P and ID'] }} untare background"
+                for="{{ sensor['P and ID'] }} Untare" class="toggleOff" style="font-size: small;">Untare</label>
+        </div>
+
+
+        {% endfor %}
+    </form>
+
+
+    <div id="backgroundContainer"></div>
+    <div id="messageContainer"></div>
+    <div class="collapsible-menu">
+        <input type="checkbox" id="menu">
+        <label for="menu">Menu</label>
+        <div class="guiControlButtonsContainer">
+            <button id="guiControlButtons" onclick="submitCoordinates()">Submit Coordinates</button>
+            <button id="guiControlButtons" onclick="getCoordinates()">Get Coordinates</button>
+            <button id="guiControlButtons" onclick="lockButtons()">Lock Buttons</button>
+            <button id="guiControlButtons" onclick="unlockButtons()">Unlock Buttons</button>
+        </div>
+    </div>
+
+
+    <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
+    <script type="text/javascript" charset="utf-8">
+        var socket = io();
+    </script>
+
+    <script>
+        // fetch all button states as a variable
+        var actuatorStatesAndSensorTareStates = {{ actuator_states_and_sensor_tare_states | tojson | safe }};
+        //console.log("actuatorStatesAndSensorTareStates: ", actuatorStatesAndSensorTareStates);
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const draggableElements = document.querySelectorAll('.draggable');
+            var isLocked = false;
+
+            // TODO: lock on default instead of having to pass function
+            lockButtons();
+
+            // Fetch coordinates when the page is loaded
+            getCoordinates();
+
+            // we load colors of the buttons saved in our python dictionary
+            for (let element of Object.entries(actuatorStatesAndSensorTareStates)) {
+                updateButtonColor(element);
+            };
+
+            draggableElements.forEach(function (element) {
+                element.addEventListener('dragstart', function (e) {
+                    if (isLocked) {
+                        e.preventDefault(); // Prevent dragging when locked
+                        return;
+                    }
+                    e.dataTransfer.setData('text/plain', element.id);
+                });
+            });
+
+            document.addEventListener('dragover', function (e) {
+                e.preventDefault();
+            });
+
+            document.addEventListener('drop', function (e) {
+                e.preventDefault();
+                if (isLocked) {
+                    return; // Ignore drop when locked
+                }
+                const data = e.dataTransfer.getData('text/plain');
+                const draggedElement = document.getElementById(data);
+
+                const offsetX = e.clientX - draggedElement.offsetWidth / 2;
+                const offsetY = e.clientY - draggedElement.offsetHeight / 2;
+
+                draggedElement.style.left = offsetX + 'px';
+                draggedElement.style.top = offsetY + 'px';
+            });
+
+        });
+
+        function buttonClicked(id, state) {
+            // when we unlock buttons we want to ignore any accidental clicks, not needed because of checkbox disable but here for extra protection
+            if (!isLocked) {
+                return;
+            }            
+            current_time = Date.now();
+            socket.emit('received_button_press', id, state, current_time);
+        }
+
+
+
+        function submitCoordinates() {
+            const textprompt = "tim hates linux"
+            while (true) {
+                const confirmationPhrase = prompt("Type 'tim hates linux' to confirm");
+                if (confirmationPhrase === textprompt) {
+
+                    const draggableElements = document.querySelectorAll('.draggable');
+                    const coordinates = [];
+
+                    draggableElements.forEach(function (element) {
+                        const rect = element.getBoundingClientRect();
+                        coordinates.push({ id: element.id, x: rect.left, y: rect.top });
+                    });
+
+                    socket.emit('actuator_button_coordinates', coordinates);
+                    return;
+
+                } else if (confirmationPhrase === null) {
+                    return; //user clicked cancel
+
+                } else {
+                    alert("Confirmation failed. Incorrect phrase.");
+                }
+            }
+        }
+
+
+        function getCoordinates() {
+            socket.emit('actuator_button_coordinates', 'getCoordinates');
+            //TODO: reasearch this, may one day skip over socket.on and just not get anything on a slower computer
+            socket.on('get_actuator_button_location_config', function (coordinates) {
+                // Place the buttons at the fetched coordinates
+                coordinates.forEach(coord => {
+                    const button = document.getElementById(coord.id);
+                    if (button) {
+                        button.style.left = coord.x + 'px';
+                        button.style.top = coord.y + 'px';
+                    }
+                });
+            });
+        }
+
+        function updateButtonColor(element){
+            buttonID = element[0];
+            buttonState = element[1];
+
+            const a = document.getElementById("" + buttonID + " " + buttonState + " background");
+
+            if (buttonState === 'off'){
+                const b = document.getElementById("" + buttonID + " on" + " background");
+                a.style.backgroundColor = "lightcoral";
+                b.style.backgroundColor = "white";
+            } else if (buttonState === 'on'){
+                const b = document.getElementById("" + buttonID + " off" + " background");
+                a.style.backgroundColor = "lightgreen";
+                b.style.backgroundColor = "white";
+            } else if (buttonState === 'untare'){
+                const b = document.getElementById("" + buttonID + " tare" + " background");
+                a.style.backgroundColor = "lightcoral";
+                b.style.backgroundColor = "white";
+            } else if (buttonState === 'tare'){
+                const b = document.getElementById("" + buttonID + " untare" + " background");
+                a.style.backgroundColor = "lightgreen";
+                b.style.backgroundColor = "white";
+            } else {
+                console.log("error!!!");
+            }
+        }
+
+        function lockButtons() {
+            const draggableElements = document.querySelectorAll('.draggable');
+            draggableElements.forEach(function (element) {
+                element.classList.add('locked');
+                element.draggable = false;
+            });
+
+            var checkboxes = document.querySelectorAll('.checkbox');
+            checkboxes.forEach(function (checkbox) {
+                checkbox.disabled = false;
+            });
+
+            isLocked = true;
+            messageContainer.innerHTML = "Button Positions are LOCKED, Buttons are ARMED";
+        }
+
+        function unlockButtons() {
+            const draggableElements = document.querySelectorAll('.draggable');
+            draggableElements.forEach(function (element) {
+                element.classList.remove('locked');
+                element.draggable = true;
+            });
+
+            var checkboxes = document.querySelectorAll('.checkbox');
+            checkboxes.forEach(function (checkbox) {
+                checkbox.disabled = true;
+            });
+
+            isLocked = false;
+            messageContainer.innerHTML = "Button Positions are UNLOCKED, Buttons are DISARMED";
+        }
+
+
+        socket.on('sensor_data', function (data) {
+            // right now sending data as a list, index0 = data, index1 = timestamp of data and time of transmission
+            const listOfSensorIDValueTuples = data
+
+            listOfSensorIDValueTuples.forEach(function (sensorTuple) {
+                const sensorID = sensorTuple[0]+'sensorValueLegend';
+                const sensorValue = sensorTuple[1];
+                document.getElementById(sensorID).textContent = sensorValue;
+            });
+
+            document.getElementById("performanceIndicator").textContent = `Data is: ${(Date.now() - timeAtTransmission).toFixed(1)} milliseconds old`;
+        });
+
+
+        socket.on('responding_with_button_data', function (data) {
+            updateButtonColor(data);
+        });
+        
+        socket.on('sensor_and_actuator_config_uploaded', function() {
+            location.reload();
+        });
+
+
+        let pingTimeout;
+
+        socket.on('ping', function (time) {
+            // Update ping display
+            document.getElementById("ping").textContent = `Ping: ${(Date.now() - time).toFixed(0)} milliseconds`;
+
+            // Clear the timeout when the pong response is received
+            clearTimeout(pingTimeout);
+
+            // Set a new timeout for the next expected ping
+            pingTimeout = setTimeout(function() {
+                const a = document.getElementById("ping");
+                a.textContent = "Server not responding";
+                location.reload();
+            }, 2000 + 1000); // If we get ping 1 second late attempt reload
+        });
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,18 @@
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit,min,max
+3,sensor,ADC Internal Temp,MoTE Temperature TOTR,24,TEMP,*C Internal,-50,250
+3,sensor,i2c ADC 2ch PGA128,Thermocouple TOTR,30,TOTR,Degrees C,-500,500
+3,sensor,i2c ADC 1ch,Pressure Transducer POTB,33,POTB,PSI_1k,0,1000
+3,sensor,i2c ADC 1ch,Pressure Transducer POTR,34,POTR,PSI_1k,0,1000
+3,sensor,i2c ADC 1ch,Pressure Transducer PNTB,20,PNTB,PSI_1k,0,1000
+3,sensor,i2c ADC 1ch,Pressure Transducer PFTR,21,PFTR,PSI_1k,0,1000
+3,sensor,i2c ADC 2ch PGA128,Loadcell LOTM,40,LOTM,Volts,0,2.048
+3,sensor,i2c ADC 2ch PGA128,Loadcell LFTM,41,LFTM,Volts,0,2.048
+3,actuator,servoPWM,Servo VFTV,5,VFTV,None,None,None
+3,actuator,servoPWM,Servo VOTV,6,VOTV,None,None,None
+3,actuator,servoPWM,Servo VOTF,27,VOTF,None,None,None
+3,actuator,servoPWM,Servo VPTE,29,VPTE,None,None,None
+3,actuator,Binary GPIO,Solenoid VNTB,23,VNTB,None,None,None
+3,actuator,Binary GPIO,Solenoid VXND,22,VXND,None,None,None
+3,actuator,Binary GPIO,Solenoid VNTO,32,VNTO,None,None,None
+
+

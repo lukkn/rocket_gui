@@ -1,0 +1,1560 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 3 3
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Device:R_Small_US R?
+U 1 1 60DCEAE3
+P 1800 5250
+AR Path="/60DCEAE3" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60DCEAE3" Ref="R15"  Part="1" 
+F 0 "R15" V 1595 5250 50  0000 C CNN
+F 1 "470" V 1686 5250 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 1800 5250 50  0001 C CNN
+F 3 "~" H 1800 5250 50  0001 C CNN
+F 4 " C23179" H 1800 5250 50  0001 C CNN "LCSC Part #"
+	1    1800 5250
+	0    1    1    0   
+$EndComp
+Connection ~ 2600 4700
+Wire Wire Line
+	2600 4700 2400 4700
+Wire Wire Line
+	2600 4700 2850 4700
+Wire Wire Line
+	2850 5000 2600 5000
+Wire Wire Line
+	2850 4800 2850 5000
+$Comp
+L Device:D D?
+U 1 1 60DCEAF0
+P 2600 4850
+AR Path="/60DCEAF0" Ref="D?"  Part="1" 
+AR Path="/60DBC7EC/60DCEAF0" Ref="D1"  Part="1" 
+F 0 "D1" V 2554 4930 50  0000 L CNN
+F 1 "D" V 2645 4930 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-123" H 2600 4850 50  0001 C CNN
+F 3 "~" H 2600 4850 50  0001 C CNN
+F 4 "C8598" H 2600 4850 50  0001 C CNN "LCSC Part #"
+	1    2600 4850
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:Conn_01x02_Male J?
+U 1 1 60DCEAFC
+P 3050 4800
+AR Path="/60DCEAFC" Ref="J?"  Part="1" 
+AR Path="/60DBC7EC/60DCEAFC" Ref="J4"  Part="1" 
+F 0 "J4" H 3022 4682 50  0000 R CNN
+F 1 "Solenoid" H 3022 4773 50  0000 R CNN
+F 2 "Connector_JST:JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical" H 3050 4800 50  0001 C CNN
+F 3 "~" H 3050 4800 50  0001 C CNN
+	1    3050 4800
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60DCEB02
+P 2400 5450
+AR Path="/60DCEB02" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB02" Ref="#PWR0156"  Part="1" 
+F 0 "#PWR0156" H 2400 5200 50  0001 C CNN
+F 1 "GNDA" H 2405 5277 50  0000 C CNN
+F 2 "" H 2400 5450 50  0001 C CNN
+F 3 "" H 2400 5450 50  0001 C CNN
+	1    2400 5450
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R_Small_US R?
+U 1 1 60DCEB08
+P 2000 5350
+AR Path="/60DCEB08" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB08" Ref="R18"  Part="1" 
+F 0 "R18" H 2068 5396 50  0000 L CNN
+F 1 "10k" H 2068 5305 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 2000 5350 50  0001 C CNN
+F 3 "~" H 2000 5350 50  0001 C CNN
+F 4 "C25804" H 2000 5350 50  0001 C CNN "LCSC Part #"
+	1    2000 5350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Transistor_FET:DMG3404L Q?
+U 1 1 60DCEB0E
+P 2300 5250
+AR Path="/60DCEB0E" Ref="Q?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB0E" Ref="Q5"  Part="1" 
+F 0 "Q5" H 2504 5296 50  0000 L CNN
+F 1 "DMG3404L" H 2504 5205 50  0000 L CNN
+F 2 "Package_TO_SOT_SMD:SOT-23" H 2500 5175 50  0001 L CIN
+F 3 "http://www.diodes.com/assets/Datasheets/DMG3404L.pdf" H 2300 5250 50  0001 L CNN
+	1    2300 5250
+	1    0    0    -1  
+$EndComp
+Text GLabel 1700 5250 0    50   Input ~ 0
+Solenoid5
+Wire Wire Line
+	1900 5250 2000 5250
+Connection ~ 2000 5250
+Wire Wire Line
+	2000 5250 2100 5250
+$Comp
+L power:GNDA #PWR?
+U 1 1 60DCEB18
+P 2000 5450
+AR Path="/60DCEB18" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB18" Ref="#PWR0157"  Part="1" 
+F 0 "#PWR0157" H 2000 5200 50  0001 C CNN
+F 1 "GNDA" H 2005 5277 50  0000 C CNN
+F 2 "" H 2000 5450 50  0001 C CNN
+F 3 "" H 2000 5450 50  0001 C CNN
+	1    2000 5450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+12V #PWR?
+U 1 1 60DCEB1E
+P 2400 4700
+AR Path="/60DCEB1E" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB1E" Ref="#PWR0158"  Part="1" 
+F 0 "#PWR0158" H 2400 4550 50  0001 C CNN
+F 1 "+12V" H 2415 4873 50  0000 C CNN
+F 2 "" H 2400 4700 50  0001 C CNN
+F 3 "" H 2400 4700 50  0001 C CNN
+	1    2400 4700
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R_Small_US R?
+U 1 1 60DCEB25
+P 1850 4050
+AR Path="/60DCEB25" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB25" Ref="R17"  Part="1" 
+F 0 "R17" V 1645 4050 50  0000 C CNN
+F 1 "470" V 1736 4050 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 1850 4050 50  0001 C CNN
+F 3 "~" H 1850 4050 50  0001 C CNN
+F 4 " C23179" H 1850 4050 50  0001 C CNN "LCSC Part #"
+	1    1850 4050
+	0    1    1    0   
+$EndComp
+Connection ~ 2650 3500
+Wire Wire Line
+	2650 3500 2450 3500
+Wire Wire Line
+	2650 3500 2900 3500
+Wire Wire Line
+	2900 3800 2650 3800
+Wire Wire Line
+	2900 3600 2900 3800
+$Comp
+L Device:D D?
+U 1 1 60DCEB32
+P 2650 3650
+AR Path="/60DCEB32" Ref="D?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB32" Ref="D3"  Part="1" 
+F 0 "D3" V 2604 3730 50  0000 L CNN
+F 1 "D" V 2695 3730 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-123" H 2650 3650 50  0001 C CNN
+F 3 "~" H 2650 3650 50  0001 C CNN
+F 4 "C8598" H 2650 3650 50  0001 C CNN "LCSC Part #"
+	1    2650 3650
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:Conn_01x02_Male J?
+U 1 1 60DCEB3E
+P 3100 3600
+AR Path="/60DCEB3E" Ref="J?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB3E" Ref="J6"  Part="1" 
+F 0 "J6" H 3072 3482 50  0000 R CNN
+F 1 "Solenoid" H 3072 3573 50  0000 R CNN
+F 2 "Connector_JST:JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical" H 3100 3600 50  0001 C CNN
+F 3 "~" H 3100 3600 50  0001 C CNN
+	1    3100 3600
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60DCEB44
+P 2450 4250
+AR Path="/60DCEB44" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB44" Ref="#PWR0160"  Part="1" 
+F 0 "#PWR0160" H 2450 4000 50  0001 C CNN
+F 1 "GNDA" H 2455 4077 50  0000 C CNN
+F 2 "" H 2450 4250 50  0001 C CNN
+F 3 "" H 2450 4250 50  0001 C CNN
+	1    2450 4250
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R_Small_US R?
+U 1 1 60DCEB4A
+P 2050 4150
+AR Path="/60DCEB4A" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB4A" Ref="R21"  Part="1" 
+F 0 "R21" H 2118 4196 50  0000 L CNN
+F 1 "10k" H 2118 4105 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 2050 4150 50  0001 C CNN
+F 3 "~" H 2050 4150 50  0001 C CNN
+F 4 "C25804" H 2050 4150 50  0001 C CNN "LCSC Part #"
+	1    2050 4150
+	1    0    0    -1  
+$EndComp
+$Comp
+L Transistor_FET:DMG3404L Q?
+U 1 1 60DCEB50
+P 2350 4050
+AR Path="/60DCEB50" Ref="Q?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB50" Ref="Q7"  Part="1" 
+F 0 "Q7" H 2554 4096 50  0000 L CNN
+F 1 "DMG3404L" H 2554 4005 50  0000 L CNN
+F 2 "Package_TO_SOT_SMD:SOT-23" H 2550 3975 50  0001 L CIN
+F 3 "http://www.diodes.com/assets/Datasheets/DMG3404L.pdf" H 2350 4050 50  0001 L CNN
+	1    2350 4050
+	1    0    0    -1  
+$EndComp
+Text GLabel 1750 4050 0    50   Input ~ 0
+Solenoid3
+Wire Wire Line
+	1950 4050 2050 4050
+Connection ~ 2050 4050
+Wire Wire Line
+	2050 4050 2150 4050
+$Comp
+L power:GNDA #PWR?
+U 1 1 60DCEB5A
+P 2050 4250
+AR Path="/60DCEB5A" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB5A" Ref="#PWR0161"  Part="1" 
+F 0 "#PWR0161" H 2050 4000 50  0001 C CNN
+F 1 "GNDA" H 2055 4077 50  0000 C CNN
+F 2 "" H 2050 4250 50  0001 C CNN
+F 3 "" H 2050 4250 50  0001 C CNN
+	1    2050 4250
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+12V #PWR?
+U 1 1 60DCEB60
+P 2450 3500
+AR Path="/60DCEB60" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB60" Ref="#PWR0162"  Part="1" 
+F 0 "#PWR0162" H 2450 3350 50  0001 C CNN
+F 1 "+12V" H 2465 3673 50  0000 C CNN
+F 2 "" H 2450 3500 50  0001 C CNN
+F 3 "" H 2450 3500 50  0001 C CNN
+	1    2450 3500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2900 2300 2900 2500
+$Comp
+L Connector:Conn_01x02_Male J?
+U 1 1 60DCEB68
+P 3100 2300
+AR Path="/60DCEB68" Ref="J?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB68" Ref="J5"  Part="1" 
+F 0 "J5" H 3072 2182 50  0000 R CNN
+F 1 "Solenoid" H 3072 2273 50  0000 R CNN
+F 2 "Connector_JST:JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical" H 3100 2300 50  0001 C CNN
+F 3 "~" H 3100 2300 50  0001 C CNN
+	1    3100 2300
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:+12V #PWR?
+U 1 1 60DCEB70
+P 2450 2200
+AR Path="/60DCEB70" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB70" Ref="#PWR0163"  Part="1" 
+F 0 "#PWR0163" H 2450 2050 50  0001 C CNN
+F 1 "+12V" H 2465 2373 50  0000 C CNN
+F 2 "" H 2450 2200 50  0001 C CNN
+F 3 "" H 2450 2200 50  0001 C CNN
+	1    2450 2200
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60DCEB76
+P 2050 2950
+AR Path="/60DCEB76" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB76" Ref="#PWR0164"  Part="1" 
+F 0 "#PWR0164" H 2050 2700 50  0001 C CNN
+F 1 "GNDA" H 2055 2777 50  0000 C CNN
+F 2 "" H 2050 2950 50  0001 C CNN
+F 3 "" H 2050 2950 50  0001 C CNN
+	1    2050 2950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2050 2750 2150 2750
+Connection ~ 2050 2750
+Wire Wire Line
+	1950 2750 2050 2750
+Text GLabel 3550 2700 0    50   Input ~ 0
+Solenoid1
+$Comp
+L Device:R_Small_US R?
+U 1 1 60DCEB80
+P 2050 2850
+AR Path="/60DCEB80" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB80" Ref="R20"  Part="1" 
+F 0 "R20" H 2118 2896 50  0000 L CNN
+F 1 "10k" H 2118 2805 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 2050 2850 50  0001 C CNN
+F 3 "~" H 2050 2850 50  0001 C CNN
+F 4 "C25804" H 2050 2850 50  0001 C CNN "LCSC Part #"
+	1    2050 2850
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60DCEB86
+P 2450 2950
+AR Path="/60DCEB86" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB86" Ref="#PWR0165"  Part="1" 
+F 0 "#PWR0165" H 2450 2700 50  0001 C CNN
+F 1 "GNDA" H 2455 2777 50  0000 C CNN
+F 2 "" H 2450 2950 50  0001 C CNN
+F 3 "" H 2450 2950 50  0001 C CNN
+	1    2450 2950
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D D?
+U 1 1 60DCEB92
+P 2650 2350
+AR Path="/60DCEB92" Ref="D?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB92" Ref="D2"  Part="1" 
+F 0 "D2" V 2604 2430 50  0000 L CNN
+F 1 "D" V 2695 2430 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-123" H 2650 2350 50  0001 C CNN
+F 3 "~" H 2650 2350 50  0001 C CNN
+F 4 "C8598" H 2650 2350 50  0001 C CNN "LCSC Part #"
+	1    2650 2350
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	2900 2500 2650 2500
+Wire Wire Line
+	2650 2200 2900 2200
+Wire Wire Line
+	2650 2200 2450 2200
+Connection ~ 2650 2200
+$Comp
+L Device:R_Small_US R?
+U 1 1 60DCEB9D
+P 1850 2750
+AR Path="/60DCEB9D" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60DCEB9D" Ref="R16"  Part="1" 
+F 0 "R16" V 1645 2750 50  0000 C CNN
+F 1 "470" V 1736 2750 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 1850 2750 50  0001 C CNN
+F 3 "~" H 1850 2750 50  0001 C CNN
+F 4 " C23179" H 1850 2750 50  0001 C CNN "LCSC Part #"
+	1    1850 2750
+	0    1    1    0   
+$EndComp
+$Comp
+L Transistor_FET:IPP060N06N Q?
+U 1 1 60DCEBA3
+P 2350 2750
+AR Path="/60DCEBA3" Ref="Q?"  Part="1" 
+AR Path="/60DBC7EC/60DCEBA3" Ref="Q6"  Part="1" 
+F 0 "Q6" H 2555 2796 50  0000 L CNN
+F 1 "IPP060N06N" H 2555 2705 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 2600 2675 50  0001 L CIN
+F 3 "https://www.infineon.com/dgdl/Infineon-IPP060N06N-DS-v02_02-en.pdf?fileId=db3a30433727a44301372c06d9d7498a" H 2350 2750 50  0001 L CNN
+	1    2350 2750
+	1    0    0    -1  
+$EndComp
+Text Notes 1450 2400 0    50   ~ 0
+MOSFETS for\nSolenoid 1&2 are\nhigher current (can\nbe used for fire pump)
+$Comp
+L Transistor_FET:IPP060N06N Q?
+U 1 1 60DCEBAA
+P 4150 2700
+AR Path="/60DCEBAA" Ref="Q?"  Part="1" 
+AR Path="/60DBC7EC/60DCEBAA" Ref="Q8"  Part="1" 
+F 0 "Q8" H 4355 2746 50  0000 L CNN
+F 1 "IPP060N06N" H 4355 2655 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 4400 2625 50  0001 L CIN
+F 3 "https://www.infineon.com/dgdl/Infineon-IPP060N06N-DS-v02_02-en.pdf?fileId=db3a30433727a44301372c06d9d7498a" H 4150 2700 50  0001 L CNN
+	1    4150 2700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+12V #PWR?
+U 1 1 60DCEBB1
+P 4250 2150
+AR Path="/60DCEBB1" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEBB1" Ref="#PWR0167"  Part="1" 
+F 0 "#PWR0167" H 4250 2000 50  0001 C CNN
+F 1 "+12V" H 4265 2323 50  0000 C CNN
+F 2 "" H 4250 2150 50  0001 C CNN
+F 3 "" H 4250 2150 50  0001 C CNN
+	1    4250 2150
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60DCEBB7
+P 3850 2900
+AR Path="/60DCEBB7" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEBB7" Ref="#PWR0168"  Part="1" 
+F 0 "#PWR0168" H 3850 2650 50  0001 C CNN
+F 1 "GNDA" H 3855 2727 50  0000 C CNN
+F 2 "" H 3850 2900 50  0001 C CNN
+F 3 "" H 3850 2900 50  0001 C CNN
+	1    3850 2900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3850 2700 3950 2700
+Connection ~ 3850 2700
+Wire Wire Line
+	3750 2700 3850 2700
+Text GLabel 1750 2750 0    50   Input ~ 0
+Solenoid2
+$Comp
+L Device:R_Small_US R?
+U 1 1 60DCEBC1
+P 3850 2800
+AR Path="/60DCEBC1" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60DCEBC1" Ref="R71"  Part="1" 
+F 0 "R71" H 3918 2846 50  0000 L CNN
+F 1 "10k" H 3918 2755 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 3850 2800 50  0001 C CNN
+F 3 "~" H 3850 2800 50  0001 C CNN
+F 4 "C25804" H 3850 2800 50  0001 C CNN "LCSC Part #"
+	1    3850 2800
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60DCEBC7
+P 4250 2900
+AR Path="/60DCEBC7" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEBC7" Ref="#PWR0169"  Part="1" 
+F 0 "#PWR0169" H 4250 2650 50  0001 C CNN
+F 1 "GNDA" H 4255 2727 50  0000 C CNN
+F 2 "" H 4250 2900 50  0001 C CNN
+F 3 "" H 4250 2900 50  0001 C CNN
+	1    4250 2900
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x02_Male J?
+U 1 1 60DCEBCD
+P 4850 2250
+AR Path="/60DCEBCD" Ref="J?"  Part="1" 
+AR Path="/60DBC7EC/60DCEBCD" Ref="J7"  Part="1" 
+F 0 "J7" H 4822 2132 50  0000 R CNN
+F 1 "Solenoid" H 4822 2223 50  0000 R CNN
+F 2 "Connector_JST:JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical" H 4850 2250 50  0001 C CNN
+F 3 "~" H 4850 2250 50  0001 C CNN
+	1    4850 2250
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:D D?
+U 1 1 60DCEBD9
+P 4450 2300
+AR Path="/60DCEBD9" Ref="D?"  Part="1" 
+AR Path="/60DBC7EC/60DCEBD9" Ref="D4"  Part="1" 
+F 0 "D4" V 4404 2380 50  0000 L CNN
+F 1 "D" V 4495 2380 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-123" H 4450 2300 50  0001 C CNN
+F 3 "~" H 4450 2300 50  0001 C CNN
+F 4 "C8598" H 4450 2300 50  0001 C CNN "LCSC Part #"
+	1    4450 2300
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4650 2250 4650 2450
+Wire Wire Line
+	4650 2450 4450 2450
+Wire Wire Line
+	4450 2150 4650 2150
+Wire Wire Line
+	4450 2150 4250 2150
+Connection ~ 4450 2150
+$Comp
+L Device:R_Small_US R?
+U 1 1 60DCEBE6
+P 3650 2700
+AR Path="/60DCEBE6" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60DCEBE6" Ref="R22"  Part="1" 
+F 0 "R22" V 3445 2700 50  0000 C CNN
+F 1 "470" V 3536 2700 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 3650 2700 50  0001 C CNN
+F 3 "~" H 3650 2700 50  0001 C CNN
+F 4 " C23179" H 3650 2700 50  0001 C CNN "LCSC Part #"
+	1    3650 2700
+	0    1    1    0   
+$EndComp
+Text Notes 1500 1950 0    128  ~ 0
+Solenoid and general purpose drivers
+$Comp
+L power:+12V #PWR?
+U 1 1 60DCEBEE
+P 4250 3450
+AR Path="/60DCEBEE" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEBEE" Ref="#PWR0171"  Part="1" 
+F 0 "#PWR0171" H 4250 3300 50  0001 C CNN
+F 1 "+12V" H 4265 3623 50  0000 C CNN
+F 2 "" H 4250 3450 50  0001 C CNN
+F 3 "" H 4250 3450 50  0001 C CNN
+	1    4250 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60DCEBF4
+P 3850 4200
+AR Path="/60DCEBF4" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEBF4" Ref="#PWR0172"  Part="1" 
+F 0 "#PWR0172" H 3850 3950 50  0001 C CNN
+F 1 "GNDA" H 3855 4027 50  0000 C CNN
+F 2 "" H 3850 4200 50  0001 C CNN
+F 3 "" H 3850 4200 50  0001 C CNN
+	1    3850 4200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3850 4000 3950 4000
+Connection ~ 3850 4000
+Wire Wire Line
+	3750 4000 3850 4000
+Text GLabel 3550 4000 0    50   Input ~ 0
+Solenoid4
+$Comp
+L Transistor_FET:DMG3404L Q?
+U 1 1 60DCEBFE
+P 4150 4000
+AR Path="/60DCEBFE" Ref="Q?"  Part="1" 
+AR Path="/60DBC7EC/60DCEBFE" Ref="Q9"  Part="1" 
+F 0 "Q9" H 4354 4046 50  0000 L CNN
+F 1 "DMG3404L" H 4354 3955 50  0000 L CNN
+F 2 "Package_TO_SOT_SMD:SOT-23" H 4350 3925 50  0001 L CIN
+F 3 "http://www.diodes.com/assets/Datasheets/DMG3404L.pdf" H 4150 4000 50  0001 L CNN
+	1    4150 4000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60DCEC0A
+P 4250 4200
+AR Path="/60DCEC0A" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEC0A" Ref="#PWR0173"  Part="1" 
+F 0 "#PWR0173" H 4250 3950 50  0001 C CNN
+F 1 "GNDA" H 4255 4027 50  0000 C CNN
+F 2 "" H 4250 4200 50  0001 C CNN
+F 3 "" H 4250 4200 50  0001 C CNN
+	1    4250 4200
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x02_Male J?
+U 1 1 60DCEC10
+P 4900 3550
+AR Path="/60DCEC10" Ref="J?"  Part="1" 
+AR Path="/60DBC7EC/60DCEC10" Ref="J10"  Part="1" 
+F 0 "J10" H 4872 3432 50  0000 R CNN
+F 1 "Solenoid" H 4872 3523 50  0000 R CNN
+F 2 "Connector_JST:JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical" H 4900 3550 50  0001 C CNN
+F 3 "~" H 4900 3550 50  0001 C CNN
+	1    4900 3550
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:D D?
+U 1 1 60DCEC1C
+P 4450 3600
+AR Path="/60DCEC1C" Ref="D?"  Part="1" 
+AR Path="/60DBC7EC/60DCEC1C" Ref="D5"  Part="1" 
+F 0 "D5" V 4404 3680 50  0000 L CNN
+F 1 "D" V 4495 3680 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-123" H 4450 3600 50  0001 C CNN
+F 3 "~" H 4450 3600 50  0001 C CNN
+F 4 "C8598" H 4450 3600 50  0001 C CNN "LCSC Part #"
+	1    4450 3600
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4700 3550 4700 3750
+Wire Wire Line
+	4700 3750 4450 3750
+Wire Wire Line
+	4450 3450 4700 3450
+Wire Wire Line
+	4450 3450 4250 3450
+Connection ~ 4450 3450
+$Comp
+L Device:R_Small_US R?
+U 1 1 60DCEC29
+P 3650 4000
+AR Path="/60DCEC29" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60DCEC29" Ref="R23"  Part="1" 
+F 0 "R23" V 3445 4000 50  0000 C CNN
+F 1 "470" V 3536 4000 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 3650 4000 50  0001 C CNN
+F 3 "~" H 3650 4000 50  0001 C CNN
+F 4 " C23179" H 3650 4000 50  0001 C CNN "LCSC Part #"
+	1    3650 4000
+	0    1    1    0   
+$EndComp
+$Comp
+L power:+12V #PWR?
+U 1 1 60DCEC30
+P 4250 4700
+AR Path="/60DCEC30" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEC30" Ref="#PWR0175"  Part="1" 
+F 0 "#PWR0175" H 4250 4550 50  0001 C CNN
+F 1 "+12V" H 4265 4873 50  0000 C CNN
+F 2 "" H 4250 4700 50  0001 C CNN
+F 3 "" H 4250 4700 50  0001 C CNN
+	1    4250 4700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60DCEC36
+P 3850 5450
+AR Path="/60DCEC36" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEC36" Ref="#PWR0176"  Part="1" 
+F 0 "#PWR0176" H 3850 5200 50  0001 C CNN
+F 1 "GNDA" H 3855 5277 50  0000 C CNN
+F 2 "" H 3850 5450 50  0001 C CNN
+F 3 "" H 3850 5450 50  0001 C CNN
+	1    3850 5450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3850 5250 3950 5250
+Connection ~ 3850 5250
+Wire Wire Line
+	3750 5250 3850 5250
+Text GLabel 3550 5250 0    50   Input ~ 0
+Solenoid6
+$Comp
+L Transistor_FET:DMG3404L Q?
+U 1 1 60DCEC40
+P 4150 5250
+AR Path="/60DCEC40" Ref="Q?"  Part="1" 
+AR Path="/60DBC7EC/60DCEC40" Ref="Q10"  Part="1" 
+F 0 "Q10" H 4354 5296 50  0000 L CNN
+F 1 "DMG3404L" H 4354 5205 50  0000 L CNN
+F 2 "Package_TO_SOT_SMD:SOT-23" H 4350 5175 50  0001 L CIN
+F 3 "http://www.diodes.com/assets/Datasheets/DMG3404L.pdf" H 4150 5250 50  0001 L CNN
+	1    4150 5250
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R_Small_US R?
+U 1 1 60DCEC46
+P 3850 5350
+AR Path="/60DCEC46" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60DCEC46" Ref="R73"  Part="1" 
+F 0 "R73" H 3918 5396 50  0000 L CNN
+F 1 "10k" H 3918 5305 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 3850 5350 50  0001 C CNN
+F 3 "~" H 3850 5350 50  0001 C CNN
+F 4 "C25804" H 3850 5350 50  0001 C CNN "LCSC Part #"
+	1    3850 5350
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60DCEC4C
+P 4250 5450
+AR Path="/60DCEC4C" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60DCEC4C" Ref="#PWR0177"  Part="1" 
+F 0 "#PWR0177" H 4250 5200 50  0001 C CNN
+F 1 "GNDA" H 4255 5277 50  0000 C CNN
+F 2 "" H 4250 5450 50  0001 C CNN
+F 3 "" H 4250 5450 50  0001 C CNN
+	1    4250 5450
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D D?
+U 1 1 60DCEC5E
+P 4450 4850
+AR Path="/60DCEC5E" Ref="D?"  Part="1" 
+AR Path="/60DBC7EC/60DCEC5E" Ref="D6"  Part="1" 
+F 0 "D6" V 4404 4930 50  0000 L CNN
+F 1 "D" V 4495 4930 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-123" H 4450 4850 50  0001 C CNN
+F 3 "~" H 4450 4850 50  0001 C CNN
+F 4 "C8598" H 4450 4850 50  0001 C CNN "LCSC Part #"
+	1    4450 4850
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4700 4800 4700 5000
+Wire Wire Line
+	4700 5000 4450 5000
+Wire Wire Line
+	4450 4700 4700 4700
+Wire Wire Line
+	4450 4700 4250 4700
+Connection ~ 4450 4700
+$Comp
+L Device:R_Small_US R?
+U 1 1 60DCEC6B
+P 3650 5250
+AR Path="/60DCEC6B" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60DCEC6B" Ref="R70"  Part="1" 
+F 0 "R70" V 3445 5250 50  0000 C CNN
+F 1 "470" V 3536 5250 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 3650 5250 50  0001 C CNN
+F 3 "~" H 3650 5250 50  0001 C CNN
+F 4 " C23179" H 3650 5250 50  0001 C CNN "LCSC Part #"
+	1    3650 5250
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7750 2250 7750 2450
+$Comp
+L Connector:Conn_01x02_Male J?
+U 1 1 60F2FFCC
+P 7950 2250
+AR Path="/60F2FFCC" Ref="J?"  Part="1" 
+AR Path="/60DBC7EC/60F2FFCC" Ref="J30"  Part="1" 
+F 0 "J30" H 7922 2132 50  0000 R CNN
+F 1 "Solenoid" H 7922 2223 50  0000 R CNN
+F 2 "Connector_JST:JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical" H 7950 2250 50  0001 C CNN
+F 3 "~" H 7950 2250 50  0001 C CNN
+	1    7950 2250
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:+12V #PWR?
+U 1 1 60F2FFD4
+P 7300 2150
+AR Path="/60F2FFD4" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F2FFD4" Ref="#PWR0179"  Part="1" 
+F 0 "#PWR0179" H 7300 2000 50  0001 C CNN
+F 1 "+12V" H 7315 2323 50  0000 C CNN
+F 2 "" H 7300 2150 50  0001 C CNN
+F 3 "" H 7300 2150 50  0001 C CNN
+	1    7300 2150
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60F2FFDA
+P 6900 2900
+AR Path="/60F2FFDA" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F2FFDA" Ref="#PWR0180"  Part="1" 
+F 0 "#PWR0180" H 6900 2650 50  0001 C CNN
+F 1 "GNDA" H 6905 2727 50  0000 C CNN
+F 2 "" H 6900 2900 50  0001 C CNN
+F 3 "" H 6900 2900 50  0001 C CNN
+	1    6900 2900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6900 2700 7000 2700
+Connection ~ 6900 2700
+Wire Wire Line
+	6800 2700 6900 2700
+$Comp
+L Device:R_Small_US R?
+U 1 1 60F2FFE4
+P 6900 2800
+AR Path="/60F2FFE4" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60F2FFE4" Ref="R77"  Part="1" 
+F 0 "R77" H 6968 2846 50  0000 L CNN
+F 1 "10k" H 6968 2755 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 6900 2800 50  0001 C CNN
+F 3 "~" H 6900 2800 50  0001 C CNN
+F 4 "C25804" H 6900 2800 50  0001 C CNN "LCSC Part #"
+	1    6900 2800
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60F2FFEA
+P 7300 2900
+AR Path="/60F2FFEA" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F2FFEA" Ref="#PWR0181"  Part="1" 
+F 0 "#PWR0181" H 7300 2650 50  0001 C CNN
+F 1 "GNDA" H 7305 2727 50  0000 C CNN
+F 2 "" H 7300 2900 50  0001 C CNN
+F 3 "" H 7300 2900 50  0001 C CNN
+	1    7300 2900
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D D?
+U 1 1 60F2FFF6
+P 7500 2300
+AR Path="/60F2FFF6" Ref="D?"  Part="1" 
+AR Path="/60DBC7EC/60F2FFF6" Ref="D8"  Part="1" 
+F 0 "D8" V 7454 2380 50  0000 L CNN
+F 1 "D" V 7545 2380 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-123" H 7500 2300 50  0001 C CNN
+F 3 "~" H 7500 2300 50  0001 C CNN
+F 4 "C8598" H 7500 2300 50  0001 C CNN "LCSC Part #"
+	1    7500 2300
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7750 2450 7500 2450
+Wire Wire Line
+	7500 2150 7750 2150
+Wire Wire Line
+	7500 2150 7300 2150
+Connection ~ 7500 2150
+$Comp
+L Device:R_Small_US R?
+U 1 1 60F30001
+P 6700 2700
+AR Path="/60F30001" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60F30001" Ref="R74"  Part="1" 
+F 0 "R74" V 6495 2700 50  0000 C CNN
+F 1 "470" V 6586 2700 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 6700 2700 50  0001 C CNN
+F 3 "~" H 6700 2700 50  0001 C CNN
+F 4 " C23179" H 6700 2700 50  0001 C CNN "LCSC Part #"
+	1    6700 2700
+	0    1    1    0   
+$EndComp
+$Comp
+L Transistor_FET:IPP060N06N Q?
+U 1 1 60F30007
+P 7200 2700
+AR Path="/60F30007" Ref="Q?"  Part="1" 
+AR Path="/60DBC7EC/60F30007" Ref="Q11"  Part="1" 
+F 0 "Q11" H 7405 2746 50  0000 L CNN
+F 1 "IPP060N06N" H 7405 2655 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 7450 2625 50  0001 L CIN
+F 3 "https://www.infineon.com/dgdl/Infineon-IPP060N06N-DS-v02_02-en.pdf?fileId=db3a30433727a44301372c06d9d7498a" H 7200 2700 50  0001 L CNN
+	1    7200 2700
+	1    0    0    -1  
+$EndComp
+Text Notes 6300 2350 0    50   ~ 0
+All of these are the\nhigh current MOSFETs
+$Comp
+L Transistor_FET:IPP060N06N Q?
+U 1 1 60F3000E
+P 9050 2750
+AR Path="/60F3000E" Ref="Q?"  Part="1" 
+AR Path="/60DBC7EC/60F3000E" Ref="Q14"  Part="1" 
+F 0 "Q14" H 9255 2796 50  0000 L CNN
+F 1 "IPP060N06N" H 9255 2705 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 9300 2675 50  0001 L CIN
+F 3 "https://www.infineon.com/dgdl/Infineon-IPP060N06N-DS-v02_02-en.pdf?fileId=db3a30433727a44301372c06d9d7498a" H 9050 2750 50  0001 L CNN
+	1    9050 2750
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+12V #PWR?
+U 1 1 60F30015
+P 9150 2200
+AR Path="/60F30015" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F30015" Ref="#PWR0183"  Part="1" 
+F 0 "#PWR0183" H 9150 2050 50  0001 C CNN
+F 1 "+12V" H 9165 2373 50  0000 C CNN
+F 2 "" H 9150 2200 50  0001 C CNN
+F 3 "" H 9150 2200 50  0001 C CNN
+	1    9150 2200
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60F3001B
+P 8750 2950
+AR Path="/60F3001B" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F3001B" Ref="#PWR0184"  Part="1" 
+F 0 "#PWR0184" H 8750 2700 50  0001 C CNN
+F 1 "GNDA" H 8755 2777 50  0000 C CNN
+F 2 "" H 8750 2950 50  0001 C CNN
+F 3 "" H 8750 2950 50  0001 C CNN
+	1    8750 2950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8750 2750 8850 2750
+Connection ~ 8750 2750
+Wire Wire Line
+	8650 2750 8750 2750
+$Comp
+L Device:R_Small_US R?
+U 1 1 60F30025
+P 8750 2850
+AR Path="/60F30025" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60F30025" Ref="R83"  Part="1" 
+F 0 "R83" H 8818 2896 50  0000 L CNN
+F 1 "10k" H 8818 2805 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 8750 2850 50  0001 C CNN
+F 3 "~" H 8750 2850 50  0001 C CNN
+F 4 "C25804" H 8750 2850 50  0001 C CNN "LCSC Part #"
+	1    8750 2850
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60F3002B
+P 9150 2950
+AR Path="/60F3002B" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F3002B" Ref="#PWR0185"  Part="1" 
+F 0 "#PWR0185" H 9150 2700 50  0001 C CNN
+F 1 "GNDA" H 9155 2777 50  0000 C CNN
+F 2 "" H 9150 2950 50  0001 C CNN
+F 3 "" H 9150 2950 50  0001 C CNN
+	1    9150 2950
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x02_Male J?
+U 1 1 60F30031
+P 9750 2300
+AR Path="/60F30031" Ref="J?"  Part="1" 
+AR Path="/60DBC7EC/60F30031" Ref="J33"  Part="1" 
+F 0 "J33" H 9722 2182 50  0000 R CNN
+F 1 "Solenoid" H 9722 2273 50  0000 R CNN
+F 2 "Connector_JST:JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical" H 9750 2300 50  0001 C CNN
+F 3 "~" H 9750 2300 50  0001 C CNN
+	1    9750 2300
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:D D?
+U 1 1 60F3003D
+P 9350 2350
+AR Path="/60F3003D" Ref="D?"  Part="1" 
+AR Path="/60DBC7EC/60F3003D" Ref="D11"  Part="1" 
+F 0 "D11" V 9304 2430 50  0000 L CNN
+F 1 "D" V 9395 2430 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-123" H 9350 2350 50  0001 C CNN
+F 3 "~" H 9350 2350 50  0001 C CNN
+F 4 "C8598" H 9350 2350 50  0001 C CNN "LCSC Part #"
+	1    9350 2350
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	9550 2300 9550 2500
+Wire Wire Line
+	9550 2500 9350 2500
+Wire Wire Line
+	9350 2200 9550 2200
+Wire Wire Line
+	9350 2200 9150 2200
+Connection ~ 9350 2200
+$Comp
+L Device:R_Small_US R?
+U 1 1 60F3004A
+P 8550 2750
+AR Path="/60F3004A" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60F3004A" Ref="R80"  Part="1" 
+F 0 "R80" V 8345 2750 50  0000 C CNN
+F 1 "470" V 8436 2750 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 8550 2750 50  0001 C CNN
+F 3 "~" H 8550 2750 50  0001 C CNN
+F 4 " C23179" H 8550 2750 50  0001 C CNN "LCSC Part #"
+	1    8550 2750
+	0    1    1    0   
+$EndComp
+Text Notes 6350 1900 0    128  ~ 0
+Solenoid and general purpose drivers
+Text GLabel 6600 2700 0    50   Input ~ 0
+ctrl1
+Text GLabel 8450 2750 0    50   Input ~ 0
+ctrl2
+Text GLabel 8450 4050 0    50   Input ~ 0
+ctrl3
+Text GLabel 6600 4000 0    50   Input ~ 0
+ctrl4
+Text GLabel 6600 5300 0    50   Input ~ 0
+ctrl5
+Text GLabel 8450 5350 0    50   Input ~ 0
+ctrl6
+Wire Wire Line
+	7750 3550 7750 3750
+$Comp
+L Connector:Conn_01x02_Male J?
+U 1 1 60F42FE0
+P 7950 3550
+AR Path="/60F42FE0" Ref="J?"  Part="1" 
+AR Path="/60DBC7EC/60F42FE0" Ref="J31"  Part="1" 
+F 0 "J31" H 7922 3432 50  0000 R CNN
+F 1 "Solenoid" H 7922 3523 50  0000 R CNN
+F 2 "Connector_JST:JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical" H 7950 3550 50  0001 C CNN
+F 3 "~" H 7950 3550 50  0001 C CNN
+	1    7950 3550
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:+12V #PWR?
+U 1 1 60F42FE8
+P 7300 3450
+AR Path="/60F42FE8" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F42FE8" Ref="#PWR0187"  Part="1" 
+F 0 "#PWR0187" H 7300 3300 50  0001 C CNN
+F 1 "+12V" H 7315 3623 50  0000 C CNN
+F 2 "" H 7300 3450 50  0001 C CNN
+F 3 "" H 7300 3450 50  0001 C CNN
+	1    7300 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60F42FEE
+P 6900 4200
+AR Path="/60F42FEE" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F42FEE" Ref="#PWR0188"  Part="1" 
+F 0 "#PWR0188" H 6900 3950 50  0001 C CNN
+F 1 "GNDA" H 6905 4027 50  0000 C CNN
+F 2 "" H 6900 4200 50  0001 C CNN
+F 3 "" H 6900 4200 50  0001 C CNN
+	1    6900 4200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6900 4000 7000 4000
+Connection ~ 6900 4000
+Wire Wire Line
+	6800 4000 6900 4000
+$Comp
+L Device:R_Small_US R?
+U 1 1 60F42FF7
+P 6900 4100
+AR Path="/60F42FF7" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60F42FF7" Ref="R78"  Part="1" 
+F 0 "R78" H 6968 4146 50  0000 L CNN
+F 1 "10k" H 6968 4055 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 6900 4100 50  0001 C CNN
+F 3 "~" H 6900 4100 50  0001 C CNN
+F 4 "C25804" H 6900 4100 50  0001 C CNN "LCSC Part #"
+	1    6900 4100
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60F42FFD
+P 7300 4200
+AR Path="/60F42FFD" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F42FFD" Ref="#PWR0189"  Part="1" 
+F 0 "#PWR0189" H 7300 3950 50  0001 C CNN
+F 1 "GNDA" H 7305 4027 50  0000 C CNN
+F 2 "" H 7300 4200 50  0001 C CNN
+F 3 "" H 7300 4200 50  0001 C CNN
+	1    7300 4200
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D D?
+U 1 1 60F43009
+P 7500 3600
+AR Path="/60F43009" Ref="D?"  Part="1" 
+AR Path="/60DBC7EC/60F43009" Ref="D9"  Part="1" 
+F 0 "D9" V 7454 3680 50  0000 L CNN
+F 1 "D" V 7545 3680 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-123" H 7500 3600 50  0001 C CNN
+F 3 "~" H 7500 3600 50  0001 C CNN
+F 4 "C8598" H 7500 3600 50  0001 C CNN "LCSC Part #"
+	1    7500 3600
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7750 3750 7500 3750
+Wire Wire Line
+	7500 3450 7750 3450
+Wire Wire Line
+	7500 3450 7300 3450
+Connection ~ 7500 3450
+$Comp
+L Device:R_Small_US R?
+U 1 1 60F43014
+P 6700 4000
+AR Path="/60F43014" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60F43014" Ref="R75"  Part="1" 
+F 0 "R75" V 6495 4000 50  0000 C CNN
+F 1 "470" V 6586 4000 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 6700 4000 50  0001 C CNN
+F 3 "~" H 6700 4000 50  0001 C CNN
+F 4 " C23179" H 6700 4000 50  0001 C CNN "LCSC Part #"
+	1    6700 4000
+	0    1    1    0   
+$EndComp
+$Comp
+L Transistor_FET:IPP060N06N Q?
+U 1 1 60F4301A
+P 7200 4000
+AR Path="/60F4301A" Ref="Q?"  Part="1" 
+AR Path="/60DBC7EC/60F4301A" Ref="Q12"  Part="1" 
+F 0 "Q12" H 7405 4046 50  0000 L CNN
+F 1 "IPP060N06N" H 7405 3955 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 7450 3925 50  0001 L CIN
+F 3 "https://www.infineon.com/dgdl/Infineon-IPP060N06N-DS-v02_02-en.pdf?fileId=db3a30433727a44301372c06d9d7498a" H 7200 4000 50  0001 L CNN
+	1    7200 4000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Transistor_FET:IPP060N06N Q?
+U 1 1 60F43021
+P 9050 4050
+AR Path="/60F43021" Ref="Q?"  Part="1" 
+AR Path="/60DBC7EC/60F43021" Ref="Q15"  Part="1" 
+F 0 "Q15" H 9255 4096 50  0000 L CNN
+F 1 "IPP060N06N" H 9255 4005 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 9300 3975 50  0001 L CIN
+F 3 "https://www.infineon.com/dgdl/Infineon-IPP060N06N-DS-v02_02-en.pdf?fileId=db3a30433727a44301372c06d9d7498a" H 9050 4050 50  0001 L CNN
+	1    9050 4050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+12V #PWR?
+U 1 1 60F43028
+P 9150 3500
+AR Path="/60F43028" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F43028" Ref="#PWR0191"  Part="1" 
+F 0 "#PWR0191" H 9150 3350 50  0001 C CNN
+F 1 "+12V" H 9165 3673 50  0000 C CNN
+F 2 "" H 9150 3500 50  0001 C CNN
+F 3 "" H 9150 3500 50  0001 C CNN
+	1    9150 3500
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60F4302E
+P 8750 4250
+AR Path="/60F4302E" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F4302E" Ref="#PWR0192"  Part="1" 
+F 0 "#PWR0192" H 8750 4000 50  0001 C CNN
+F 1 "GNDA" H 8755 4077 50  0000 C CNN
+F 2 "" H 8750 4250 50  0001 C CNN
+F 3 "" H 8750 4250 50  0001 C CNN
+	1    8750 4250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8750 4050 8850 4050
+Connection ~ 8750 4050
+Wire Wire Line
+	8650 4050 8750 4050
+$Comp
+L Device:R_Small_US R?
+U 1 1 60F43037
+P 8750 4150
+AR Path="/60F43037" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60F43037" Ref="R84"  Part="1" 
+F 0 "R84" H 8818 4196 50  0000 L CNN
+F 1 "10k" H 8818 4105 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 8750 4150 50  0001 C CNN
+F 3 "~" H 8750 4150 50  0001 C CNN
+F 4 "C25804" H 8750 4150 50  0001 C CNN "LCSC Part #"
+	1    8750 4150
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60F4303D
+P 9150 4250
+AR Path="/60F4303D" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F4303D" Ref="#PWR0193"  Part="1" 
+F 0 "#PWR0193" H 9150 4000 50  0001 C CNN
+F 1 "GNDA" H 9155 4077 50  0000 C CNN
+F 2 "" H 9150 4250 50  0001 C CNN
+F 3 "" H 9150 4250 50  0001 C CNN
+	1    9150 4250
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x02_Male J?
+U 1 1 60F43043
+P 9750 3600
+AR Path="/60F43043" Ref="J?"  Part="1" 
+AR Path="/60DBC7EC/60F43043" Ref="J34"  Part="1" 
+F 0 "J34" H 9722 3482 50  0000 R CNN
+F 1 "Solenoid" H 9722 3573 50  0000 R CNN
+F 2 "Connector_JST:JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical" H 9750 3600 50  0001 C CNN
+F 3 "~" H 9750 3600 50  0001 C CNN
+	1    9750 3600
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:D D?
+U 1 1 60F4304F
+P 9350 3650
+AR Path="/60F4304F" Ref="D?"  Part="1" 
+AR Path="/60DBC7EC/60F4304F" Ref="D12"  Part="1" 
+F 0 "D12" V 9304 3730 50  0000 L CNN
+F 1 "D" V 9395 3730 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-123" H 9350 3650 50  0001 C CNN
+F 3 "~" H 9350 3650 50  0001 C CNN
+F 4 "C8598" H 9350 3650 50  0001 C CNN "LCSC Part #"
+	1    9350 3650
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	9550 3600 9550 3800
+Wire Wire Line
+	9550 3800 9350 3800
+Wire Wire Line
+	9350 3500 9550 3500
+Wire Wire Line
+	9350 3500 9150 3500
+Connection ~ 9350 3500
+$Comp
+L Device:R_Small_US R?
+U 1 1 60F4305C
+P 8550 4050
+AR Path="/60F4305C" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60F4305C" Ref="R81"  Part="1" 
+F 0 "R81" V 8345 4050 50  0000 C CNN
+F 1 "470" V 8436 4050 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 8550 4050 50  0001 C CNN
+F 3 "~" H 8550 4050 50  0001 C CNN
+F 4 " C23179" H 8550 4050 50  0001 C CNN "LCSC Part #"
+	1    8550 4050
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7750 4850 7750 5050
+$Comp
+L Connector:Conn_01x02_Male J?
+U 1 1 60F4AD99
+P 7950 4850
+AR Path="/60F4AD99" Ref="J?"  Part="1" 
+AR Path="/60DBC7EC/60F4AD99" Ref="J32"  Part="1" 
+F 0 "J32" H 7922 4732 50  0000 R CNN
+F 1 "Solenoid" H 7922 4823 50  0000 R CNN
+F 2 "Connector_JST:JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical" H 7950 4850 50  0001 C CNN
+F 3 "~" H 7950 4850 50  0001 C CNN
+	1    7950 4850
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:+12V #PWR?
+U 1 1 60F4ADA1
+P 7300 4750
+AR Path="/60F4ADA1" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F4ADA1" Ref="#PWR0195"  Part="1" 
+F 0 "#PWR0195" H 7300 4600 50  0001 C CNN
+F 1 "+12V" H 7315 4923 50  0000 C CNN
+F 2 "" H 7300 4750 50  0001 C CNN
+F 3 "" H 7300 4750 50  0001 C CNN
+	1    7300 4750
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60F4ADA7
+P 6900 5500
+AR Path="/60F4ADA7" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F4ADA7" Ref="#PWR0196"  Part="1" 
+F 0 "#PWR0196" H 6900 5250 50  0001 C CNN
+F 1 "GNDA" H 6905 5327 50  0000 C CNN
+F 2 "" H 6900 5500 50  0001 C CNN
+F 3 "" H 6900 5500 50  0001 C CNN
+	1    6900 5500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6900 5300 7000 5300
+Connection ~ 6900 5300
+Wire Wire Line
+	6800 5300 6900 5300
+$Comp
+L Device:R_Small_US R?
+U 1 1 60F4ADB0
+P 6900 5400
+AR Path="/60F4ADB0" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60F4ADB0" Ref="R79"  Part="1" 
+F 0 "R79" H 6968 5446 50  0000 L CNN
+F 1 "10k" H 6968 5355 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 6900 5400 50  0001 C CNN
+F 3 "~" H 6900 5400 50  0001 C CNN
+F 4 "C25804" H 6900 5400 50  0001 C CNN "LCSC Part #"
+	1    6900 5400
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60F4ADB6
+P 7300 5500
+AR Path="/60F4ADB6" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F4ADB6" Ref="#PWR0197"  Part="1" 
+F 0 "#PWR0197" H 7300 5250 50  0001 C CNN
+F 1 "GNDA" H 7305 5327 50  0000 C CNN
+F 2 "" H 7300 5500 50  0001 C CNN
+F 3 "" H 7300 5500 50  0001 C CNN
+	1    7300 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D D?
+U 1 1 60F4ADC2
+P 7500 4900
+AR Path="/60F4ADC2" Ref="D?"  Part="1" 
+AR Path="/60DBC7EC/60F4ADC2" Ref="D10"  Part="1" 
+F 0 "D10" V 7454 4980 50  0000 L CNN
+F 1 "D" V 7545 4980 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-123" H 7500 4900 50  0001 C CNN
+F 3 "~" H 7500 4900 50  0001 C CNN
+F 4 "C8598" H 7500 4900 50  0001 C CNN "LCSC Part #"
+	1    7500 4900
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7750 5050 7500 5050
+Wire Wire Line
+	7500 4750 7750 4750
+Wire Wire Line
+	7500 4750 7300 4750
+Connection ~ 7500 4750
+$Comp
+L Device:R_Small_US R?
+U 1 1 60F4ADCD
+P 6700 5300
+AR Path="/60F4ADCD" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60F4ADCD" Ref="R76"  Part="1" 
+F 0 "R76" V 6495 5300 50  0000 C CNN
+F 1 "470" V 6586 5300 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 6700 5300 50  0001 C CNN
+F 3 "~" H 6700 5300 50  0001 C CNN
+F 4 " C23179" H 6700 5300 50  0001 C CNN "LCSC Part #"
+	1    6700 5300
+	0    1    1    0   
+$EndComp
+$Comp
+L Transistor_FET:IPP060N06N Q?
+U 1 1 60F4ADD3
+P 7200 5300
+AR Path="/60F4ADD3" Ref="Q?"  Part="1" 
+AR Path="/60DBC7EC/60F4ADD3" Ref="Q13"  Part="1" 
+F 0 "Q13" H 7405 5346 50  0000 L CNN
+F 1 "IPP060N06N" H 7405 5255 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 7450 5225 50  0001 L CIN
+F 3 "https://www.infineon.com/dgdl/Infineon-IPP060N06N-DS-v02_02-en.pdf?fileId=db3a30433727a44301372c06d9d7498a" H 7200 5300 50  0001 L CNN
+	1    7200 5300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Transistor_FET:IPP060N06N Q?
+U 1 1 60F4ADD9
+P 9050 5350
+AR Path="/60F4ADD9" Ref="Q?"  Part="1" 
+AR Path="/60DBC7EC/60F4ADD9" Ref="Q16"  Part="1" 
+F 0 "Q16" H 9255 5396 50  0000 L CNN
+F 1 "IPP060N06N" H 9255 5305 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 9300 5275 50  0001 L CIN
+F 3 "https://www.infineon.com/dgdl/Infineon-IPP060N06N-DS-v02_02-en.pdf?fileId=db3a30433727a44301372c06d9d7498a" H 9050 5350 50  0001 L CNN
+	1    9050 5350
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+12V #PWR?
+U 1 1 60F4ADE0
+P 9150 4800
+AR Path="/60F4ADE0" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F4ADE0" Ref="#PWR0199"  Part="1" 
+F 0 "#PWR0199" H 9150 4650 50  0001 C CNN
+F 1 "+12V" H 9165 4973 50  0000 C CNN
+F 2 "" H 9150 4800 50  0001 C CNN
+F 3 "" H 9150 4800 50  0001 C CNN
+	1    9150 4800
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60F4ADE6
+P 8750 5550
+AR Path="/60F4ADE6" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F4ADE6" Ref="#PWR0200"  Part="1" 
+F 0 "#PWR0200" H 8750 5300 50  0001 C CNN
+F 1 "GNDA" H 8755 5377 50  0000 C CNN
+F 2 "" H 8750 5550 50  0001 C CNN
+F 3 "" H 8750 5550 50  0001 C CNN
+	1    8750 5550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8750 5350 8850 5350
+Connection ~ 8750 5350
+Wire Wire Line
+	8650 5350 8750 5350
+$Comp
+L Device:R_Small_US R?
+U 1 1 60F4ADEF
+P 8750 5450
+AR Path="/60F4ADEF" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60F4ADEF" Ref="R85"  Part="1" 
+F 0 "R85" H 8818 5496 50  0000 L CNN
+F 1 "10k" H 8818 5405 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 8750 5450 50  0001 C CNN
+F 3 "~" H 8750 5450 50  0001 C CNN
+F 4 "C25804" H 8750 5450 50  0001 C CNN "LCSC Part #"
+	1    8750 5450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDA #PWR?
+U 1 1 60F4ADF5
+P 9150 5550
+AR Path="/60F4ADF5" Ref="#PWR?"  Part="1" 
+AR Path="/60DBC7EC/60F4ADF5" Ref="#PWR0201"  Part="1" 
+F 0 "#PWR0201" H 9150 5300 50  0001 C CNN
+F 1 "GNDA" H 9155 5377 50  0000 C CNN
+F 2 "" H 9150 5550 50  0001 C CNN
+F 3 "" H 9150 5550 50  0001 C CNN
+	1    9150 5550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x02_Male J?
+U 1 1 60F4ADFB
+P 9750 4900
+AR Path="/60F4ADFB" Ref="J?"  Part="1" 
+AR Path="/60DBC7EC/60F4ADFB" Ref="J35"  Part="1" 
+F 0 "J35" H 9722 4782 50  0000 R CNN
+F 1 "Solenoid" H 9722 4873 50  0000 R CNN
+F 2 "Connector_JST:JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical" H 9750 4900 50  0001 C CNN
+F 3 "~" H 9750 4900 50  0001 C CNN
+	1    9750 4900
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:D D?
+U 1 1 60F4AE07
+P 9350 4950
+AR Path="/60F4AE07" Ref="D?"  Part="1" 
+AR Path="/60DBC7EC/60F4AE07" Ref="D13"  Part="1" 
+F 0 "D13" V 9304 5030 50  0000 L CNN
+F 1 "D" V 9395 5030 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-123" H 9350 4950 50  0001 C CNN
+F 3 "~" H 9350 4950 50  0001 C CNN
+F 4 "C8598" H 9350 4950 50  0001 C CNN "LCSC Part #"
+	1    9350 4950
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	9550 4900 9550 5100
+Wire Wire Line
+	9550 5100 9350 5100
+Wire Wire Line
+	9350 4800 9550 4800
+Wire Wire Line
+	9350 4800 9150 4800
+Connection ~ 9350 4800
+$Comp
+L Device:R_Small_US R?
+U 1 1 60F4AE14
+P 8550 5350
+AR Path="/60F4AE14" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60F4AE14" Ref="R82"  Part="1" 
+F 0 "R82" V 8345 5350 50  0000 C CNN
+F 1 "470" V 8436 5350 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 8550 5350 50  0001 C CNN
+F 3 "~" H 8550 5350 50  0001 C CNN
+F 4 " C23179" H 8550 5350 50  0001 C CNN "LCSC Part #"
+	1    8550 5350
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R_Small_US R?
+U 1 1 60DCEC04
+P 3850 4100
+AR Path="/60DCEC04" Ref="R?"  Part="1" 
+AR Path="/60DBC7EC/60DCEC04" Ref="R72"  Part="1" 
+F 0 "R72" H 3918 4146 50  0000 L CNN
+F 1 "10k" H 3918 4055 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" H 3850 4100 50  0001 C CNN
+F 3 "~" H 3850 4100 50  0001 C CNN
+F 4 "C25804" H 3850 4100 50  0001 C CNN "LCSC Part #"
+	1    3850 4100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4450 5000 4250 5000
+Wire Wire Line
+	4250 5000 4250 5050
+Connection ~ 4450 5000
+Wire Wire Line
+	2600 5000 2400 5000
+Wire Wire Line
+	2400 5000 2400 5050
+Connection ~ 2600 5000
+Wire Wire Line
+	2450 3850 2450 3800
+Wire Wire Line
+	2450 3800 2650 3800
+Connection ~ 2650 3800
+Wire Wire Line
+	4250 3800 4250 3750
+Wire Wire Line
+	4250 3750 4450 3750
+Connection ~ 4450 3750
+Wire Wire Line
+	4450 2450 4250 2450
+Wire Wire Line
+	4250 2450 4250 2500
+Connection ~ 4450 2450
+Wire Wire Line
+	2650 2500 2450 2500
+Wire Wire Line
+	2450 2500 2450 2550
+Connection ~ 2650 2500
+Wire Wire Line
+	9350 5100 9150 5100
+Wire Wire Line
+	9150 5100 9150 5150
+Connection ~ 9350 5100
+Wire Wire Line
+	7500 5050 7300 5050
+Wire Wire Line
+	7300 5050 7300 5100
+Connection ~ 7500 5050
+$Comp
+L Connector:Conn_01x02_Male J?
+U 1 1 60DCEC52
+P 4900 4800
+AR Path="/60DCEC52" Ref="J?"  Part="1" 
+AR Path="/60DBC7EC/60DCEC52" Ref="J11"  Part="1" 
+F 0 "J11" H 4872 4682 50  0000 R CNN
+F 1 "Solenoid" H 4872 4773 50  0000 R CNN
+F 2 "Connector_JST:JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical" H 4900 4800 50  0001 C CNN
+F 3 "~" H 4900 4800 50  0001 C CNN
+	1    4900 4800
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	7500 2450 7300 2450
+Wire Wire Line
+	7300 2450 7300 2500
+Connection ~ 7500 2450
+Wire Wire Line
+	7500 3750 7300 3750
+Wire Wire Line
+	7300 3750 7300 3800
+Connection ~ 7500 3750
+Wire Wire Line
+	9150 2550 9150 2500
+Wire Wire Line
+	9150 2500 9350 2500
+Connection ~ 9350 2500
+Wire Wire Line
+	9350 3800 9150 3800
+Wire Wire Line
+	9150 3800 9150 3850
+Connection ~ 9350 3800
+$EndSCHEMATC

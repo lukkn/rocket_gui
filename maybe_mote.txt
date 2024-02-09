@@ -1,0 +1,45 @@
+Sent from GUI:
+
+-> on connect button press sends config file packet (sensors) to mote which kicks off communication
+
+-> GUI then sends heartbeat packets to mote every few seconds
+	- heartbeat packets contain origin ip of gui
+
+-> on actuator button press gui sends press packet (actuator type, mote id, pin#, actuator state) tuple to mote
+	- autoseq, abort seq, are sent as multiple timed packets to mote. handled purely GUI side
+
+-> gui pings mote every x seconds
+
+
+
+Rec by Mote:
+
+-> on rec of config file packet mote runs several functions to init sensors specified in config packet. Mote enters 'active state'
+
+-> on rec of actuator packet Mote runs appropriate function to actuate device
+	- sends an acknowelegement packet to gui which is a "sensor reading" with a pin num = 100+actuator pin
+		- acknowelegement packet should create a checkmark on the gui or something
+	- sends bang-bang controller state *deprecated*
+
+-> mote sends sensor data packets as fast as it can to the lastest ip address contained in a received packet
+
+-> if not rec heartbeat for x seconds then Mote enters 'comm fail state'
+	- currently runs hardcoded sequence to close certian valves
+	- should have config file, either sent along with config for convenience or stored in sdCard for robustness
+
+
+
+
+Current configs GUI side:
+
+-> sensor + actuator config file
+
+-> autoseq config file
+
+-> abort config file
+
+FUTURE? -> 'comm fail state' config file ;; should be sent to mote along with sensors config file
+
+
+log actuator presses on a rolling basis python side
+actually just log everything
