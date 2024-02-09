@@ -9,7 +9,7 @@ import sys
 
 # configuration file tim wrote
 import configuration
-from networking import *
+import networking
 
 # temporarily append our library directory to sys.path so we can use eventlet. DO NOT REMOVE
 sys.path.append(os.path.abspath("./python_flask_and_flaskio_and_eventlet_libraries"))
@@ -188,20 +188,20 @@ def handle_launch_request():
 @socketio.on('connect_request')
 def handle_connect_request():
     print("Received connect request to MoTE")
-    send_config_to_mote(sensor_list, actuator_list) # Networking function
+    networking.send_config_to_mote(sensor_list, actuator_list) # Networking function
             
 
 @socketio.on('abort_request')
 def handle_abort_request(abort_sequence_file):
     print("Received abort request") 
-    send_abort_request_to_mote() #Networking function
+    networking.send_abort_request_to_mote() #Networking function
 
 @socketio.on('cancel_request')
 def handle_cancel_request():
     print("Received cancel request") 
     global autosequence_commands
     autosequence_commands = []
-    send_cancel_request_to_mote()
+    networking.send_cancel_request_to_mote()
     global cancel 
     cancel = True
     
