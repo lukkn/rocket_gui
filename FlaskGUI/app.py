@@ -126,6 +126,17 @@ def handle_button_press(buttonID, state, time):
     else:
         print("stand is disarmed!!! " + buttonID + " was not set to " + state)
 
+
+@socketio.on('received_button_press')
+def handle_button_press(buttonID, state, current_time):
+    if armed or (buttonID not in [actuator['P and ID'] for actuator in actuator_list]): # if disarmed then only allow button presses for sensors
+        print('received button press: ', buttonID, state, 'Delay:',(time.time_ns() // 1_000_000) - current_time)
+        actuator_states_and_sensor_tare_states[buttonID] = state
+        socketio.emit('responding_with_button_data', [buttonID, state])
+    else:
+        print("stand is disarmed!!! " + buttonID + " was not set to " + state)
+        
+
 @socketio.on('actuator_button_coordinates')
 def actuator_button_coordinates(get_request_or_coordinate_data):
     # if pidview.html is requesting the coordinates stored in the .json
@@ -194,14 +205,14 @@ def handle_connect_request():
 @socketio.on('abort_request')
 def handle_abort_request(abort_sequence_file):
     print("Received abort request") 
-    networking.send_abort_request_to_mote() #Networking function
+    networking.send_abort_request_to_mote() # Networking function
 
 @socketio.on('cancel_request')
 def handle_cancel_request():
     print("Received cancel request") 
     global autosequence_commands
     autosequence_commands = []
-    networking.send_cancel_request_to_mote()
+    networking.send_cancel_request_to_mote() # Networking function
     global cancel 
     cancel = True
     
