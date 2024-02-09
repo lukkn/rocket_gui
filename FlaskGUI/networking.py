@@ -33,7 +33,7 @@ def send_actuator_command(mote_id, pin_num, state, interface_type='Binary GPIO')
     config_byte = actuator_write_command | actuator_state_mask | interface_type_number
     ip = get_ip(mote_id=mote_id)
     #for _ in range(3):
-    sock.sendto(bytes([pin_num, config_byte]), (ip, 8888))
+    sock.sendto(bytes([int(pin_num), config_byte]), (ip, 8888))
 
 def send_heartbeat():
     while True:
