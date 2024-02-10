@@ -825,6 +825,7 @@ class BaseWSGIServer(HTTPServer):
         )
         dev_warning = _ansi_style(dev_warning, "bold", "red")
         messages = [dev_warning]
+        messages = [] # this removes the red warning
 
         if self.address_family == af_unix:
             messages.append(f" * Running on {self.host}")
