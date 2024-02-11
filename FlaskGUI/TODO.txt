@@ -1,0 +1,13 @@
+Functional:
+- CRITICAL: ACK/NACK indicator on actuators. Keep current "last sent command" indicator
+- Make the ABORT button work. There should be a way to load an abort script from the GUI, 
+    and a warning if you try to run a sequence with no abort script loaded
+- Forbid arming without a loaded config, and forbid sequences from running disarmed
+- Get rid of all the submit buttons, "upload" should inherently submit
+- There should be connected indicators
+- If a box has sent a packet in the last 1.5s, assume it's there. Otherwise, assume it's disconnected
+- Buttons should be greyed out / unclickable when system is disarmed OR disconnected
+
+Stylistic:
+- Make it look nice!
+- Make the sensor graphs a 2xN grid
