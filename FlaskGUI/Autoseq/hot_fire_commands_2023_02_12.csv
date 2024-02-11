@@ -1,0 +1,16 @@
+P and ID,State,Time(ms),Comments
+VPTE,True,-15000,Open VPTE Preliminary Purge
+VPTE,False,-14000,Close VPTE
+NULL,False,-10000,Last manual abort oppurtunity
+STATE_ACTIVE,True,-9000,Entering active state
+IGNTN,True,-500,Pyro Activate IGNTN
+VPTE,True,-250,Open VPTE Begin Engine Purge
+IGNTN,False,-100,Pyro Deactivate IGNTN
+VNNP,True,0,Open VNNP Ox Main Valve
+VNNF,True,150,Open VNNF Fuel Main Valve
+VNNP,False,1590,Close VNNP Ox Main Valve
+VNND,False,1640,Open VNND FireX
+VNNF,False,2090,Close VNNF Fuel Main Valve
+STATE_IDLE,True,2100,Entering idle state
+VNND,True,6590,Close VNND FireX
+VPTE,False,7000,Close VPTE End Engine Purge

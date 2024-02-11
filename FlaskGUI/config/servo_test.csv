@@ -1,0 +1,8 @@
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID
+1,sensor,i2c ADC 1ch,Analog_1,42
+1,actuator,servoPWM,Servo_1_5V,9
+1,actuator,servoPWM,Servo_2_5V,8
+1,actuator,servoPWM,Servo_3_5V,7
+1,actuator,servoPWM,Servo_1_7V,29
+1,actuator,servoPWM,Servo_2_7V,27
+1,actuator,servoPWM,Servo_3_7V,25

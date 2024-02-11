@@ -11,30 +11,66 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-color: #21262d;
+            height: 100%;
             margin: 20px;
+            display: grid;
+            grid-template-columns: 120px auto ;
+            gap: 20px;
+            row-gap: 0;
         }
 
-        button {
-            margin: 10px;
-            padding: 10px;
-            cursor: pointer;
+        .pageLink button {
+            background-color: transparent;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
+            height: 100%;
+            cursor: pointer;
+            color: #ecf2f8;
+        }
+
+        button img {
+            width: 90%;
+            vertical-align: middle;
+        }
+
+        #pageLinksTitle{
+            grid-row: 1;
+            grid-column: 1;
+            color: #ecf2f8;
+            text-align: center;
+        }
+
+        #pageLinks {
+            grid-row: 2;
+            grid-column: 1;
+            display: grid;
+            grid-template-columns: 100%;
+            grid-auto-rows: 1fr;
+            gap: 5%;
+            padding: 5%;
+            font-size: 14px;
+        }
+
+        .pageLink {
+            text-align: center;
+            padding: 10px;
+            color: #ecf2f8;
+        }
+
+        #statusPanel {
+            border: solid;
+            grid-row: 1/ span 2;
+            grid-column: 2;
         }
 
         /* Add your styling for the armed and disarmed states */
         .armed {
-            background-color: green;
-            color: white;
+            background-color: #7ce38b;
         }
 
         .disarmed {
-            background-color: red;
-            color: white;
+            background-color: #fa7970;
+            color: #ecf2f8;
         }
 
         /* Style for file input and upload button */
@@ -44,10 +80,33 @@
 
         .upload-button {
             background-color: #3498db;
-            color: #fff;
-            padding: 8px 15px;
+            color:#ecf2f8;
+            margin: 10px;
+            padding: 10px;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
+            overflow: wrap;
+        }
+
+        #connectButton {
+            background-color: #faa356;
+            margin: 10px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            overflow: wrap;
+        }
+        
+        #armDisarmButton {
+            margin: 10px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
             overflow: wrap;
         }
 
@@ -55,37 +114,36 @@
 </head>
 
 <body>
-
-    <div style="margin-left: auto;">
-        <p id="ping" style="float: right; margin: 0"></p>
+    <!-- Page Links -->
+    <div id = "pageLinksTitle"><h2>Pages</div>
+    <div id="pageLinks">
+        <div class = "pageLink"><button onclick="openPage('/actuators');"><img src = "../static/icons/actuator_icon.png"></button> Actuators</div>
+        <div class = "pageLink"><button onclick="openPage('/sensors');"><img src = "../static/icons/sensor_icon.png"></button> Sensors</div>
+        <div class = "pageLink"><button onclick="openPage('/pidview');"><img src = "../static/icons/pid_icon.png"></button>PID View</div>
+        <div class = "pageLink"><button onclick="openPage('/autosequence');"><img src = "../static/icons/autosequence_icon.png"></button>Autosequence</div>
     </div>
 
-    <h2>Toggle Arm/Disarm Test Stand</h2>
-
-    <form onsubmit="return false;">
+    <!-- Status panel -->
+    <div id = "statusPanel">
+        <!-- Arm button -->
         <button id="armDisarmButton" name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
             {% if armed %}Stand is Armed<br>Click to Disarm{% else %}Stand is Disarmed<br>Click to Arm{% endif %}
         </button>
-    </form>
 
-    <h2>Page Links</h2>
+        <!-- Upload buttons for CSV file -->
+        <div style = "position: relative; float: left; top: 20px">
+            <label for="csvFile1" title = " Upload sensors and actuators configuration file" class="upload-button">Upload Config</label>
+            <input type="file" id="csvFile1" accept=".csv" onchange="uploadFile('csvFile1')">
+            <div id="csvFile1Message" class= "fileName"></div>
+        </div>
+        <div style = " float: left">
+            <button id = "connectButton" title = "Send config to MoTE" onclick="connectToMote()">Connect</button>
+        </div>
 
-    <form id="myForm" style="display: flex; justify-content: space-around;" onsubmit="return false;">
-        <button onclick="openPage('/actuators');">Actuators</button>
-        <button onclick="openPage('/sensors');">Sensors</button>
-        <button onclick="openPage('/pidview');">Piping and Instrumentation Diagram View</button>
-        <button onclick="openPage('/autosequence');">Autosequence</button>
-    </form>
-
-    <h2>Upload Config</h2>
-
-    <!-- Upload buttons for two CSV files -->
-    <div>
-        <label for="csvFile1" class="upload-button">Upload Sensors and Actuators Config</label>
-        <input type="file" id="csvFile1" accept=".csv" onchange="updateFileName('csvFile1')">
-        <button type="button" onclick="submitCSV('csvFile1')">Submit CSV File</button>
+        <!-- Mote connection status and ping -->
+        <div></div>
     </div>
-    <div id="csvFile1Message" class= "fileName"></div>
+    
 
     <!-- reserved for future use DO NOT DELETE
     <br>
@@ -137,28 +195,20 @@
         }
 
 
-        function updateFileName(inputId) {
+        function uploadFile(inputId) {
             const fileInput = document.getElementById(inputId);
             const file = fileInput.files[0];
             console.log(`File ${file.name} uploaded`);
 
             const fileMessage = document.getElementById(inputId + "Message");
             fileMessage.innerHTML = `File ${file.name} uploaded`;
+            socket.emit("uploadConfigFile", [inputId, file]);
+
         }
 
 
-        function submitCSV(inputId) {
-            const fileInput = document.getElementById(inputId);
-            const file = fileInput.files[0];
-
-            if (file) {
-                //console.log(file);
-                socket.emit('configFile', [inputId, file]);
-                const fileMessage = document.getElementById(inputId + "Message");
-                fileMessage.innerHTML = `File ${file.name} submitted`;
-            } else {
-                alert('Please select a file before submitting.');
-            }
+        function connectToMote(){
+            socket.emit("connect_request");
         }
 
  

@@ -721,10 +721,12 @@ def show_server_banner(debug, app_import_path):
         return
 
     if app_import_path is not None:
-        click.echo(f" * Serving Flask app '{app_import_path}'")
+        pass # added to supress Serving Flask app message
+        # click.echo(f" * Serving Flask app '{app_import_path}'")
 
     if debug is not None:
-        click.echo(f" * Debug mode: {'on' if debug else 'off'}")
+        pass # added to supress debug mode status
+        #click.echo(f" * Debug mode: {'on' if debug else 'off'}")
 
 
 class CertParamType(click.ParamType):

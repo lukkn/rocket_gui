@@ -1,0 +1,15 @@
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit,min,max,window
+4,sensor,Teensy ADC,Teensy ADC,14,TNSY,None,0,1000,0
+4,sensor,SPI_ADC_2ch PGA128,Test,0,TEST,None,0,5,0
+4,sensor,SPI_ADC_2ch PGA128,Test,10,TEST2,None,0,5,0
+4,actuator,Binary GPIO,LOAD_1,5,SW1,None,None,None,None
+4,actuator,Binary GPIO,LOAD_2,6,SW2,None,None,None,None
+4,actuator,Binary GPIO,LOAD_3,7,SW3,None,None,None,None
+4,actuator,Binary GPIO,LOAD_4,8,SW4,None,None,None,None
+4,actuator,Binary GPIO,LOAD_5,9,SW5,None,None,None,None
+4,actuator,Binary GPIO,LOAD_6,29,SW6,None,None,None,None
+4,actuator,Binary GPIO,LOAD_7,28,SW7,None,None,None,None
+
+
+
+

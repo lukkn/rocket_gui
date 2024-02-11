@@ -1,6 +1,7 @@
 import csv
+import os
 
-CONFIG_FILE = '../m5_config.csv'
+CONFIG_FILE = 'FlaskGUI/m5_config.csv'
 
 def get_interface_type_number(interface_name):
     if interface_name == 'servoPWM_12V':
@@ -34,9 +35,7 @@ def load_config(file=CONFIG_FILE):
     sensors = []
     decoded_string = file.decode('utf-8')
     lines = decoded_string.strip().split('\n')
-    print("these are the lines of the config: ", lines)
     for row in csv.DictReader(lines):
-        print("each row: ", row)
         if row['Sensor or Actuator'] == 'actuator':
             actuators.append(row)
         elif row['Sensor or Actuator'] == 'sensor':

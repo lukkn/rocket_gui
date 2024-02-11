@@ -11,7 +11,7 @@ import re
 import random
 
 import gi
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '3.0') # TIM I ADDED THIS BECAUSE OTHERWISE IT WOULD USE GTK 4 AND MATPLOTLIB HATES THAT
 
 from gi.repository import GLib, Gtk, Gdk, GObject
 
@@ -72,7 +72,7 @@ def init_sensor_log():
 
     global sensor_log_path
     sensor_log_path = f"../Logs/sensor_log_{current_filenum}.csv"
-    os.makedirs(os.path.dirname(sensor_log_path), exist_ok=True)
+    os.makedirs(os.path.dirname(sensor_log_path), exist_ok=True) # TIM I ADDED THIS BECAUSE THERE WAS NO SUCH FILE OR DIRECTORY
 
     with open(sensor_log_path, 'w') as csvfile:
         #csv.writer(csvfile).writerow(['Time(ms)'] + [sensor['Human Name'] for sensor in sensors])
