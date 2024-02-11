@@ -99,5 +99,19 @@ def send_launch_request_to_mote():
     return 
 
 
+def telemetry_reciever(sensor_value_gtk_labels,sensor_value_gtk_slider):
+    #IP Adresses for HOST
+    #Twin bois: 209.6.245.222
+    #Tim's Laptop: 192.168.1.106
+    #TESTOP 1: 192.168.1.115
+    HOST, PORT = "0.0.0.0", 8888
+    buffer_size = 1024
+
+    sock.bind((HOST, PORT))
+
+    while True:
+        data, address = sock.recvfrom(buffer_size)
+        print("received message: %s" % data)
+
 
 
