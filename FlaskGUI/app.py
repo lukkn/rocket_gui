@@ -36,10 +36,13 @@ actuator_states_and_sensor_tare_states = {}
 # Global Variable that determines if stand is armed
 armed = False
 
+autosequence_header_line = []
 autosequence_commands = []
+completed_autosequence_commands = []
 sleep_times_list = [] # generated from difference in times between commands in autosequence_commands
 cancel = False # has cancel button been pressed
 autosequence_occuring = False # this will be used to block most functions while autosequence is occuring
+time_to_show = 0
 
 # REMOVE BEFORE DEPLOYMENT
 #actuator_list = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'VNTB'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Fuel tank vent', 'Pin': '1', 'P and ID': 'VFTV'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Ox bang-bang', 'Pin': '0', 'P and ID': 'VNTO'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Ox tank fill', 'Pin': '0', 'P and ID': 'VOTF'}]
@@ -52,8 +55,10 @@ app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 thread2 = None
+thread3 = None
 thread_lock = Lock()
 thread_lock2 = Lock()
+thread_lock3 = Lock()
 
 #i am in webthocket hell
 #lmao skill issue
@@ -72,9 +77,7 @@ def index():
 
 @app.route('/autosequence', methods=['GET'])
 def autosequence():
-    global autosequence_commands
-    autosequence_commands = []
-    return render_template('autosequence.html')
+    return render_template('autosequence.html', autosequence_header_line=autosequence_header_line, autosequence_commands=autosequence_commands, completed_autosequence_commands=completed_autosequence_commands, time_to_show=time_to_show)
     
 @app.route('/pidview', methods=['GET'])
 def pidview():
@@ -113,30 +116,24 @@ def armDisarm():
     socketio.emit('armOrDisarmResponse', armed)
     print('variable armed is now: ', armed)
 
-# @socketio.on('received_button_press')
-# def handle_button_press(buttonID, state, time):
-#     buttonInfo = [actuator for actuator in actuator_list if actuator['P and ID'] == buttonID][0]
-#     print(buttonInfo)
-
-#     if armed or (buttonID not in [actuator['P and ID'] for actuator in actuator_list]): # if disarmed then only allow button presses for sensors
-#         print('received button press: ', buttonID, state)
-#         actuator_states_and_sensor_tare_states[buttonID] = state
-#         socketio.emit('responding_with_button_data', [buttonID, state])
-#         networking.send_actuator_command(buttonInfo['Mote id'], buttonInfo['Pin'], state, interface_type='Binary GPIO')
-#     else:
-#         print("stand is disarmed!!! " + buttonID + " was not set to " + state)
-
-
 @socketio.on('received_button_press')
-def handle_button_press(buttonDict, state, current_time):
-    print(buttonDict['P and ID'])
-    if armed or (buttonDict['P and ID'] not in [actuator['P and ID'] for actuator in actuator_list]): # if disarmed then only allow button presses for sensors
-        print('received button press: ', buttonDict, state, 'Delay:',(time.time_ns() // 1_000_000) - current_time)
-        actuator_states_and_sensor_tare_states[buttonDict] = state
-        socketio.emit('responding_with_button_data', [buttonDict, state])
+def handle_button_press(buttonID, state, current_time):
+
+    # lookup rest of parameters for buttonID in either sensors or actuators
+    # TODO: IMPORTANT; enforce uniqueness in 'P and ID' for all lines in config file
+    buttonDict = [config_line for config_line in (actuator_list + sensor_list) if config_line['P and ID'] == buttonID][0] # index 0 because list comprehension returns a list containing 1 dictionary
+
+    print('received button press: ', buttonID, state, 'Delay:',(time.time_ns() // 1_000_000) - current_time)
+    if buttonDict['Sensor or Actuator'] == 'sensor':
+        actuator_states_and_sensor_tare_states[buttonID] = state
+        socketio.emit('responding_with_button_data', [buttonID, state])
+    elif buttonDict['Sensor or Actuator'] == 'actuator' and armed:
+        actuator_states_and_sensor_tare_states[buttonID] = state
+        socketio.emit('responding_with_button_data', [buttonID, state])
+        networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], state, buttonDict['Interface Type'])
     else:
-        print("stand is disarmed!!! " + buttonDict + " was not set to " + state)
-        
+        print("stand is disarmed!!! " + buttonID + " was not set to " + state)    
+
 
 @socketio.on('actuator_button_coordinates')
 def actuator_button_coordinates(get_request_or_coordinate_data):
@@ -154,44 +151,56 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
 
 @socketio.on('autosequence')
 def handle_autoseqeunce(file):
-    print("Received file") 
+    print("Received file")
+    global autosequence_header_line
     global autosequence_commands
-    autosequence_commands = [line.split(",")[:-1] for line in file.decode("utf-8").splitlines()][1:]
+    global sleep_times_list
+    # returns a list of lists, each sublist containing a line from the config file
+    #TODO: look into this parsing, is it robust?
+    file_content = file.decode("utf-8").splitlines()
+    autosequence_header_line = file_content[0].split(",")
+    autosequence_commands = [line.split(",") for line in file_content[1:]]
     sleep_times_list = [abs(int(autosequence_commands[i][2]) - int(autosequence_commands[i+1][2])) for i in range(len(autosequence_commands)-1)] + [0] # 0 on the end so we dont go out of range and instead delay for 0 seconds after autoseq is finished
+    print("autoseq_commands_header =", autosequence_header_line)
     print("differences =", sleep_times_list)
     print("autoseq commands =", autosequence_commands)
+    socketio.emit('reload_autosequence_page')
 
 
 @socketio.on('launch_request')
 def handle_launch_request():
     global autosequence_occuring
+    global completed_autosequence_commands
     if autosequence_occuring:
         print("Autosequence is already running")
     else:
         print("Received launch request")
 
-        autosequence_occuring = True
-
-        global cancel 
-        cancel = False  
-
         # check for config file
         if not autosequence_commands:
             socketio.emit('no_config')
+            print("no config was uploaded")
         else:
-            networking.send_launch_request_to_mote() # Networking function ### i think we should move this a few lines down and have it be just an actuator press
+            autosequence_occuring = True
+            global cancel 
+            cancel = False
+            completed_autosequence_commands = []
+            socketio.emit('start_launch')
+
             sleep_list_iterator = 0 # iterate over a list of times to sleep, starting at index 0
             for command in autosequence_commands:
+                if (cancel):
+                    print("Launch cancelled")
+                    break
+                print("Command Sent =", command)
                 buttonID = command[0]
                 booleanState = command[1] # true false convention used in autoseq file. This is a string as .csv files are parsed as strings
                 stringState = 'on' if booleanState == 'True' else 'off' # on/off state used in webpages
                 time = command[2] # not used in app.py; sent to autosequence.html to create rowID, used in case we toggle an actuator :: True, False, True :: then rows would be identical
+                completed_autosequence_commands += [command]
                 socketio.emit('responding_with_button_data', [buttonID, stringState])
-                socketio.emit('command', [buttonID, booleanState, time])
+                socketio.emit('command', completed_autosequence_commands)
                 # send actuator to mote #
-                if (cancel):
-                    print("Launch cancelled")
-                    break
                 socketio.sleep(sleep_times_list[sleep_list_iterator]/1000) # socketio.sleep() expects seconds as input
                 sleep_list_iterator += 1
         autosequence_occuring = False
@@ -211,12 +220,8 @@ def handle_abort_request(abort_sequence_file):
 @socketio.on('cancel_request')
 def handle_cancel_request():
     print("Received cancel request") 
-    global autosequence_commands
-    autosequence_commands = []
-    networking.send_cancel_request_to_mote() # Networking function
     global cancel 
-    cancel = True
-    
+    cancel = True    
 
 
 # FUNCTIONS BELOW RELATE TO GETTING SENSOR DATA IN BACKGROUND THREAD
@@ -258,6 +263,19 @@ def ping_thread():
         socketio.emit("ping", time.time_ns() // 1000000)
         #print('ping', time.time())
 
+@socketio.on('start_timer') # time of first autosequence command
+def launch_time_thread():
+    print('started time function in python')
+    global time_to_show
+    time_to_show = int(autosequence_commands[0][2])
+    while True:
+        socketio.emit('launch_time', time_to_show)
+        if not cancel:
+            time_to_show = time_to_show + 1000
+            socketio.sleep(1)
+        else:
+            print('time to show before break', time_to_show)
+            break
 
 # Dummy data function, this function should FETCH data from udp packet
 def packet_sensor_data(sensor_list):
