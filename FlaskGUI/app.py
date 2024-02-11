@@ -79,7 +79,7 @@ def index():
 @app.route('/autosequence', methods=['GET'])
 def autosequence():
     return render_template('autosequence.html', autosequence_header_line=autosequence_header_line, autosequence_commands=autosequence_commands, completed_autosequence_commands=completed_autosequence_commands, time_to_show=time_to_show)
-    
+
 @app.route('/pidview', methods=['GET'])
 def pidview():
     return render_template('pidview.html', actuator_list=actuator_list, sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
@@ -139,7 +139,7 @@ def handle_button_press(buttonID, state, current_time):
         socketio.emit('responding_with_button_data', [buttonID, state])
         networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], state_bool, buttonDict['Interface Type'])
     else:
-        print("stand is disarmed!!! " + buttonID + " was not set to " + state)    
+        print("stand is disarmed!!! " + buttonID + " was not set to " + state)
 
 
 @socketio.on('actuator_button_coordinates')
@@ -201,7 +201,7 @@ def handle_launch_request():
             time_to_show = int(int(autosequence_commands[0][2])/1000)
             sleep_list_iterator = 0 # iterate over a list of times to sleep, starting at index 0
             socketio.emit('autosequence_started')
-            
+
             for command in autosequence_commands:
                 timeAtBeginning = time.perf_counter()
                 #print("timeAtBeginning", timeAtBeginning)
@@ -245,26 +245,27 @@ def broadcast_time():
                 print("timer stopped")
                 return None
             socketio.sleep(.01)
-            
+
         time_to_show += 1
 
 @socketio.on('connect_request')
 def handle_connect_request():
     print("Attempting to send config to MoTE")
     networking.send_config_to_mote(sensor_list, actuator_list) # Networking function
-            
+    networking.start_telemetry_thread()
+
 
 @socketio.on('abort_request')
 def handle_abort_request(abort_sequence_file):
-    print("Received abort request") 
+    print("Received abort request")
     networking.send_abort_request_to_mote() # Networking function
 
 @socketio.on('cancel_request')
 def handle_cancel_request():
     global time_to_show
-    print("Received cancel request at",time_to_show,"seconds") 
-    global cancel 
-    cancel = True    
+    print("Received cancel request at",time_to_show,"seconds")
+    global cancel
+    cancel = True
 
 
 # FUNCTIONS BELOW RELATE TO GETTING SENSOR DATA IN BACKGROUND THREAD
@@ -274,7 +275,7 @@ def guion():
     global thread
     global thread2
     with thread_lock:
-        if thread is None:   
+        if thread is None:
             thread = socketio.start_background_task(sensor_data_thread)
     with thread_lock2:
         if thread2 is None:
@@ -291,7 +292,7 @@ def sensor_data_thread():
         # test what happens with different scales
 
         #sensors_and_data[0][1] = random.random()*10
-        
+
         # testing shows we get data at 3khz with random, 6khz with a predetermined constant; ex: 1
         # with open("sensor_data_log", mode='a', newline='') as csv_file:
         #     csv_writer = csv.writer(csv_file)

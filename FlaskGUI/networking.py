@@ -1,4 +1,5 @@
 import socket
+import socketserver
 import time
 import threading
 from threading import Thread
@@ -12,7 +13,7 @@ sock = socket.socket(socket.AF_INET,  # Internet
                      socket.SOCK_DGRAM)  # UDP
 
 def get_mote_status(num):
-    return mote_status[num - 1] 
+    return mote_status[num - 1]
 
 def get_ip(mote_id=None):
     if mote_id == None:
@@ -50,7 +51,7 @@ def send_config_to_mote(sensor_list, actuator_list):
     sensors_and_actuators_list = sensor_list + actuator_list
     print("sent sensor config data to mote")
     for m in range(1, 4):
-        reset_command = bytearray(2) 
+        reset_command = bytearray(2)
         reset_command[0] = 0
         reset_command[1] |= 0b00000000
         reset_command[1] |= 0b00111111 & get_interface_type_number('Clear_Config')
@@ -78,7 +79,7 @@ def send_config_to_mote(sensor_list, actuator_list):
         config_command[1] |= 0b00000000
         config_command[1] |= 0b00111111 & get_interface_type_number(
             sensor['Interface Type'])
-        
+
         print(config_command, "config_command")
         print(config_command[0])
         print(config_command[1])
@@ -96,22 +97,30 @@ def send_cancel_request_to_mote():
 
 def send_launch_request_to_mote():
     # TODO
-    return 
+    return
 
 
-def telemetry_reciever(sensor_value_gtk_labels,sensor_value_gtk_slider):
+
+
+
+
+
+
+def generate_handler():
+    class TelemetryRecieveHandler(socketserver.BaseRequestHandler):
+        def handle(self):
+            data = self.request[0]
+            print(f"data = {data}, len = {len(data)}, type = {type(data)}")
+    return TelemetryRecieveHandler
+
+def telemetry_reciever():
     #IP Adresses for HOST
-    #Twin bois: 209.6.245.222
     #Tim's Laptop: 192.168.1.106
     #TESTOP 1: 192.168.1.115
     HOST, PORT = "0.0.0.0", 8888
-    buffer_size = 1024
+    with socketserver.UDPServer((HOST, PORT), generate_handler()) as server:
+        server.serve_forever()
 
-    sock.bind((HOST, PORT))
-
-    while True:
-        data, address = sock.recvfrom(buffer_size)
-        print("received message: %s" % data)
-
-
-
+def start_telemetry_thread():
+    telemetry_thread = Thread(target=telemetry_reciever, daemon=True)
+    telemetry_thread.start()
