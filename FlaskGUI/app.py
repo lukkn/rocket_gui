@@ -156,6 +156,7 @@ def handle_autoseqeunce(file):
     global autosequence_commands
     global sleep_times_list
     global completed_autosequence_commands
+    global time_to_show
 
     completed_autosequence_commands = []
 
@@ -163,6 +164,7 @@ def handle_autoseqeunce(file):
     autosequence_header_line = file_content[0].split(",")
     autosequence_commands = [line.split(",") for line in file_content[1:]]
     sleep_times_list = [abs(int(autosequence_commands[i][2]) - int(autosequence_commands[i+1][2])) for i in range(len(autosequence_commands)-1)] + [0] # 0 on the end so we dont go out of range and instead delay for 0 seconds after autoseq is finished
+    time_to_show = int(int(autosequence_commands[0][2])/1000)
     #print("autoseq_commands_header =", autosequence_header_line)
     #print("differences =", sleep_times_list)
     #print("autoseq commands =", autosequence_commands)
@@ -195,7 +197,8 @@ def handle_launch_request():
             socketio.emit('autosequence_started')
             
             for command in autosequence_commands:
-                timeAtBeginning = time.time()
+                timeAtBeginning = time.perf_counter()
+                #print("timeAtBeginning", timeAtBeginning)
                 buttonID = command[0]
                 booleanState = command[1] # true false convention used in autoseq file. This is a string as .csv files are parsed as strings
                 stringState = 'on' if booleanState == 'True' else 'off' # on/off state used in webpages
@@ -204,32 +207,34 @@ def handle_launch_request():
                 socketio.emit('responding_with_button_data', [buttonID, stringState])
                 socketio.emit('command', completed_autosequence_commands)
                 print("Command Sent =", command)
-                print(time.time())
                 # send actuator to mote #
-                for _ in range(100): #100hz
-                    if not cancel:
-                        socketio.sleep(   ((sleep_times_list[sleep_list_iterator]/1000) - (time.time() - timeAtBeginning))   /100) # socketio.sleep() expects seconds as input ## 100hz
-                    else:
+
+                while (time.perf_counter() - timeAtBeginning) < sleep_times_list[sleep_list_iterator]/1000:
+                    if cancel or not autosequence_occuring:
+                        autosequence_occuring = False
                         print("Launch cancelled")
+                        return None
+                    socketio.sleep(.0001)
+
                 sleep_list_iterator += 1
+                #print("loop time =", time.perf_counter() - timeAtBeginning)
             autosequence_occuring = False
 
 @socketio.on('start_timer')
 def broadcast_time():
     socketio.emit('start_timer_ack')
     global time_to_show
-    while not cancel and autosequence_occuring:
+    while True:
+        timeAtBeginning = time.perf_counter()
 
         socketio.emit('current_time', time_to_show)
-        print('time_to_show in python =', time_to_show)
 
-        for i in range(100): # 100hz test cancel rate
-            if not cancel and autosequence_occuring:
-                socketio.sleep(.01) # 100hz test cancel rate
-            else:
-                print("Timer Stopped, last time is: ", time_to_show)
-                print("Iterations =", i)
-                return None # prevents running last line
+        while (time.perf_counter() - timeAtBeginning) < 1:
+            if cancel or not autosequence_occuring:
+                print("timer stopped")
+                return None
+            socketio.sleep(.01)
+            
         time_to_show += 1
 
 @socketio.on('connect_request')
