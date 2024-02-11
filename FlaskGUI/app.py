@@ -124,6 +124,12 @@ def handle_button_press(buttonID, state, current_time):
     # TODO: IMPORTANT; enforce uniqueness in 'P and ID' for all lines in config file
     buttonDict = [config_line for config_line in (actuator_list + sensor_list) if config_line['P and ID'] == buttonID][0] # index 0 because list comprehension returns a list containing 1 dictionary
 
+    state_bool = True if state == "on" else False if state == "off" else None
+
+    if state_bool is None:
+        print(f"Invalid state {state}, no command sent")
+        return
+
     print('received button press: ', buttonID, state, 'Delay:',(time.time_ns() // 1_000_000) - current_time)
     if buttonDict['Sensor or Actuator'] == 'sensor':
         actuator_states_and_sensor_tare_states[buttonID] = state
@@ -131,7 +137,7 @@ def handle_button_press(buttonID, state, current_time):
     elif buttonDict['Sensor or Actuator'] == 'actuator' and armed:
         actuator_states_and_sensor_tare_states[buttonID] = state
         socketio.emit('responding_with_button_data', [buttonID, state])
-        networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], state, buttonDict['Interface Type'])
+        networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], state_bool, buttonDict['Interface Type'])
     else:
         print("stand is disarmed!!! " + buttonID + " was not set to " + state)    
 
@@ -204,10 +210,15 @@ def handle_launch_request():
                 stringState = 'on' if booleanState == 'True' else 'off' # on/off state used in webpages
                 completed_autosequence_commands += [command]
 
+                booleanState = True if booleanState == "True" else False
+
                 socketio.emit('responding_with_button_data', [buttonID, stringState])
                 socketio.emit('command', completed_autosequence_commands)
                 print("Command Sent =", command)
+
                 # send actuator to mote #
+                buttonDict = [config_line for config_line in (actuator_list + sensor_list) if config_line['P and ID'] == buttonID][0]
+                networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], booleanState, buttonDict['Interface Type'])
 
                 while (time.perf_counter() - timeAtBeginning) < sleep_times_list[sleep_list_iterator]/1000:
                     if cancel or not autosequence_occuring:
