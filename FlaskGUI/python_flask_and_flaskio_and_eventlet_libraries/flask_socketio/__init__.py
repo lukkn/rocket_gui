@@ -15,9 +15,10 @@ if gevent_socketio_found:
           'install the latest version of python-socketio in its place.')
     sys.exit(1)
 
-import flask
-from flask import has_request_context, json as flask_json
-from flask.sessions import SessionMixin
+
+from python_flask_and_flaskio_and_eventlet_libraries import flask
+from python_flask_and_flaskio_and_eventlet_libraries.flask import has_request_context, json as flask_json
+from python_flask_and_flaskio_and_eventlet_libraries.flask.sessions import SessionMixin
 import socketio
 from socketio.exceptions import ConnectionRefusedError  # noqa: F401
 from werkzeug.debug import DebuggedApplication

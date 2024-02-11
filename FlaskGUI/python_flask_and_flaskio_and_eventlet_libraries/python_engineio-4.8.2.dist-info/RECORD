@@ -15,7 +15,7 @@ engineio/__pycache__/payload.cpython-312.pyc,,
 engineio/__pycache__/server.cpython-312.pyc,,
 engineio/__pycache__/socket.cpython-312.pyc,,
 engineio/__pycache__/static_files.cpython-312.pyc,,
-engineio/async_client.py,sha256=QyHBWpLZxfBc4lK_eodkPM0xzsfVYpt7mzNaA9uG3cg,27932
+engineio/async_client.py,sha256=d1Jg2sRo8NT2hDnq6KXj0mvIsLbLfnlfCwn7UDPNX-A,27637
 engineio/async_drivers/__init__.py,sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU,0
 engineio/async_drivers/__pycache__/__init__.cpython-312.pyc,,
 engineio/async_drivers/__pycache__/_websocket_wsgi.cpython-312.pyc,,
@@ -41,7 +41,7 @@ engineio/async_socket.py,sha256=P8OZW1N5y7jr2hW1qLLK2y_Clt7aHdv2ucYW69mbU4Q,1030
 engineio/base_client.py,sha256=Q_w0Stvy89wPHwWk7411dRxpGjxNPypm4xy_4XMPZ9M,4872
 engineio/base_server.py,sha256=Em2RRpbohulKjmYTWHnf_lALKvTT_jHr442Rr2g_BEQ,14013
 engineio/base_socket.py,sha256=Bw6TWv1pnlXcDdqT59C5CyTaBi7l-_mkykIUuZLjz-g,400
-engineio/client.py,sha256=xz1KVYlxjynGUUn6hR_rga1sByYcVdYb5taMVsfXJkk,26291
+engineio/client.py,sha256=DccBMvReANgUrF3icCjvM0jwID9y-lqUtTN0M-QTRg8,25676
 engineio/exceptions.py,sha256=FyuMb5qhX9CUYP3fEoe1m-faU96ApdQTSbblaaoo8LA,292
 engineio/json.py,sha256=SG5FTojqd1ix6u0dKXJsZVqqdYioZLO4S2GPL7BKl3U,405
 engineio/middleware.py,sha256=BF_qHAIZZnIbfiP256SD1CX3kzNWbSuto1cpih8oIFg,3766
@@ -50,9 +50,9 @@ engineio/payload.py,sha256=2iLIFgIweTWkLok_UZ5zCgELmRSGyUUI5eeYcEerFSs,1547
 engineio/server.py,sha256=UegXydKobZaR1O0MxS_MENKNF7PBjpP_kPI0-OpI5EQ,21558
 engineio/socket.py,sha256=dasec3jXoV2eR1jmIrhEIfHzyUuuv8FwvxLB3DpyjeY,9996
 engineio/static_files.py,sha256=pwez9LQFaSQXMbtI0vLyD6UDiokQ4rNfmRYgVLKOthc,2064
-python_engineio-4.9.0.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
-python_engineio-4.9.0.dist-info/LICENSE,sha256=yel9Pbwfu82094CLKCzWRtuIev9PUxP-a76NTDFAWpw,1082
-python_engineio-4.9.0.dist-info/METADATA,sha256=Qb43yDoGFRx78nu3tWw4hLWtPAt3bU-44hLJV-4P8DA,2244
-python_engineio-4.9.0.dist-info/RECORD,,
-python_engineio-4.9.0.dist-info/WHEEL,sha256=oiQVh_5PnQM0E3gPdiz09WCNmwiHDMaGer_elqB3coM,92
-python_engineio-4.9.0.dist-info/top_level.txt,sha256=u8PmNisCZLwRYcWrNLe9wutQ2tt4zNi8IH362c-HWuA,9
+python_engineio-4.8.2.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+python_engineio-4.8.2.dist-info/LICENSE,sha256=yel9Pbwfu82094CLKCzWRtuIev9PUxP-a76NTDFAWpw,1082
+python_engineio-4.8.2.dist-info/METADATA,sha256=1l6l4gW-F64FROlvz-r6AUpTSXHXeiKhAjZka0s02l8,2244
+python_engineio-4.8.2.dist-info/RECORD,,
+python_engineio-4.8.2.dist-info/WHEEL,sha256=oiQVh_5PnQM0E3gPdiz09WCNmwiHDMaGer_elqB3coM,92
+python_engineio-4.8.2.dist-info/top_level.txt,sha256=u8PmNisCZLwRYcWrNLe9wutQ2tt4zNi8IH362c-HWuA,9

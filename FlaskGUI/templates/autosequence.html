@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Autosequence</title>
     <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
-    <script src="{{ url_for('static', filename='papaparse.js') }}"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -116,7 +115,7 @@
             overflow: wrap;
         }
         .activeRow{
-            background-color: #faa356;
+            background-color: #7ce38b;
             color: #21262d;
         }
 
@@ -128,7 +127,8 @@
         <div id="timer">0 s</div>
         <div id="configButtons">
             <label for="csvFile" class="upload-button">Upload CSV File</label>
-            <input type="file" id="csvFile" accept=".csv" onchange="updateFileName('csvFile')">
+            <!--  <input type="file" id="csvFile" accept=".csv" onchange="updateFileName('csvFile')"> -->
+            <input type="file" id="csvFile" accept=".csv">
             <button type="button" onclick="submitCSV('csvFile')">Submit CSV</button>
         </div>
         <div id="csvFileMessage" class= "fileName"></div>
@@ -159,66 +159,57 @@
 
     <script>
         var socket = io.connect('http://' + document.domain + ':' + location.port);
-        var startTime = 0;
-        var time = 0;   
-        var timerStopped = false;
 
-        // on page load parse
+        // on page load
         var autosequence_header_line = JSON.parse('{{ autosequence_header_line|tojson|safe }}');
         var autosequence_commands = JSON.parse('{{ autosequence_commands|tojson|safe }}');
         var completed_autosequence_commands = JSON.parse('{{ completed_autosequence_commands|tojson|safe }}');
-        timer.innerText = time_to_show/1000 + " s"
-        console.log("autosequence_header_line", [autosequence_header_line]);
-        console.log("autosequence_commands", autosequence_commands);
+        var time_to_show = '{{ time_to_show }}';
 
-        if (autosequence_commands.length > 0){
-            displayCSV([autosequence_header_line].concat(autosequence_commands));
-        }
+        // once all elements are loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const timer = document.getElementById("timer");
+            timer.innerText = time_to_show + " s";
+            if (autosequence_commands.length > 0){
+                displayCSV([autosequence_header_line].concat(autosequence_commands));
+            }
+            highlight_finished_commands(completed_autosequence_commands);
+        });
 
-        highlight_finished_commands(completed_autosequence_commands);
 
-        function updateFileName(inputId) {
-            const fileInput = document.getElementById(inputId);
-            const file = fileInput.files[0];
-            // console.log(`File ${file.name} uploaded`);
+        // function updateFileName(inputId) {
+        //     const fileInput = document.getElementById(inputId);
+        //     const file = fileInput.files[0];
+        //     // console.log(`File ${file.name} uploaded`);
 
-            const fileMessage = document.getElementById(inputId + "Message");
-            fileMessage.innerHTML = `File ${file.name} uploaded`;
-        }
+        //     const fileMessage = document.getElementById(inputId + "Message");
+        //     fileMessage.innerHTML = `File ${file.name} uploaded`;
+        // }
 
 
         function submitCSV(inputId) {
             const fileInput = document.getElementById(inputId);
             const file = fileInput.files[0];
-
             if (file) {
                 // display submitted message
-                const fileMessage = document.getElementById(inputId + "Message");
-                fileMessage.innerHTML = `File ${file.name} submitted`;
+                //const fileMessage = document.getElementById(inputId + "Message");
+                //fileMessage.innerHTML = `File ${file.name} submitted`;
 
                 // send file to backend
-                socket.emit('autosequence', file);
+                socket.emit('autosequence_uploaded', file);
             } else {
                 alert('Please select a file before submitting.');
             }
         } 
 
-        function displayCSV(file){
-            const table = createTable(file);
-            startTime = file[1][2];
-            time = parseInt(startTime)/1000;
-            const timer = document.getElementById("timer");
-            timer.innerText = time + " s";
-                
-        }
 
-        function createTable(tableData) {
+        function displayCSV(file) {
             var table = document.getElementById("configTable");
             var tableBody = document.createElement('tbody');
             var tableHead = document.createElement('thead');
 
-            const headData = tableData[0];
-            const bodyData = tableData.slice(1)
+            const headData = file[0];
+            const bodyData = file.slice(1)
 
             // create table head
             var headRow = document.createElement('tr');
@@ -241,59 +232,9 @@
                     cell.appendChild(document.createTextNode(cellData));
                     row.appendChild(cell);
                 });
-
                 tableBody.appendChild(row);
             });
-            
             table.appendChild(tableBody);
-        }
-
-        function cancel(){
-            stopTimer();
-            socket.emit('cancel_request');
-        }
-
-        function abort(){
-            stopTimer();
-            socket.emit('abort_request');
-        }
-
-        function launch(){
-            socket.emit('launch_request');
-            socket.emit('start_timer')
-        }
-
-
-        // function startTimer(){
-        //     timerStopped = false;
-        //     const timer = document.getElementById("timer");
-        //     var interval = 100; // ms
-        //     var expected = Date.now() + interval;
-        //     setTimeout(step, interval);
-        //     function step() {
-        //         var dt = Date.now() - expected; // the drift (positive for overshooting)
-        //         time += 0.1;
-        //         timer.innerText = time.toFixed(0) + " s";
-
-        //         expected += interval;
-        //         timeout = setTimeout(step, Math.max(0, interval - dt)); //take into account drift   
-        //         if (timerStopped){clearTimeout(timeout);}
-        //     }
-        // }
-
-        function resetTimer() {
-            stopTimer();
-            time = parseInt(startTime);
-            const timer = document.getElementById("timer");
-            timer.innerText = time + " s";
-        }
-
-        function stopTimer() {
-            timerStopped = true;
-        }
-
-        function showAbortSequence() {
-            // TODO: display abort sequence 
         }
 
         function highlight_finished_commands(commands){
@@ -306,31 +247,47 @@
             });
         }
 
+        function cancel(){
+            socket.emit('cancel_request');
+            location.reload;
+        }
+
+        function abort(){
+            socket.emit('abort_request');
+        }
+
+        function launch() {
+            socket.emit('launch_request');
+            socket.on('autosequence_started', function() {
+                socket.emit('start_timer');
+                socket.on('start_timer_ack', function() {
+                    location.reload();
+                });
+            });
+        }
+
+        function showAbortSequence() {
+            // TODO: display abort sequence 
+        }
+
         socket.on('command', function (commands) {
             highlight_finished_commands(commands);
+        });
+
+        socket.on('current_time', function(time_to_show){
+            console.log('in current_time, time_to_show is: ', time_to_show)
+            const timer = document.getElementById("timer");
+            timer.innerText = time_to_show + " s";
         });
 
         socket.on('no_config', function(){
             alert ("Please submit an autosequence file.")
         });
 
-        socket.on('start_launch', function(){
-            location.reload();
-            // startTimer();
-        });
-
-        socket.on('launch_time', function(time){
-            const timer = document.getElementById("timer");
-            timer.innerText = time/1000 + " s"
-        });
-
-        var time_to_show = '{{ time_to_show }}';
-        const timer = document.getElementById("timer");
-
         socket.on('abort', function(){
             showAbortSequence();
         });
-        socket.on('reload_autosequence_page', function(){
+        socket.on('autosequence_successfully_received_in_python', function(){
             location.reload();
         });
     </script>

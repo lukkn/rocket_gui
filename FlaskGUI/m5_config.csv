@@ -9,3 +9,7 @@ Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit,min,max,w
 4,actuator,Binary GPIO,LOAD_5,9,SW5,None,None,None,None
 4,actuator,Binary GPIO,LOAD_6,29,SW6,None,None,None,None
 4,actuator,Binary GPIO,LOAD_7,28,SW7,None,None,None,None
+
+
+
+

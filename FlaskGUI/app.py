@@ -6,6 +6,7 @@ import random
 import time
 import webbrowser
 import sys
+import math
 
 import configuration
 import networking
@@ -149,66 +150,91 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
             json.dump(get_request_or_coordinate_data, file)
             print("button coordinates saved to .json file")
 
-@socketio.on('autosequence')
+@socketio.on('autosequence_uploaded')
 def handle_autoseqeunce(file):
-    print("Received file")
     global autosequence_header_line
     global autosequence_commands
     global sleep_times_list
-    # returns a list of lists, each sublist containing a line from the config file
-    #TODO: look into this parsing, is it robust?
-    file_content = file.decode("utf-8").splitlines()
+    global completed_autosequence_commands
+
+    completed_autosequence_commands = []
+
+    file_content = [line.rstrip('\n') for line in file.decode("utf-8").splitlines() if line.strip()]
     autosequence_header_line = file_content[0].split(",")
     autosequence_commands = [line.split(",") for line in file_content[1:]]
     sleep_times_list = [abs(int(autosequence_commands[i][2]) - int(autosequence_commands[i+1][2])) for i in range(len(autosequence_commands)-1)] + [0] # 0 on the end so we dont go out of range and instead delay for 0 seconds after autoseq is finished
-    print("autoseq_commands_header =", autosequence_header_line)
-    print("differences =", sleep_times_list)
-    print("autoseq commands =", autosequence_commands)
-    socketio.emit('reload_autosequence_page')
+    #print("autoseq_commands_header =", autosequence_header_line)
+    #print("differences =", sleep_times_list)
+    #print("autoseq commands =", autosequence_commands)
+    socketio.emit('autosequence_successfully_received_in_python')
 
 
 @socketio.on('launch_request')
 def handle_launch_request():
     global autosequence_occuring
     global completed_autosequence_commands
+    global time_to_show
+    global cancel
     if autosequence_occuring:
         print("Autosequence is already running")
+        return None
     else:
         print("Received launch request")
-
         # check for config file
         if not autosequence_commands:
             socketio.emit('no_config')
-            print("no config was uploaded")
+            print("cofig not received properly")
+            return None
         else:
+            print("autosequence started")
             autosequence_occuring = True
-            global cancel 
             cancel = False
             completed_autosequence_commands = []
-            socketio.emit('start_launch')
-
+            time_to_show = int(int(autosequence_commands[0][2])/1000)
             sleep_list_iterator = 0 # iterate over a list of times to sleep, starting at index 0
+            socketio.emit('autosequence_started')
+            
             for command in autosequence_commands:
-                if (cancel):
-                    print("Launch cancelled")
-                    break
-                print("Command Sent =", command)
+                timeAtBeginning = time.time()
                 buttonID = command[0]
                 booleanState = command[1] # true false convention used in autoseq file. This is a string as .csv files are parsed as strings
                 stringState = 'on' if booleanState == 'True' else 'off' # on/off state used in webpages
-                time = command[2] # not used in app.py; sent to autosequence.html to create rowID, used in case we toggle an actuator :: True, False, True :: then rows would be identical
                 completed_autosequence_commands += [command]
+
                 socketio.emit('responding_with_button_data', [buttonID, stringState])
                 socketio.emit('command', completed_autosequence_commands)
+                print("Command Sent =", command)
+                print(time.time())
                 # send actuator to mote #
-                socketio.sleep(sleep_times_list[sleep_list_iterator]/1000) # socketio.sleep() expects seconds as input
+                for _ in range(100): #100hz
+                    if not cancel:
+                        socketio.sleep(   ((sleep_times_list[sleep_list_iterator]/1000) - (time.time() - timeAtBeginning))   /100) # socketio.sleep() expects seconds as input ## 100hz
+                    else:
+                        print("Launch cancelled")
                 sleep_list_iterator += 1
-        autosequence_occuring = False
+            autosequence_occuring = False
 
+@socketio.on('start_timer')
+def broadcast_time():
+    socketio.emit('start_timer_ack')
+    global time_to_show
+    while not cancel and autosequence_occuring:
+
+        socketio.emit('current_time', time_to_show)
+        print('time_to_show in python =', time_to_show)
+
+        for i in range(100): # 100hz test cancel rate
+            if not cancel and autosequence_occuring:
+                socketio.sleep(.01) # 100hz test cancel rate
+            else:
+                print("Timer Stopped, last time is: ", time_to_show)
+                print("Iterations =", i)
+                return None # prevents running last line
+        time_to_show += 1
 
 @socketio.on('connect_request')
 def handle_connect_request():
-    print("Received connect request to MoTE")
+    print("Attempting to send config to MoTE")
     networking.send_config_to_mote(sensor_list, actuator_list) # Networking function
             
 
@@ -219,7 +245,8 @@ def handle_abort_request(abort_sequence_file):
 
 @socketio.on('cancel_request')
 def handle_cancel_request():
-    print("Received cancel request") 
+    global time_to_show
+    print("Received cancel request at",time_to_show,"seconds") 
     global cancel 
     cancel = True    
 
@@ -262,20 +289,6 @@ def ping_thread():
         socketio.sleep(2)
         socketio.emit("ping", time.time_ns() // 1000000)
         #print('ping', time.time())
-
-@socketio.on('start_timer') # time of first autosequence command
-def launch_time_thread():
-    print('started time function in python')
-    global time_to_show
-    time_to_show = int(autosequence_commands[0][2])
-    while True:
-        socketio.emit('launch_time', time_to_show)
-        if not cancel:
-            time_to_show = time_to_show + 1000
-            socketio.sleep(1)
-        else:
-            print('time to show before break', time_to_show)
-            break
 
 # Dummy data function, this function should FETCH data from udp packet
 def packet_sensor_data(sensor_list):

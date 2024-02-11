@@ -187,18 +187,15 @@ class BaseServer:
         namespace = namespace or '/'
         return self.manager.get_rooms(sid, namespace)
 
-    def transport(self, sid, namespace=None):
+    def transport(self, sid):
         """Return the name of the transport used by the client.
 
         The two possible values returned by this function are ``'polling'``
         and ``'websocket'``.
 
         :param sid: The session of the client.
-        :param namespace: The Socket.IO namespace. If this argument is omitted
-                          the default namespace is used.
         """
-        eio_sid = self.manager.eio_sid_from_sid(sid, namespace or '/')
-        return self.eio.transport(eio_sid)
+        return self.eio.transport(sid)
 
     def get_environ(self, sid, namespace=None):
         """Return the WSGI environ dictionary for a client.

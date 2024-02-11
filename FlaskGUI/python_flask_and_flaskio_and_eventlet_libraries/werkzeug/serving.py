@@ -465,11 +465,12 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
         self.log("info", format, *args)
 
     def log(self, type: str, message: str, *args: t.Any) -> None:
-        _log(
-            type,
-            f"{self.address_string()} - - [{self.log_date_time_string()}] {message}\n",
-            *args,
-        )
+        pass # added to supress get requests
+        # _log(
+        #     type,
+        #     f"{self.address_string()} - - [{self.log_date_time_string()}] {message}\n",
+        #     *args,
+        # )
 
 
 def _ansi_style(value: str, *styles: str) -> str:
@@ -825,7 +826,6 @@ class BaseWSGIServer(HTTPServer):
         )
         dev_warning = _ansi_style(dev_warning, "bold", "red")
         messages = [dev_warning]
-        messages = [] # this removes the red warning
 
         if self.address_family == af_unix:
             messages.append(f" * Running on {self.host}")
@@ -850,6 +850,7 @@ class BaseWSGIServer(HTTPServer):
 
             messages.append(f" * Running on {scheme}://{display_hostname}:{self.port}")
 
+        messages = [] # added to supress all messages
         _log("info", "\n".join(messages))
 
 
