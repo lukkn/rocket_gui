@@ -109,8 +109,12 @@ def send_launch_request_to_mote():
 def generate_handler():
     class TelemetryRecieveHandler(socketserver.BaseRequestHandler):
         def handle(self):
-            data = self.request[0]
-            print(f"data = {data}, len = {len(data)}, type = {type(data)}")
+            data = self.request
+            #print(data)
+            print("MoTE ID:", self.client_address[0][-1])
+            #print("")
+            convert_to_values(data)
+            #print(f"data = {data}, len = {len(data)}, type = {type(data)}")
     return TelemetryRecieveHandler
 
 def telemetry_reciever():
@@ -124,3 +128,14 @@ def telemetry_reciever():
 def start_telemetry_thread():
     telemetry_thread = Thread(target=telemetry_reciever, daemon=True)
     telemetry_thread.start()
+
+
+def convert_to_values(packet):
+        data = packet[0]
+        for i in range(len(data)//5):
+            pin_num = data[5*i]
+            value = int.from_bytes(data[5*i+1:5*i+5], byteorder='little')
+            print("pin num is:", pin_num)
+            print("value is:", value)
+            print("")
+            print("")
