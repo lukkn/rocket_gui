@@ -7,6 +7,7 @@ Functional:
 - There should be connected indicators
 - If a box has sent a packet in the last 1.5s, assume it's there. Otherwise, assume it's disconnected
 - Buttons should be greyed out / unclickable when system is disarmed OR disconnected
+- Verifiy autoseq with actuators before autoseq runs
 
 Stylistic:
 - Make it look nice!
