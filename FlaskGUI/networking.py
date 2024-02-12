@@ -105,7 +105,7 @@ def generate_handler():
     class TelemetryRecieveHandler(socketserver.BaseRequestHandler):
         def handle(self):
             data = self.request
-            mote_id = self.client_address
+            mote_id = self.client_address[0][-1]
             data_to_send_to_frontend = convert_to_values(data, mote_id)
             print('data to send to frontend: ')
             print(data_to_send_to_frontend)
