@@ -7,7 +7,8 @@ Functional:
 - There should be connected indicators
 - If a box has sent a packet in the last 1.5s, assume it's there. Otherwise, assume it's disconnected
 - Buttons should be greyed out / unclickable when system is disarmed OR disconnected
-- Verifiy autoseq with actuators before autoseq runs
+- Verify autoseq with actuators before autoseq runs
+- Arm/Disarm button spamming while app.py is not running will lead to all commands being received on restart ;; check this for actuator presses as well, we default to disarm so fixing the first issue should fix the second but not a good aproach
 
 Stylistic:
 - Make it look nice!
