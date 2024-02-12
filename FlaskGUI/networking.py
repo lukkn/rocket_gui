@@ -8,6 +8,10 @@ import configuration
 from configuration import get_interface_type_number
 from configuration import load_config
 
+
+num_motes = 4
+mote_status = []
+
 # Sending config and actuator commands
 sock = socket.socket(socket.AF_INET,  # Internet
                      socket.SOCK_DGRAM)  # UDP

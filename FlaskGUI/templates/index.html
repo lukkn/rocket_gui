@@ -63,16 +63,6 @@
             grid-column: 2;
         }
 
-        /* Add your styling for the armed and disarmed states */
-        .armed {
-            background-color: #7ce38b;
-        }
-
-        .disarmed {
-            background-color: #fa7970;
-            color: #ecf2f8;
-        }
-
         /* Style for file input and upload button */
         input[type="file"] {
             display: none;
@@ -99,15 +89,20 @@
             font-size: 16px;
             overflow: wrap;
         }
-
+        
         #armDisarmButton {
+            background-color: transparent;
+            color: #ecf2f8;
             margin: 10px;
             padding: 10px;
-            border: none;
-            border-radius: 5px;
+            border: solid;
             cursor: pointer;
             font-size: 16px;
-            overflow: wrap;
+            width: 100px;
+        }
+
+        table, th, td {
+            border: solid;
         }
 
     </style>
@@ -125,25 +120,62 @@
 
     <!-- Status panel -->
     <div id = "statusPanel">
-        <!-- Arm button -->
-        <button id="armDisarmButton" name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
-            {% if armed %}Stand is Armed<br>Click to Disarm{% else %}Stand is Disarmed<br>Click to Arm{% endif %}
-        </button>
-
-        <!-- Upload buttons for CSV file -->
-        <div style = "position: relative; float: left; top: 20px">
-            <label for="csvFile1" title = " Upload sensors and actuators configuration file" class="upload-button">Upload Config</label>
-            <input type="file" id="csvFile1" accept=".csv" onchange="uploadFile('csvFile1')">
-            <div id="csvFile1Message" class= "fileName"></div>
-        </div>
-        <div style = " float: left">
-            <button id = "connectButton" title = "Send config to MoTE" onclick="connectToMote()">Connect</button>
-        </div>
 
         <!-- Mote connection status and ping -->
-        <div></div>
+        <div>
+            <table style="width: 60%; color: #ecf2f8; text-align: center; margin: 10px">
+                <tr>
+                    <th>MoTE number</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Ping (ms)</th>
+                </tr>
+                <tr>
+                    <td>MoTE1</td>
+                    <td>Purge Panel</td>
+                    <td>Connected</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>MoTE2</td>
+                    <td>Pneumatics Panel</td>
+                    <td>Connected</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>MoTE3</td>
+                    <td>Tank Stand</td>
+                    <td>Connected</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>MoTE4</td>
+                    <td>LoRA</td>
+                    <td>Connected</td>
+                    <td>None</td>
+                </tr>
+            </table>
+        </div>
     </div>
 
+    <!-- Arm button -->
+    <button id="armDisarmButton" name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
+        <img id = "armDisarmImg" src = "" style = "margin-bottom: 10px;"> 
+        {% if armed %}Armed{% else %}Disarmed{% endif %}
+    </button>
+
+    <!-- Upload buttons for CSV file -->
+    <div>
+        <label for="csvFile1" title = " Upload sensors and actuators configuration file" class="upload-button">Upload Config</label>
+        <input type="file" id="csvFile1" accept=".csv" onchange="uploadFile('csvFile1')">
+        <div id="csvFile1Message" class= "fileName"></div>
+    </div>
+    <div>
+        <button id = "connectButton" title = "Send config to MoTE" onclick="connectToMote()">Connect</button>
+    </div>
+
+
+    
 
     <!-- reserved for future use DO NOT DELETE
     <br>
@@ -171,12 +203,12 @@
             // update the button color on page load or reload
             // TODO: make this dependent on something more robust
             const armDisarmButton = document.getElementById('armDisarmButton');
+            const armDisarmImg = document.getElementById("armDisarmImg");
+
             if (armDisarmButton.innerText.includes('Armed')) {
-                armDisarmButton.classList.remove('disarmed');
-                armDisarmButton.classList.add('armed');
+                armDisarmImg.src = "../static/icons/armed_icon.png";
             } else if (armDisarmButton.innerText.includes('Disarmed')) {
-                armDisarmButton.classList.remove('armed');
-                armDisarmButton.classList.add('disarmed');
+                armDisarmImg.src = "../static/icons/disarmed_icon.png";
             } else {console.log('button text is invalid', armDisarmButton.innerHTML);}
 
 
@@ -214,38 +246,16 @@
 
         socket.on('armOrDisarmResponse', function (boolean_state) {
             const armDisarmButton = document.getElementById('armDisarmButton');
+            console.log(armDisarmImg);
             // Toggle the text and color
             if (boolean_state) {
                 console.log("stand is armed, trying to update button");
-                armDisarmButton.innerHTML = 'Stand is Armed<br>Click to Disarm';
-                armDisarmButton.classList.remove('disarmed');
-                armDisarmButton.classList.add('armed');
+                armDisarmButton.innerHTML = '<img id = "armDisarmImg" src = "../static/icons/armed_icon.png" style = "margin-bottom: 10px;"> Armed';
             } else {
                 console.log("stand is disarmed, trying to update button");
-                armDisarmButton.innerHTML = 'Stand is Disarmed<br>Click to Arm';
-                armDisarmButton.classList.remove('armed');
-                armDisarmButton.classList.add('disarmed');
+                armDisarmButton.innerHTML = '<img id = "armDisarmImg" src = "../static/icons/disarmed_icon.png" style = "margin-bottom: 10px;"> Disarmed';
             }
         });
-
-
-        let pingTimeout;
-
-        socket.on('ping', function (time) {
-            // Update ping display
-            document.getElementById("ping").textContent = `Ping: ${(Date.now() - time).toFixed(0)} milliseconds`;
-
-            // Clear the timeout when the pong response is received
-            clearTimeout(pingTimeout);
-
-            // Set a new timeout for the next expected ping
-            pingTimeout = setTimeout(function () {
-                const a = document.getElementById("ping");
-                a.textContent = "Server not responding";
-                location.reload();
-            }, 2000 + 1000); // If we get ping 1 second late attempt reload
-        });
-
 
     </script>
 </body>
