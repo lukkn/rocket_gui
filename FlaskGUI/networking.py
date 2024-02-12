@@ -4,9 +4,10 @@ import time
 import threading
 from threading import Thread
 
+
+import app
+
 import configuration
-from configuration import get_interface_type_number
-from configuration import load_config
 
 
 num_motes = 4
@@ -33,7 +34,7 @@ def send_actuator_command(mote_id, pin_num, state, interface_type='Binary GPIO')
             pass
     actuator_write_command = 0b10000000
     actuator_state_mask = 0b01000000 if state else 0
-    interface_type_number = get_interface_type_number(
+    interface_type_number = configuration.get_interface_type_number(
         interface_type) & 0b00111111
     config_byte = actuator_write_command | actuator_state_mask | interface_type_number
     ip = get_ip(mote_id=mote_id)
@@ -58,7 +59,7 @@ def send_config_to_mote(sensor_list, actuator_list):
         reset_command = bytearray(2)
         reset_command[0] = 0
         reset_command[1] |= 0b00000000
-        reset_command[1] |= 0b00111111 & get_interface_type_number('Clear_Config')
+        reset_command[1] |= 0b00111111 & configuration.get_interface_type_number('Clear_Config')
 
         sock.sendto(reset_command, (get_ip(m), 8888))
 
@@ -73,21 +74,17 @@ def send_config_to_mote(sensor_list, actuator_list):
         if int(sensor['Mote id']) >= 10:
             continue
 
-        print(sensor['Interface Type'])
-        #print("at least one sensor has been accessed")
         ip = get_ip(sensor['Mote id'])  # '192.168.2.'+sensor['Mote id']
+
         # See Readme for explenation of config_command
         config_command = bytearray(2)  # 2 byte byte array
         config_command[0] = int(sensor['Pin'])  # set first byte
+
         # set this to 0b10000000 for actuator write command
         config_command[1] |= 0b00000000
-        config_command[1] |= 0b00111111 & get_interface_type_number(
+        config_command[1] |= 0b00111111 & configuration.get_interface_type_number(
             sensor['Interface Type'])
 
-        print(config_command, "config_command")
-        print(config_command[0])
-        print(config_command[1])
-        print(ip)
         sock.sendto(config_command, (ip, 8888))
         time.sleep(0.1)
 
@@ -104,21 +101,14 @@ def send_launch_request_to_mote():
     return
 
 
-
-
-
-
-
-
 def generate_handler():
     class TelemetryRecieveHandler(socketserver.BaseRequestHandler):
         def handle(self):
             data = self.request
-            #print(data)
-            print("MoTE ID:", self.client_address[0][-1])
-            #print("")
-            convert_to_values(data)
-            #print(f"data = {data}, len = {len(data)}, type = {type(data)}")
+            mote_id = self.client_address
+            data_to_send_to_frontend = convert_to_values(data, mote_id)
+            print(data_to_send_to_frontend)
+            app.packet_sensor_data(data_to_send_to_frontend)
     return TelemetryRecieveHandler
 
 def telemetry_reciever():
@@ -134,12 +124,11 @@ def start_telemetry_thread():
     telemetry_thread.start()
 
 
-def convert_to_values(packet):
-        data = packet[0]
-        for i in range(len(data)//5):
-            pin_num = data[5*i]
-            value = int.from_bytes(data[5*i+1:5*i+5], byteorder='little')
-            print("pin num is:", pin_num)
-            print("value is:", value)
-            print("")
-            print("")
+def convert_to_values(packet, mote_id):
+    data = packet[0]
+    parsed_data = []
+    for i in range(len(data)//5):
+        pin_num = data[5*i]
+        value = int.from_bytes(data[5*i+1:5*i+5], byteorder='little')
+        parsed_data += {'Mote ID': mote_id, 'Pin': pin_num, 'Value': value}
+    return parsed_data

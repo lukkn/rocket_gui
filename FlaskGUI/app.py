@@ -30,6 +30,7 @@ sessionid = str(random.random())[2:]
 # GLOBAL VARIABLES for sensors and actuators
 actuator_list = []
 sensor_list = []
+sensor_dictionary = {}
 
 # dictionary of modified states for sensors + actuators
 actuator_states_and_sensor_tare_states = {}
@@ -252,6 +253,7 @@ def broadcast_time():
 def handle_connect_request():
     print("Attempting to send config to MoTE")
     networking.send_config_to_mote(sensor_list, actuator_list) # Networking function
+    create_sensor_dictionary()
     networking.start_telemetry_thread()
 
 
@@ -307,15 +309,25 @@ def ping_thread():
         socketio.emit("ping", time.time_ns() // 1000000)
         #print('ping', time.time())
 
-# Dummy data function, this function should FETCH data from udp packet
-def packet_sensor_data(sensor_list):
-    a = []
-    for sensor in sensor_list:
-        a.append([sensor['P and ID'], round(random.random(), 5)])
-    return a
 
-count = 0
-def packet_sensor_data2(sensor_list):
+def create_sensor_dictionary():
+    global sensor_dictionary
+    for sensor in sensor_list:
+        sensor_dictionary[sensor["Mote ID"] + ", " + sensor["Pin"]] = sensor["P and ID"]
+
+
+# Dummy data function, this function should FETCH data from udp packet
+def packet_sensor_data(telemetry_data):
+    parsed_data = []
+
+    for data in telemetry_data:
+        sensor_value_pair = (sensor_dictionary[data["Mote ID"] + ", " + data["Pin"]], data['Value'])
+        parsed_data.append(sensor_value_pair)
+    return parsed_data
+
+
+
+def dummy_data(sensor_list):
     global count
     a = []
     for sensor in sensor_list:

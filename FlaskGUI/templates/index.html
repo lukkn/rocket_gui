@@ -156,24 +156,25 @@
                 </tr>
             </table>
         </div>
+
+        <!-- Arm button -->
+        <button id="armDisarmButton" name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
+            <img id = "armDisarmImg" src = "" style = "margin-bottom: 10px;"> 
+            {% if armed %}Armed{% else %}Disarmed{% endif %}
+        </button>
+
+        <!-- Upload buttons for CSV file -->
+        <div>
+            <label for="csvFile1" title = " Upload sensors and actuators configuration file" class="upload-button">Upload Config</label>
+            <input type="file" id="csvFile1" accept=".csv" onchange="uploadFile('csvFile1')">
+            <div id="csvFile1Message" class= "fileName"></div>
+        </div>
+        <div>
+            <button id = "connectButton" title = "Send config to MoTE" onclick="connectToMote()">Connect</button>
+        </div>
     </div>
 
-    <!-- Arm button -->
-    <button id="armDisarmButton" name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
-        <img id = "armDisarmImg" src = "" style = "margin-bottom: 10px;"> 
-        {% if armed %}Armed{% else %}Disarmed{% endif %}
-    </button>
-
-    <!-- Upload buttons for CSV file -->
-    <div>
-        <label for="csvFile1" title = " Upload sensors and actuators configuration file" class="upload-button">Upload Config</label>
-        <input type="file" id="csvFile1" accept=".csv" onchange="uploadFile('csvFile1')">
-        <div id="csvFile1Message" class= "fileName"></div>
-    </div>
-    <div>
-        <button id = "connectButton" title = "Send config to MoTE" onclick="connectToMote()">Connect</button>
-    </div>
-
+    
 
     
 
