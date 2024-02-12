@@ -107,6 +107,7 @@ def generate_handler():
             data = self.request
             mote_id = self.client_address
             data_to_send_to_frontend = convert_to_values(data, mote_id)
+            print('data to send to frontend: ')
             print(data_to_send_to_frontend)
             app.packet_sensor_data(data_to_send_to_frontend)
     return TelemetryRecieveHandler
@@ -130,5 +131,5 @@ def convert_to_values(packet, mote_id):
     for i in range(len(data)//5):
         pin_num = data[5*i]
         value = int.from_bytes(data[5*i+1:5*i+5], byteorder='little')
-        parsed_data += {'Mote ID': mote_id, 'Pin': pin_num, 'Value': value}
+        parsed_data.append({'Mote id': mote_id, 'Pin': pin_num, 'Value': value})
     return parsed_data

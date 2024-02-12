@@ -104,6 +104,7 @@ def loadConfigFile(CSVFileAndFileContents):
         global actuator_list
         #print(fileContents)
         actuator_list, sensor_list = configuration.load_config(fileContents)
+        create_sensor_dictionary()
         socketio.emit('sensor_and_actuator_config_uploaded')
 
 @socketio.on('armOrDisarmRequest')
@@ -252,8 +253,15 @@ def broadcast_time():
 @socketio.on('connect_request')
 def handle_connect_request():
     print("Attempting to send config to MoTE")
+    global thread
+    global thread2
+    with thread_lock:
+        if thread is None:
+            thread = socketio.start_background_task(sensor_data_thread)
+    with thread_lock2:
+        if thread2 is None:
+            thread2 = socketio.start_background_task(ping_thread)
     networking.send_config_to_mote(sensor_list, actuator_list) # Networking function
-    create_sensor_dictionary()
     networking.start_telemetry_thread()
 
 
@@ -274,14 +282,16 @@ def handle_cancel_request():
 @socketio.on('guion')
 def guion():
     print('guion was triggered')
-    global thread
-    global thread2
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(sensor_data_thread)
-    with thread_lock2:
-        if thread2 is None:
-            thread2 = socketio.start_background_task(ping_thread)
+
+
+def create_sensor_dictionary():
+    global sensor_dictionary
+    for sensor in sensor_list:
+        sensor_dictionary[sensor["Mote id"] + ", " + sensor["Pin"]] = sensor["P and ID"]
+    print('sensor dictionary: ')
+    print(sensor_dictionary)
+    print('')
+
 
 def sensor_data_thread():
     # if this delay is not here code fails
@@ -310,18 +320,12 @@ def ping_thread():
         #print('ping', time.time())
 
 
-def create_sensor_dictionary():
-    global sensor_dictionary
-    for sensor in sensor_list:
-        sensor_dictionary[sensor["Mote ID"] + ", " + sensor["Pin"]] = sensor["P and ID"]
-
-
 # Dummy data function, this function should FETCH data from udp packet
 def packet_sensor_data(telemetry_data):
     parsed_data = []
 
     for data in telemetry_data:
-        sensor_value_pair = (sensor_dictionary[data["Mote ID"] + ", " + data["Pin"]], data['Value'])
+        sensor_value_pair = (sensor_dictionary[data["Mote id"] + ", " + data["Pin"]], data['Value'])
         parsed_data.append(sensor_value_pair)
     return parsed_data
 
