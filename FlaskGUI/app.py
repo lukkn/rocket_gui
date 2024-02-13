@@ -19,7 +19,7 @@ sys.path.append(os.path.abspath("./python_flask_and_flaskio_and_eventlet_librari
 from python_flask_and_flaskio_and_eventlet_libraries.flask import Flask, render_template
 from python_flask_and_flaskio_and_eventlet_libraries.flask_socketio import SocketIO
 
-
+count  = 0
 # not quite sure what this does but leave it here anyway
 async_mode = None
 
@@ -30,7 +30,6 @@ sessionid = str(random.random())[2:]
 # GLOBAL VARIABLES for sensors and actuators
 actuator_list = []
 sensor_list = []
-sensor_dictionary = {}
 
 # dictionary of modified states for sensors + actuators
 actuator_states_and_sensor_tare_states = {}
@@ -50,7 +49,7 @@ time_to_show = 0
 #actuator_list = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'VNTB'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Fuel tank vent', 'Pin': '1', 'P and ID': 'VFTV'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Ox bang-bang', 'Pin': '0', 'P and ID': 'VNTO'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Ox tank fill', 'Pin': '0', 'P and ID': 'VOTF'}]
 #sensor_list = [{'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '0', 'P and ID': 'PNTB', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '1', 'P and ID': 'POTB', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '2', 'P and ID': 'PNTB2', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '3', 'P and ID': 'POTB3', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '4', 'P and ID': 'PNTB4', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '5', 'P and ID': 'POTB5', 'unit': 'bar'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Nitrogen storage bottle pressure', 'Pin': '6', 'P and ID': 'PNTB6', 'unit': 'C'}, {'Mote id': '2', 'Sensor or Actuator': 'sensor', 'Interface Type': 'i2c ADC 1ch', 'Human Name': 'Ox storage bottle pressure', 'Pin': '7', 'P and ID': 'POTB7', 'unit': 'bar'}]
 
-#actuator_list = [{'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'IGNTN'}]
+#actuator_list = [{'Mote id': '1', 'Sensor sensor_dictionary = {}or Actuator': 'actuator', 'Interface Type': 'servoPWM', 'Human Name': 'Nitrogen engine purge', 'Pin': '0', 'P and ID': 'VPTE'}, {'Mote id': '1', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'Fuel bang-bang', 'Pin': '0', 'P and ID': 'IGNTN'}]
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -104,7 +103,6 @@ def loadConfigFile(CSVFileAndFileContents):
         global actuator_list
         #print(fileContents)
         actuator_list, sensor_list = configuration.load_config(fileContents)
-        create_sensor_dictionary()
         socketio.emit('sensor_and_actuator_config_uploaded')
 
 @socketio.on('armOrDisarmRequest')
@@ -148,7 +146,7 @@ def handle_button_press(buttonID, state, current_time):
 def actuator_button_coordinates(get_request_or_coordinate_data):
     # if pidview.html is requesting the coordinates stored in the .json
     if get_request_or_coordinate_data == 'getCoordinates':
-        #emit coordinates
+        #emit coordinates'test': 'testval'
         with open(os.path.dirname(os.path.abspath(__file__)) + '/static/coordinates.json', 'r') as file:
             coordinates = json.load(file)
             print("pidview.html is requesting coordinates from .json")
@@ -253,20 +251,24 @@ def broadcast_time():
 @socketio.on('connect_request')
 def handle_connect_request():
     print("Attempting to send config to MoTE")
+    networking.send_config_to_mote(sensor_list, actuator_list) # Networking function
+    networking.start_telemetry_thread()
     global thread
-    global thread2
     with thread_lock:
         if thread is None:
             thread = socketio.start_background_task(sensor_data_thread)
-    with thread_lock2:
-        if thread2 is None:
-            thread2 = socketio.start_background_task(ping_thread)
-    networking.send_config_to_mote(sensor_list, actuator_list) # Networking function
-    networking.start_telemetry_thread()
+
+
+def sensor_data_thread():
+    socketio.sleep(1)
+    while True:
+        socketio.sleep(1/20)
+        sensors_and_data = networking.get_sensor_data()
+        socketio.emit('sensor_data', [sensors_and_data, time.time_ns() // 1000000])
 
 
 @socketio.on('abort_request')
-def handle_abort_request(abort_sequence_file):
+def handle_abort_request():
     print("Received abort request")
     networking.send_abort_request_to_mote() # Networking function
 
@@ -277,58 +279,10 @@ def handle_cancel_request():
     global cancel
     cancel = True
 
-
 # FUNCTIONS BELOW RELATE TO GETTING SENSOR DATA IN BACKGROUND THREAD
 @socketio.on('guion')
 def guion():
     print('guion was triggered')
-
-
-def create_sensor_dictionary():
-    global sensor_dictionary
-    for sensor in sensor_list:
-        sensor_dictionary[sensor["Mote id"] + ", " + sensor["Pin"]] = sensor["P and ID"]
-    print('sensor dictionary: ')
-    print(sensor_dictionary)
-    print('')
-
-
-def sensor_data_thread():
-    # if this delay is not here code fails
-    socketio.sleep(1)
-    while True:
-        socketio.sleep(1/20)
-        # sensors_and_data is a list of tuples containing (sensorID, value)
-        sensors_and_data = packet_sensor_data(sensor_list)
-
-        # test what happens with different scales
-
-        #sensors_and_data[0][1] = random.random()*10
-
-        # testing shows we get data at 3khz with random, 6khz with a predetermined constant; ex: 1
-        # with open("sensor_data_log", mode='a', newline='') as csv_file:
-        #     csv_writer = csv.writer(csv_file)
-        #     csv_writer.writerow(sensors_and_data)
-
-        # print("sensor is reading:", sensors_and_data[0][1])
-        socketio.emit('sensor_data', [sensors_and_data, time.time_ns() // 1000000])
-
-def ping_thread():
-    while True:
-        socketio.sleep(2)
-        socketio.emit("ping", time.time_ns() // 1000000)
-        #print('ping', time.time())
-
-
-# Dummy data function, this function should FETCH data from udp packet
-def packet_sensor_data(telemetry_data):
-    parsed_data = []
-
-    for data in telemetry_data:
-        sensor_value_pair = (sensor_dictionary[data["Mote id"] + ", " + data["Pin"]], data['Value'])
-        parsed_data.append(sensor_value_pair)
-    return parsed_data
-
 
 
 def dummy_data(sensor_list):
@@ -338,7 +292,6 @@ def dummy_data(sensor_list):
         a.append((sensor['P and ID'], count))
     count+=1
     return a
-
 
 # start the app
 if __name__ == '__main__':

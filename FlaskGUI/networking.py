@@ -4,14 +4,14 @@ import time
 import threading
 from threading import Thread
 
-
-import app
-
 import configuration
 
 
 num_motes = 4
 mote_status = []
+
+sensor_dictionary = {'1, 99': 'FireX'}
+most_recent_data_packet = []
 
 # Sending config and actuator commands
 sock = socket.socket(socket.AF_INET,  # Internet
@@ -53,6 +53,8 @@ def send_heartbeat():
 heartbeat_thread = Thread(target=send_heartbeat, daemon=True)
 
 def send_config_to_mote(sensor_list, actuator_list):
+    global sensor_dictionary
+    sensor_dictionary.update(create_sensor_dictionary(sensor_list))
     sensors_and_actuators_list = sensor_list + actuator_list
     print("sent sensor config data to mote")
     for m in range(1, 4):
@@ -100,16 +102,32 @@ def send_launch_request_to_mote():
     # TODO
     return
 
-
 def generate_handler():
     class TelemetryRecieveHandler(socketserver.BaseRequestHandler):
         def handle(self):
             data = self.request
-            mote_id = self.client_address
+            mote_id = self.client_address[0][-1]
             data_to_send_to_frontend = convert_to_values(data, mote_id)
-            print('data to send to frontend: ')
-            print(data_to_send_to_frontend)
-            app.packet_sensor_data(data_to_send_to_frontend)
+
+            global sensor_dictionary
+            global most_recent_data_packet
+
+            parsed_data = []
+
+            for data in data_to_send_to_frontend:
+
+                sensor_name = sensor_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
+                sensor_value = data['Value']
+
+                if (sensor_name == 'FireX'):
+                    #print('FireX status received')
+                    pass
+                else:
+                    sensor_value_pair = (sensor_name, sensor_value)
+                    parsed_data.append(sensor_value_pair)
+
+            most_recent_data_packet = parsed_data
+
     return TelemetryRecieveHandler
 
 def telemetry_reciever():
@@ -128,8 +146,19 @@ def start_telemetry_thread():
 def convert_to_values(packet, mote_id):
     data = packet[0]
     parsed_data = []
+
     for i in range(len(data)//5):
         pin_num = data[5*i]
         value = int.from_bytes(data[5*i+1:5*i+5], byteorder='little')
         parsed_data.append({'Mote id': mote_id, 'Pin': pin_num, 'Value': value})
     return parsed_data
+
+def create_sensor_dictionary(sensor_list):
+    dict = {}
+    for sensor in sensor_list:
+        dict[sensor["Mote id"] + ", " + sensor["Pin"]] = sensor["P and ID"]
+    return dict
+
+def get_sensor_data():
+    global most_recent_data_packet
+    return most_recent_data_packet

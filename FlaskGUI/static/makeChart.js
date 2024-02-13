@@ -9,7 +9,7 @@ const colors = [
     'red', 'blue', 'green', 'orange', 'violet', 'brown', 'salmon', 'purple',
     'cyan', 'pink', 'teal', 'maroon', 'olive', 'navy', 'magenta', 'turquoise',
     'indigo', 'lime', 'gold', 'silver', 'orchid', 'sienna', 'slategray', 'peru'
-  ]; 
+  ];
 var sensorColors = Object.create(null);
 var activeSensorsList = Object.create(null); // key: canvasID    value: array of active sensor plots
 var dataDict = Object.create(null);
@@ -59,17 +59,17 @@ function plotLines(canvasID) {
         let data = dataDict[sensor];
 
         const dataPoints = data.map((value, index) => ({
-            x: index * (canvas.width / (data.length - 1)),
+            x: index * ((canvas.width-40) / (data.length - 1)),
             y: canvas.height*((maxLabel - value)/(maxLabel - minLabel))
         }));
-    
+
         context.beginPath();
         context.moveTo(dataPoints[0].x + 40, dataPoints[0].y);
-    
+
         dataPoints.forEach(point => {
             context.lineTo(point.x + 40, point.y);
         });
-    
+
         context.lineWidth = 1;
         context.strokeStyle = sensorColors[sensor];
         context.stroke();
@@ -85,7 +85,7 @@ function defineScale(canvasID){
     activeSensors.forEach(function (sensor) {
         activeData.push.apply(activeData, dataDict[sensor]);
     });
-    
+
     maxLabel = Math.ceil(Math.max(...activeData));
     minLabel = Math.floor(Math.min(...activeData));
 }
@@ -95,8 +95,8 @@ function createEmptyChart(canvasID, sensorsList){
     activeSensorsList[canvasID] = [];
     sensorsList.forEach(function(sensorName) {
         dataDict[sensorName] = [];
-    });  
-    
+    });
+
 }
 
 function createCheckboxes(canvasID, sensorList){
@@ -126,7 +126,7 @@ function createCheckboxes(canvasID, sensorList){
         label.appendChild(document.createTextNode(sensor));
 
         container.appendChild(checkbox);
-        container.appendChild(label);  
+        container.appendChild(label);
     });
 
     // Create entry in dictionary for current chart
@@ -159,9 +159,9 @@ function updateData(sensorTupleList, dataLength) {
             // TODO: next ambitious person should make a circlular buffer class
             data.shift();
         }
-    });  
+    });
 }
- 
+
 function handleGraphCheckbox(canvasID, checkboxID, sensor){
     let activeSensors = activeSensorsList[canvasID]
 

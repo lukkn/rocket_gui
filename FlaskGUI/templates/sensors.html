@@ -75,6 +75,8 @@
             const listOfSensorIDValueTuples = data[0]
             const timestamp = data[1]
 
+            console.log('received sensor data')
+
             listOfSensorIDValueTuples.forEach(function (sensorTuple) {
                 const sensorID = sensorTuple[0];
                 const sensorValue = sensorTuple[1];
@@ -90,7 +92,7 @@
             updateData(listOfSensorIDValueTuples, 20*15);
 
             // plot updated data for each chart
-            const canvasList = document.getElementsByTagName('canvas'); 
+            const canvasList = document.getElementsByTagName('canvas');
             for (canvas of canvasList){
                 plotLines(canvas.id);
             }
@@ -133,7 +135,7 @@
         });
 
         var chartCounter = 1;
-        
+
 
         function addChart(){
             const chartNumber = chartCounter;
@@ -147,7 +149,7 @@
             canvas.style.display = "block";
             document.getElementById("chartContainer").appendChild(canvas);
 
-            
+
             var removeButton = document.createElement("button");
             removeButton.id = "removeButton" + chartNumber;
             removeButton.textContent = "Remove Chart";
@@ -169,7 +171,7 @@
 
             removeCheckboxes(canvasID, sensorList);
         }
-    
+
 
         let pingTimeout;
 
@@ -187,7 +189,6 @@
                 location.reload();
             }, 2000 + 1000); // If we get ping 1 second late attempt reload
         });
-
 
     </script>
 
