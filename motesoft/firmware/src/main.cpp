@@ -455,6 +455,7 @@ void setup()
     
     Serial.println("Hello World!");
 
+/*
     Serial.print("\nInitializing SD card...");
 
     // we'll use the initialization code from the utility libraries
@@ -489,6 +490,10 @@ void setup()
     // Open the mote_number.txt file and save to moteID
     root.open("/mote_number.txt");
     moteID = root.read();
+
+  */
+
+    moteID = '1';
    
     Serial.println("Mote number:");
     Serial.println(moteID);
@@ -512,6 +517,7 @@ void setup()
     Serial.println("Set IP!");
     //IPAddress ip(192, 168, 1, 101);
     // Start the Ethernet
+
     Ethernet.begin(mac, ip);
 
     Serial.println("Began Ethernet!");
