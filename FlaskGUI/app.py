@@ -36,6 +36,7 @@ actuator_states_and_sensor_tare_states = {}
 
 # Global Variable that determines if stand is armed
 armed = False
+count = 0
 
 autosequence_header_line = []
 autosequence_commands = []
@@ -191,7 +192,7 @@ def handle_launch_request():
         # check for config file
         if not autosequence_commands:
             socketio.emit('no_config')
-            print("cofig not received properly")
+            print("config not received properly")
             return None
         else:
             print("autosequence started")

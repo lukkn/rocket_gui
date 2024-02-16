@@ -15,17 +15,18 @@
             height: 100%;
             margin: 20px;
             display: grid;
-            grid-template-columns: 120px auto ;
+            grid-template-columns: 120px auto 110px;
             gap: 20px;
             row-gap: 0;
         }
 
         .pageLink button {
             background-color: transparent;
-            border: none;
+            border: 0;
             height: 100%;
             cursor: pointer;
             color: #ecf2f8;
+
         }
 
         button img {
@@ -41,7 +42,7 @@
         }
 
         #pageLinks {
-            grid-row: 2;
+            grid-row: 2 / span 4;
             grid-column: 1;
             display: grid;
             grid-template-columns: 100%;
@@ -58,8 +59,13 @@
         }
 
         #statusPanel {
-            border: solid;
             grid-row: 1/ span 2;
+            grid-column: 2;
+        }
+
+        #configPanel {
+            border: solid;
+            grid-row: 3;
             grid-column: 2;
         }
 
@@ -91,11 +97,12 @@
         }
         
         #armDisarmButton {
+            grid-column: 3;
+            grid-row: 1 / span 2;
             background-color: transparent;
             color: #ecf2f8;
             margin: 10px;
             padding: 10px;
-            border: solid;
             cursor: pointer;
             font-size: 16px;
             width: 100px;
@@ -103,6 +110,18 @@
 
         table, th, td {
             border: solid;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+        table {
+            color: #ecf2f8; 
+            text-align: center; 
+            width: 100%;
+        }
+        
+        th {
+            padding: 10px;
         }
 
     </style>
@@ -123,7 +142,7 @@
 
         <!-- Mote connection status and ping -->
         <div>
-            <table style="width: 60%; color: #ecf2f8; text-align: center; margin: 10px">
+            <table id = "statusTable">
                 <tr>
                     <th>MoTE number</th>
                     <th>Name</th>
@@ -156,13 +175,15 @@
                 </tr>
             </table>
         </div>
+    </div>
+    <!-- Arm button -->
+    <button id="armDisarmButton" name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
+        <img id = "armDisarmImg" src = "" style = "margin-bottom: 10px;"> 
+        {% if armed %}Armed{% else %}Disarmed{% endif %}
+    </button>
 
-        <!-- Arm button -->
-        <button id="armDisarmButton" name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
-            <img id = "armDisarmImg" src = "" style = "margin-bottom: 10px;"> 
-            {% if armed %}Armed{% else %}Disarmed{% endif %}
-        </button>
-
+    <!-- Config panel -->
+    <div id = "configPanel">
         <!-- Upload buttons for CSV file -->
         <div>
             <label for="csvFile1" title = " Upload sensors and actuators configuration file" class="upload-button">Upload Config</label>
@@ -172,8 +193,10 @@
         <div>
             <button id = "connectButton" title = "Send config to MoTE" onclick="connectToMote()">Connect</button>
         </div>
+        <table id="configTable"></table>
     </div>
 
+    <html id="config_file">{{  config_file }}</html>
     
 
     
@@ -197,7 +220,6 @@
         // var screenWidth = window.screen.availWidth;
         // var screenHeight = window.screen.availHeight;
 
-
         document.addEventListener('DOMContentLoaded', function() {
             socket.emit('guion');
 
@@ -211,8 +233,6 @@
             } else if (armDisarmButton.innerText.includes('Disarmed')) {
                 armDisarmImg.src = "../static/icons/disarmed_icon.png";
             } else {console.log('button text is invalid', armDisarmButton.innerHTML);}
-
-
         });
 
 
