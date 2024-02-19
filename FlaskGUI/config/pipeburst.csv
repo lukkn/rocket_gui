@@ -1,0 +1,2 @@
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit,min,max,window
+3,actuator,Binary GPIO,pipe test,23,VNTB
