@@ -38,5 +38,9 @@ FlaskGUI/python_flask_and_flaskio_and_eventlet_libraries/wsproto/__pycache__/
 FlaskGUI/python_flask_and_flaskio_and_eventlet_libraries/colorama/tests/__pycache__/
 FlaskGUI/python_flask_and_flaskio_and_eventlet_libraries/h11/tests/__pycache__/
 FlaskGUI/python_flask_and_flaskio_and_eventlet_libraries/werkzeug/middleware/__pycache__/
+
 sensor_data_log
 motesoft/Logs
+
+motesoft/firmware/.gitignore
+motesoft/firmware/.vscode/
