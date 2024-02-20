@@ -320,7 +320,7 @@ def ping_mote():
             except:
                 pass
                 #print(f"ping for mote {moteID} returned error code 1")
-        time.sleep(5)
+    time.sleep(5)
 
 ping_thread = Thread(target=ping_mote, daemon=True)   # Make a new thread to run ping_mote function
 ping_thread.start()  # Run the program

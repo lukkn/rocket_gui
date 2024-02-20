@@ -1,6 +1,13 @@
 import socket
 import socketserver
 import time
+
+# For ping
+import platform # to identify os
+import subprocess # to execute shell commands
+import re # for regular expressions
+
+# For threading
 import threading
 from threading import Thread
 
@@ -70,6 +77,12 @@ def send_config_to_mote(sensor_list, actuator_list):
         except:
             print("heartbeat thread already started")
 
+        try:
+            ping_thread.start() 
+        except:
+            print("ping thread already started")
+            
+
     print (sensors_and_actuators_list)
     for sensor in sensors_and_actuators_list:
         #skip labjacks
@@ -90,17 +103,30 @@ def send_config_to_mote(sensor_list, actuator_list):
         sock.sendto(config_command, (ip, 8888))
         time.sleep(0.1)
 
-def send_abort_request_to_mote():
-    # TODO
-    return
+mote_ping = [None, None, None, None]
 
-def send_cancel_request_to_mote():
-    # TODO
-    return
+def ping_mote():
+    while True:
+        for moteID in range(1, 5):
+            ip_address = get_ip(mote_id=moteID)
+            try:
+                # Option for the number of packets as a function of
+                param = '-n' if platform.system().lower()=='windows' else '-c'
+                # Building the command. Ex: "ping -c 1 google.com"
+                command = ['ping', param, '1', ip_address]
+                output = subprocess.check_output(command)
 
-def send_launch_request_to_mote():
-    # TODO
-    return
+                avgRTT = re.search("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)", str(output)).group(2)
+                delay = float(float(avgRTT)/2)
+                mote_ping[moteID-1] = delay
+                print("thread ping", delay)
+            except:
+                #pass
+                print(f"ping for mote {moteID} returned error code 1")
+        #time.sleep(5)
+
+ping_thread = Thread(target=ping_mote, daemon=True)   # Make a new thread to run ping_mote function
+
 
 def generate_handler():
     class TelemetryRecieveHandler(socketserver.BaseRequestHandler):

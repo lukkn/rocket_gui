@@ -104,6 +104,11 @@ def loadConfigFile(CSVFileAndFileContents):
         actuator_list, sensor_list = configuration.load_config(fileContents)
         socketio.emit('sensor_and_actuator_config_uploaded')
 
+@socketio.on('connect_request')
+def handle_connect_request():
+    print("Attempting to send config to MoTE")
+    networking.send_config_to_mote(sensor_list, actuator_list) # Networking function
+
 @socketio.on('armOrDisarmRequest')
 def armDisarm():
     global armed
@@ -210,11 +215,6 @@ def broadcast_time():
             socketio.sleep(.01)
         time_to_show += 1
 
-@socketio.on('connect_request')
-def handle_connect_request():
-    print("Attempting to send config to MoTE")
-    networking.send_config_to_mote(sensor_list, actuator_list) # Networking function
-
 
 @socketio.on('abort_request')
 def handle_abort_request():
@@ -302,7 +302,11 @@ def execute_autosequence(commands):
 
 def execute_abort_sequence(commands):
     global autosequence_occuring
+    global cancel
+    
     autosequence_occuring = False
+    cancel = True
+
     for command in commands:
         stringState = 'on' if command['State'] == True else 'off' # on/off state used in webpages
         socketio.emit('responding_with_button_data', [command['P and ID'], stringState])
@@ -313,7 +317,6 @@ def execute_abort_sequence(commands):
             buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
             networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command['State'], buttonDict['Interface Type'])
         time.sleep(command['Sleep time(ms)']/1000)
-
 
 def check_actuators_in_sequence(commands):
     file_valid = True
