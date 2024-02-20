@@ -113,7 +113,7 @@ def ping_mote():
                 # Option for the number of packets as a function of
                 param = '-n' if platform.system().lower()=='windows' else '-c'
                 # Building the command. Ex: "ping -c 1 google.com"
-                command = ['ping', param, '1', ip_address]
+                command = ['ping', '-w', '1', param, '1', ip_address]
                 output = subprocess.check_output(command)
 
                 avgRTT = re.search("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)", str(output)).group(2)
@@ -121,9 +121,8 @@ def ping_mote():
                 mote_ping[moteID-1] = delay
                 print("thread ping", delay)
             except:
-                #pass
-                print(f"ping for mote {moteID} returned error code 1")
-        #time.sleep(5)
+                print("ping for mote " +  str(moteID) +  " returned error code 1")
+        time.sleep(5)
 
 ping_thread = Thread(target=ping_mote, daemon=True)   # Make a new thread to run ping_mote function
 
@@ -191,3 +190,6 @@ def create_sensor_dictionary(sensor_list):
 def get_sensor_data():
     global most_recent_data_packet
     return most_recent_data_packet
+
+def get_mote_ping():
+    return mote_ping

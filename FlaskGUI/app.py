@@ -32,6 +32,8 @@ sessionid = str(random.random())[2:]
 actuator_list = []
 sensor_list = []
 
+mote_ping = []
+
 # dictionary of modified states for sensors + actuators
 actuator_states_and_sensor_tare_states = {}
 
@@ -56,8 +58,10 @@ actuator_name_exceptions = ["NULL", "STATE_IDLE", "STATE_ACTIVE"]
 app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app, async_mode=async_mode)
 
-thread = None
-thread_lock = Lock()
+sensor_thread = None
+sensor_thread_lock = Lock()
+connection_thread = None
+connection_thread_lock = Lock()
 
 #i am in webthocket hell
 #lmao skill issue
@@ -243,11 +247,26 @@ def guion():
     print('guion was triggered')
     networking.start_telemetry_thread()
     print("telemetry thread started")
-    global thread
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(sensor_data_thread)
-    print("started sensor_data_thread")
+
+    global sensor_thread
+    with sensor_thread_lock:
+        if sensor_thread is None:
+            sensor_thread = socketio.start_background_task(sensor_data_thread)
+    print("started sensor data thread")
+
+    global connection_thread
+    with connection_thread_lock:
+        if connection_thread is None:
+            connection_thread = socketio.start_background_task(update_connection_status)
+    print("started connection status thread")
+
+# Home page functions
+def update_connection_status():
+    global mote_ping
+    while True:
+        mote_ping = networking.get_mote_ping()
+        socketio.emit('mote_ping', mote_ping)
+        socketio.sleep(1)
 
 
 # Sensor page functions

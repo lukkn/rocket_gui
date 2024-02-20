@@ -109,14 +109,14 @@
         }
 
         table, th, td {
-            border: solid;
+            color: #ecf2f8; 
+            border: solid #ecf2f8;
             border-collapse: collapse;
             padding: 5px;
+            text-align: center; 
         }
 
         table {
-            color: #ecf2f8; 
-            text-align: center; 
             width: 100%;
         }
         
@@ -149,29 +149,29 @@
                     <th>Status</th>
                     <th>Ping (ms)</th>
                 </tr>
-                <tr>
+                <tr >
                     <td>MoTE1</td>
                     <td>Purge Panel</td>
-                    <td>Connected</td>
-                    <td>None</td>
+                    <td id = "mote1connection"></td>
+                    <td id = "mote1ping"></td>
                 </tr>
                 <tr>
                     <td>MoTE2</td>
                     <td>Pneumatics Panel</td>
-                    <td>Connected</td>
-                    <td>None</td>
+                    <td id = "mote2connection"></td>
+                    <td id = "mote2ping"></td>
                 </tr>
                 <tr>
                     <td>MoTE3</td>
                     <td>Tank Stand</td>
-                    <td>Connected</td>
-                    <td>None</td>
+                    <td id = "mote3connection"></td>
+                    <td id = "mote3ping"></td>
                 </tr>
                 <tr>
                     <td>MoTE4</td>
                     <td>LoRA</td>
-                    <td>Connected</td>
-                    <td>None</td>
+                    <td id = "mote4connection"></td>
+                    <td id = "mote4ping"></td>
                 </tr>
             </table>
         </div>
@@ -278,6 +278,20 @@
             }
         });
 
+        socket.on('mote_ping', function(mote_pings) {
+            mote_pings.forEach(function(mote_ping, mote_num){
+                connection = document.getElementById('mote' + (mote_num+1) + 'connection');
+                ping = document.getElementById('mote' + (mote_num+1) + 'ping');
+                if (mote_ping == null){
+                    connection.style.color = "#fa7970";
+                    connection.textContent = "Disconnected";
+                } else {
+                    connection.style.color = "#7ce38b";
+                    connection.textContent = "Connected";
+                    ping.textContent = mote_ping.toString();
+                }
+            });
+        });
     </script>
 </body>
 
