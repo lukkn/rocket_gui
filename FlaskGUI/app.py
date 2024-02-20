@@ -57,11 +57,7 @@ app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app, async_mode=async_mode)
 
 thread = None
-thread2 = None
-thread3 = None
 thread_lock = Lock()
-thread_lock2 = Lock()
-thread_lock3 = Lock()
 
 #i am in webthocket hell
 #lmao skill issue
@@ -170,7 +166,7 @@ def handle_autoseqeunce(file, fileName):
         time_to_show = int(int(autosequence_commands[0]['Time(ms)'])/1000)
         autosequence_file_name = fileName
     except:
-        pass
+        print("an autosequence file error occured")
 
 
 @socketio.on('abortSequenceFile_uploaded')
@@ -181,7 +177,7 @@ def handle_abort_sequence(file, fileName):
         abort_sequence_commands = parse_and_check_files(file)
         abort_sequence_file_name = fileName
     except:
-        pass
+        print("an abort sequence file error occured")
 
 
 @socketio.on('launch_request')
@@ -209,7 +205,7 @@ def broadcast_time():
         socketio.emit('current_time', time_to_show)
         while (time.perf_counter() - timeAtBeginning) < 1:
             if cancel or not autosequence_occuring:
-                print("timer stopped")
+                print("timer stopped, thread ended")
                 return None
             socketio.sleep(.01)
         time_to_show += 1
@@ -218,11 +214,6 @@ def broadcast_time():
 def handle_connect_request():
     print("Attempting to send config to MoTE")
     networking.send_config_to_mote(sensor_list, actuator_list) # Networking function
-    networking.start_telemetry_thread()
-    global thread
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(sensor_data_thread)
 
 
 @socketio.on('abort_request')
@@ -250,6 +241,13 @@ def handle_cancel_request():
 @socketio.on('guion')
 def guion():
     print('guion was triggered')
+    networking.start_telemetry_thread()
+    print("telemetry thread started")
+    global thread
+    with thread_lock:
+        if thread is None:
+            thread = socketio.start_background_task(sensor_data_thread)
+    print("started sensor_data_thread")
 
 
 # Sensor page functions
@@ -317,7 +315,7 @@ def execute_abort_sequence(commands):
         time.sleep(command['Sleep time(ms)']/1000)
 
 
-def check_sensors_in_sequence(commands):
+def check_actuators_in_sequence(commands):
     file_valid = True
     for command in commands:
         if not any(actuator['P and ID'] == command['P and ID'] for actuator in actuator_list):
@@ -337,7 +335,7 @@ def parse_and_check_files(file):
     header, commands = parse_file(file)
     if not check_file_format(header): 
         socketio.emit('file_header_error')
-    elif not check_sensors_in_sequence(commands):
+    elif not check_actuators_in_sequence(commands):
         print ('file_actuators_error')
         socketio.emit('file_actuators_error')
     else:

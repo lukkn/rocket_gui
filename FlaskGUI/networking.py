@@ -147,6 +147,9 @@ def convert_to_values(packet, mote_id):
     data = packet[0]
     parsed_data = []
 
+    if mote_id == '9':
+        print("data =", data)
+
     for i in range(len(data)//5):
         pin_num = data[5*i]
         value = int.from_bytes(data[5*i+1:5*i+5], byteorder='little')
