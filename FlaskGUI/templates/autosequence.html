@@ -108,7 +108,7 @@
 
         .upload-button {
             background-color: #77bdfb;
-            color: #fff;
+            color: #ecf2f8;
             padding: 8px 15px;
             border-radius: 5px;
             cursor: pointer;
@@ -117,8 +117,53 @@
             width: 180px;
             text-align: center;
         }
-        .activeRow{
-            background-color: #7ce38b;
+        #viewAbortSequence {
+            position: fixed;
+            top: 0;
+            right: 0;
+        }
+        img {
+            width: 50px;
+            vertical-align: middle;
+            padding: 8px;
+        }
+        .menu-content {
+            max-height: 0;
+            overflow: hidden;
+            background-color: #ecf2f8;
+            border-radius: 5px;
+            color: #21262d;
+            margin: 5px;
+        }
+        .collapsible-menu table{
+            color: #21262d;
+            padding: 5px;
+        }
+        .collapsible-menu label {
+            position: absolute;
+            top: 0;
+            right: 0;
+            cursor: pointer;
+            width: 100px;
+            text-align: center;
+            font-size: 13px;
+            padding: 15px;
+            color: #ecf2f8;
+        }
+        input#menu {
+            display: none;
+        }
+        input:checked ~ .menu-content {
+            max-height: 100%;
+        }
+
+        .autosequenceActiveRow {
+            background-Color: #7ce38b;
+            color: #21262d;
+        }
+
+        .abortSequenceActiveRow {
+            background-Color: #fa7970;
             color: #21262d;
         }
 
@@ -135,6 +180,17 @@
             <input type="file" id="abortSequenceFile" accept=".csv" onchange="submitCSV('abortSequenceFile')">
         </div>
         <div id="csvFileMessage" class= "fileName"></div>
+
+        <div class="collapsible-menu">
+            <input type="checkbox" id="menu">
+            <label for="menu"><img src = "../static/icons/menu_icon.png">
+                <br> Abort Sequence</label>
+            <div class="menu-content">
+                 No abort sequence uploaded
+                <table id = "abortSequenceTable"></table>
+            </div>
+        </div>
+
         <form onsubmit="return false;">
             <button id="launchButton" onclick="launch()">
             LAUNCH
@@ -146,9 +202,10 @@
             </button>
         </form>
         <div id="configContents">
-            <table id="configTable"></table>
+            <table id="autosequenceTable"></table>
         </div>
     </div>
+    
     <form onsubmit="return false;">
         <button id="abortButton" onclick="abort()">
            ABORT
@@ -156,6 +213,7 @@
     </form>
 
     <html id="autosequence_commands">{{ autosequence_commands }}</html>
+    <html id="abort_sequence_commands">{{ abort_sequence_commands }}</html>
     <html id="time_to_show">{{ time_to_show }}</html>
 
     <script>
@@ -163,14 +221,20 @@
 
         // on page load
         var autosequence_commands = JSON.parse('{{ autosequence_commands|tojson|safe }}');
+        var abort_sequence_commands = JSON.parse('{{ abort_sequence_commands|tojson|safe }}');
         var time_to_show = '{{ time_to_show }}';
 
         // once all elements are loaded
         document.addEventListener('DOMContentLoaded', function() {
             const timer = document.getElementById("timer");
             timer.innerText = time_to_show + " s";
+            console.log(abort_sequence_commands)
             if (autosequence_commands.length > 0){
-                displayCSV(autosequence_commands);
+                displayCSV(autosequence_commands, "autosequence");
+            }
+            if (abort_sequence_commands.length > 0) {
+                displayCSV(abort_sequence_commands, "abortSequence")
+                document.getElementById('menu').checked = true;
             }
         });
 
@@ -201,8 +265,8 @@
         }
 
 
-        function displayCSV(commands) {
-            var table = document.getElementById("configTable");
+        function displayCSV(commands, sequenceName) {
+            var table = document.getElementById(sequenceName+ 'Table');
             var tableBody = document.createElement('tbody');
             var tableHead = document.createElement('thead');
 
@@ -224,7 +288,7 @@
                 var row = document.createElement('tr');
                 row.id = command['P and ID'] + command['State'] + command['Time(ms)'];
                 if (command['Completed']){
-                    row.style.backgroundColor = "#7ce38b";
+                    row.className = sequenceName + "ActiveRow"
                 }
                 header.forEach(function(key) {
                     var cell = document.createElement('td');
@@ -242,18 +306,16 @@
         }
 
         function abort(){
+            document.getElementById('menu').checked = true;
             socket.emit('abort_request');
         }
 
         function launch() {
-
             // TODO: make sure autosequence and abort sequence both uploaded before launch
-
             socket.emit('launch_request');
             socket.on('autosequence_started', function() {
                 socket.emit('start_timer');
                 socket.on('start_timer_ack', function() {
-                    location.reload();
                 });
             });
         }
@@ -264,8 +326,17 @@
 
         socket.on('autosequence_command_sent', function (command) {
             rowID = command['P and ID'] + command['State'] + command['Time(ms)'];
-            document.getElementById(rowID).style.backgroundColor = "#7ce38b";
+            row = document.getElementById(rowID)
+            row.className = 'autosequenceActiveRow'
         });
+
+        socket.on('abort_sequence_command_sent', function (command) {
+            rowID = command['P and ID'] + command['State'] + command['Time(ms)'];
+            row = document.getElementById(rowID)
+            row.className = 'abortSequenceActiveRow'
+        });
+
+
 
         socket.on('current_time', function(time_to_show){
             console.log('in current_time, time_to_show is: ', time_to_show)
@@ -280,7 +351,7 @@
         socket.on('abort', function(){
             showAbortSequence();
         });
-        socket.on('valid_autosequence_file_received', function(){
+        socket.on('valid_file_received', function(){
             location.reload();
         });
         

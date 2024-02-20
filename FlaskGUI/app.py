@@ -27,8 +27,10 @@ sessionid = str(random.random())[2:]
 
 # TODO: better way than using global variables, verify config file
 # GLOBAL VARIABLES for sensors and actuators
-actuator_list = [{'Mote id': '3', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VNMO', 'Pin': '5', 'P and ID': 'VNMO', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '3', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VNMF', 'Pin': '6', 'P and ID': 'VNMF', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '3', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VPTF', 'Pin': '7', 'P and ID': 'VPTF', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '3', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'IGNTN', 'Pin': '8', 'P and ID': 'IGNTN', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '2', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VNTO', 'Pin': '5', 'P and ID': 'VNTO', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '2', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VNTF', 'Pin': '6', 'P and ID': 'VNTF', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '2', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VQDA', 'Pin': '7', 'P and ID': 'VQDA', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '2', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VNOF', 'Pin': '8', 'P and ID': 'VNOF', 'unit': '', 'min': '', 'max': '', 'window': ''}]
-sensor_list = [{'Mote id': '3', 'Sensor or Actuator': 'sensor', 'Interface Type': 'SPI_ADC_2ch PGA128', 'Human Name': 'PNTB', 'Pin': '0', 'P and ID': 'PNTB', 'unit': 'PSI_M5K', 'min': '0', 'max': '5000', 'window': '0'}, {'Mote id': '3', 'Sensor or Actuator': 'sensor', 'Interface Type': 'SPI_ADC_2ch PGA128', 'Human Name': 'PNPC', 'Pin': '1', 'P and ID': 'PNPC', 'unit': 'PSI_M1K', 'min': '0', 'max': '1000', 'window': '0'}, {'Mote id': '3', 'Sensor or Actuator': 'sensor', 'Interface Type': 'SPI_ADC_2ch PGA128', 'Human Name': 'POTB', 'Pin': '2', 'P and ID': 'POTB', 'unit': 'PSI_M1K', 'min': '0', 'max': '1000', 'window': '0'}]
+#actuator_list = [{'Mote id': '3', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VNMO', 'Pin': '5', 'P and ID': 'VNMO', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '3', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VNMF', 'Pin': '6', 'P and ID': 'VNMF', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '3', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VPTF', 'Pin': '7', 'P and ID': 'VPTF', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '3', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'IGNTN', 'Pin': '8', 'P and ID': 'IGNTN', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '2', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VNTO', 'Pin': '5', 'P and ID': 'VNTO', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '2', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VNTF', 'Pin': '6', 'P and ID': 'VNTF', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '2', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VQDA', 'Pin': '7', 'P and ID': 'VQDA', 'unit': '', 'min': '', 'max': '', 'window': ''}, {'Mote id': '2', 'Sensor or Actuator': 'actuator', 'Interface Type': 'Binary GPIO', 'Human Name': 'VNOF', 'Pin': '8', 'P and ID': 'VNOF', 'unit': '', 'min': '', 'max': '', 'window': ''}]
+#sensor_list = [{'Mote id': '3', 'Sensor or Actuator': 'sensor', 'Interface Type': 'SPI_ADC_2ch PGA128', 'Human Name': 'PNTB', 'Pin': '0', 'P and ID': 'PNTB', 'unit': 'PSI_M5K', 'min': '0', 'max': '5000', 'window': '0'}, {'Mote id': '3', 'Sensor or Actuator': 'sensor', 'Interface Type': 'SPI_ADC_2ch PGA128', 'Human Name': 'PNPC', 'Pin': '1', 'P and ID': 'PNPC', 'unit': 'PSI_M1K', 'min': '0', 'max': '1000', 'window': '0'}, {'Mote id': '3', 'Sensor or Actuator': 'sensor', 'Interface Type': 'SPI_ADC_2ch PGA128', 'Human Name': 'POTB', 'Pin': '2', 'P and ID': 'POTB', 'unit': 'PSI_M1K', 'min': '0', 'max': '1000', 'window': '0'}]
+actuator_list = []
+sensor_list = []
 
 # dictionary of modified states for sensors + actuators
 actuator_states_and_sensor_tare_states = {}
@@ -41,6 +43,9 @@ autosequence_commands = []
 cancel = False # has cancel button been pressed
 autosequence_occuring = False # this will be used to block most functions while autosequence is occuring
 time_to_show = 0
+
+# Abort sequence
+abort_sequence_commands = []
 
 # contains names for non-command lines in autosequence 
 actuator_name_exceptions = ["NULL", "STATE_IDLE", "STATE_ACTIVE"]
@@ -73,7 +78,7 @@ def index():
 
 @app.route('/autosequence', methods=['GET'])
 def autosequence():
-    return render_template('autosequence.html', autosequence_commands=autosequence_commands, time_to_show=time_to_show)
+    return render_template('autosequence.html', autosequence_commands=autosequence_commands, abort_sequence_commands= abort_sequence_commands, time_to_show=time_to_show)
 
 @app.route('/pidview', methods=['GET'])
 def pidview():
@@ -98,9 +103,6 @@ def loadConfigFile(CSVFileAndFileContents):
         global sensor_list
         global actuator_list
         
-        # REMOVE BEFORE DEPLOYMENT:
-        
-
         actuator_list, sensor_list = configuration.load_config(fileContents)
         socketio.emit('sensor_and_actuator_config_uploaded')
 
@@ -135,7 +137,7 @@ def handle_button_press(buttonID, state, current_time):
         socketio.emit('responding_with_button_data', [buttonID, state])
     elif buttonDict['Sensor or Actuator'] == 'actuator' and armed:
         actuator_states_and_sensor_tare_states[buttonID] = state
-        socketio.emit('responding_with_button_data', [buttonID, state])
+        socketio.emit('responding_with_button_data', [buttonID, state]) 
         networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], state_bool, buttonDict['Interface Type'])
     else:
         print("stand is disarmed!!! " + buttonID + " was not set to " + state)
@@ -156,38 +158,31 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
             print("button coordinates saved to .json file")
 
 
-
-
 @socketio.on('autosequenceFile_uploaded')
 def handle_autoseqeunce(file):
     global autosequence_commands
     global time_to_show
+    try:
+        autosequence_commands = parse_and_check_files(file)
+        time_to_show = int(int(autosequence_commands[0]['Time(ms)'])/1000)
+    except:
+        print('invalid autosequence file')
 
-    header, commands, start_time = parse_file(file)
-
-    if not check_file_format(header):
-        socketio.emit('file_header_error')
-    elif not check_sensors_in_sequence(commands):
-        print ('file_actuators_error')
-        socketio.emit('file_actuators_error')
-    else:
-        # TODO: accept autosequence file
-        autosequence_commands = commands
-        time_to_show = start_time
-        socketio.emit('valid_autosequence_file_received')
 
 @socketio.on('abortSequenceFile_uploaded')
 def handle_abort_sequence(file):
-    header, commands, start_time = parse_file(file)
-    socketio.emit('abort_sequence_file received')
+    global abort_sequence_commands
+    try:
+        abort_sequence_commands = parse_and_check_files(file)
+        print(abort_sequence_commands)
+    except:
+        print('invalid abort sequence file')
 
 
 @socketio.on('launch_request')
 def handle_launch_request():
     global autosequence_commands
-
     print("Received launch request")
-
     if autosequence_occuring:
         print("Autosequence is already running")
         return None
@@ -198,9 +193,7 @@ def handle_launch_request():
     else:
         print("autosequence started")
         socketio.emit('autosequence_started')
-        execute_sequence(autosequence_commands)
-        
-
+        execute_autosequence(autosequence_commands)
         
 
 @socketio.on('start_timer')
@@ -210,15 +203,12 @@ def broadcast_time():
     print('timer started')
     while True:
         timeAtBeginning = time.perf_counter()
-
         socketio.emit('current_time', time_to_show)
-
         while (time.perf_counter() - timeAtBeginning) < 1:
             if cancel or not autosequence_occuring:
                 print("timer stopped")
                 return None
             socketio.sleep(.01)
-
         time_to_show += 1
 
 @socketio.on('connect_request')
@@ -236,6 +226,7 @@ def handle_connect_request():
 def handle_abort_request():
     print("Received abort request")
     networking.send_abort_request_to_mote() # Networking function
+    execute_abort_sequence(abort_sequence_commands)
 
 @socketio.on('cancel_request')
 def handle_cancel_request():
@@ -260,62 +251,61 @@ def sensor_data_thread():
 
 # Autosequence page functions
 def parse_file(file):
-
     file_content = [line.rstrip('\n') for line in file.decode("utf-8").splitlines() if line.strip()]
     header = file_content[0].split(",")
-
     command_list = [line.split(",") for line in file_content[1:]]
     sleep_times_list = [abs(int(command_list[i][2]) - int(command_list[i+1][2])) for i in range(len(command_list)-1)] + [0] # 0 on the end so we dont go out of range and instead delay for 0 seconds after autoseq is finished
-    
     formatted_commands = []
     index = 0
     for command in command_list:
         command_line = {'P and ID': command[0], 'State': command[1], 'Time(ms)': command[2], 'Comments': command[3], 'Sleep time(ms)': sleep_times_list[index], 'Complete': False}
         index += 1
         formatted_commands.append(command_line)
-
-    start_time = int(int(command_list[0][2])/1000)
-
-    return header, formatted_commands, start_time
+    return header, formatted_commands
 
 
-def execute_sequence(commands):
+def execute_autosequence(commands):
     global autosequence_occuring
     global time_to_show
     global cancel
-    
+
     autosequence_occuring = True
     cancel = False
     time_to_show = int(int(autosequence_commands[0]['Time(ms)'])/1000)
-
     for command in commands:
         timeAtBeginning = time.perf_counter()
-        
         stringState = 'on' if command['State'] == True else 'off' # on/off state used in webpages
-
         socketio.emit('responding_with_button_data', [command['P and ID'], stringState])
         command['Completed'] = True
-
         socketio.emit('autosequence_command_sent', command)
-            
         # send actuator to mote #
         if command['Type'] == 'Actuator' :
             buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
             networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command['State'], buttonDict['Interface Type'])
-
         while (time.perf_counter() - timeAtBeginning) < command['Sleep time(ms)']/1000:
             if cancel or not autosequence_occuring:
                 autosequence_occuring = False
                 print("Launch cancelled")
                 return None
             socketio.sleep(.0001)
-
     autosequence_occuring = False
+
+def execute_abort_sequence(commands):
+    global autosequence_occuring
+    autosequence_occuring = False
+    for command in commands:
+        stringState = 'on' if command['State'] == True else 'off' # on/off state used in webpages
+        socketio.emit('responding_with_button_data', [command['P and ID'], stringState])
+        command['Completed'] = True
+        socketio.emit('abort_sequence_command_sent', command)
+        # send actuator to mote #
+        if command['Type'] == 'Actuator' :
+            buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
+            networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command['State'], buttonDict['Interface Type'])
 
 
 def check_sensors_in_sequence(commands):
     file_valid = True
-
     for command in commands:
         if not any(actuator['P and ID'] == command['P and ID'] for actuator in actuator_list):
             command['Type'] = 'Placeholder'
@@ -330,7 +320,16 @@ def check_sensors_in_sequence(commands):
 def check_file_format(header):
     return header[0] == 'P and ID' and header[1] == 'State' and header[2] == 'Time(ms)' and header[3] == 'Comments'
 
-
+def parse_and_check_files(file):
+    header, commands = parse_file(file)
+    if not check_file_format(header): 
+        socketio.emit('file_header_error')
+    elif not check_sensors_in_sequence(commands):
+        print ('file_actuators_error')
+        socketio.emit('file_actuators_error')
+    else:
+        socketio.emit('valid_file_received')  
+        return commands 
 
 # start the app
 if __name__ == '__main__':
