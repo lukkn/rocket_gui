@@ -26,7 +26,6 @@
         }
 
         table, th, td {
-            align-items: center;
             border: 1px solid;
             border-color: #ecf2f8;
             border-collapse: collapse;
@@ -105,7 +104,11 @@
             margin-bottom: 100px;
             overflow: hidden;
         }
-
+        .uploadButtonContainers{
+            padding-top: 15px;
+            display: block;
+            text-align: center;
+        }
         .upload-button {
             background-color: #77bdfb;
             color: #ecf2f8;
@@ -133,7 +136,11 @@
             background-color: #ecf2f8;
             border-radius: 5px;
             color: #21262d;
-            margin: 5px;
+            opacity: 0.8;
+            width: 90%;
+            margin: auto;
+            margin-top: 10px; 
+            margin-bottom: 10px;
         }
         .collapsible-menu table{
             color: #21262d;
@@ -166,6 +173,11 @@
             background-Color: #fa7970;
             color: #21262d;
         }
+        
+        .fileName{
+            color: #fa7970;
+            text-align: center;
+        }
 
     </style>
 </head>
@@ -174,20 +186,25 @@
     <div id="configContainer">
         <div id="timer">0 s</div>
         <div id="configButtons">
-            <label for="autosequenceFile" class="upload-button">Upload Autosequence</label>
-            <input type="file" id="autosequenceFile" accept=".csv" onchange="submitCSV('autosequenceFile')">
-            <label for="abortSequenceFile" class="upload-button">Upload Abort Sequence</label>
-            <input type="file" id="abortSequenceFile" accept=".csv" onchange="submitCSV('abortSequenceFile')">
+            <div class = "uploadButtonContainers"> 
+                <label for="autosequenceFile" class="upload-button">Upload Autosequence</label>
+                <input type="file" id="autosequenceFile" accept=".csv" onchange="submitCSV('autosequenceFile')">
+                <br><br> <div class = "fileName" id = "autosequenceFileName">No autosequence file</div>
+            </div>
+            <div class = "uploadButtonContainers">
+                <label for="abortSequenceFile" class="upload-button">Upload Abort Sequence</label>
+                <input type="file" id="abortSequenceFile" accept=".csv" onchange="submitCSV('abortSequenceFile')">
+                <br><br> <div class = "fileName" id = "abortSequenceFileName">No abort sequence file</div>
+            </div>
         </div>
-        <div id="csvFileMessage" class= "fileName"></div>
 
         <div class="collapsible-menu">
             <input type="checkbox" id="menu">
             <label for="menu"><img src = "../static/icons/menu_icon.png">
                 <br> Abort Sequence</label>
             <div class="menu-content">
-                 No abort sequence uploaded
-                <table id = "abortSequenceTable"></table>
+                <table id = "abortSequenceTable">
+                </table>
             </div>
         </div>
 
@@ -202,7 +219,8 @@
             </button>
         </form>
         <div id="configContents">
-            <table id="autosequenceTable"></table>
+            <table id="autosequenceTable">
+            </table>
         </div>
     </div>
     
@@ -214,6 +232,8 @@
 
     <html id="autosequence_commands">{{ autosequence_commands }}</html>
     <html id="abort_sequence_commands">{{ abort_sequence_commands }}</html>
+    <html id="autosequence_file_name">{{ autosequence_file_name }}</html>
+    <html id="abort_sequence_file_name">{{ abort_sequence_file_name }}</html>
     <html id="time_to_show">{{ time_to_show }}</html>
 
     <script>
@@ -223,6 +243,8 @@
         var autosequence_commands = JSON.parse('{{ autosequence_commands|tojson|safe }}');
         var abort_sequence_commands = JSON.parse('{{ abort_sequence_commands|tojson|safe }}');
         var time_to_show = '{{ time_to_show }}';
+        var autosequence_file_name = '{{autosequence_file_name}}'
+        var abort_sequence_file_name = '{{abort_sequence_file_name}}'
 
         // once all elements are loaded
         document.addEventListener('DOMContentLoaded', function() {
@@ -235,6 +257,16 @@
             if (abort_sequence_commands.length > 0) {
                 displayCSV(abort_sequence_commands, "abortSequence")
                 document.getElementById('menu').checked = true;
+            }
+            if (autosequence_file_name != 'None') {
+                fileName = document.getElementById("autosequenceFileName")
+                fileName.innerText = autosequence_file_name
+                fileName.style.color = "#ecf2f8"
+            }
+            if (abort_sequence_file_name != 'None') {
+                fileName = document.getElementById("abortSequenceFileName")
+                fileName.innerText = abort_sequence_file_name
+                fileName.style.color = "#ecf2f8"
             }
         });
 
@@ -258,7 +290,7 @@
                 //fileMessage.innerHTML = `File ${file.name} submitted`;
 
                 // send file to backend
-                socket.emit(inputId + '_uploaded', file);
+                socket.emit(inputId + '_uploaded', file, file.name);
             } else {
                 alert('Please select a file before submitting.');
             }
@@ -344,8 +376,16 @@
             timer.innerText = time_to_show + " s";
         });
 
-        socket.on('no_config', function(){
+        socket.on('no_autosequence', function(){
             alert ("Please submit an autosequence file.")
+        });
+
+        socket.on('no_abort_sequence', function(){
+            alert ("Please submit an abort sequence file.")
+        });
+
+        socket.on('no_autosequence_running', function(){
+            alert ("No autosequence running.")
         });
 
         socket.on('abort', function(){

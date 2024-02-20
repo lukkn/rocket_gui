@@ -39,12 +39,14 @@ actuator_states_and_sensor_tare_states = {}
 armed = False
 
 # Autosequence
+autosequence_file_name = None
 autosequence_commands = []
 cancel = False # has cancel button been pressed
 autosequence_occuring = False # this will be used to block most functions while autosequence is occuring
 time_to_show = 0
 
 # Abort sequence
+abort_sequence_file_name = None
 abort_sequence_commands = []
 
 # contains names for non-command lines in autosequence 
@@ -78,7 +80,7 @@ def index():
 
 @app.route('/autosequence', methods=['GET'])
 def autosequence():
-    return render_template('autosequence.html', autosequence_commands=autosequence_commands, abort_sequence_commands= abort_sequence_commands, time_to_show=time_to_show)
+    return render_template('autosequence.html', autosequence_commands=autosequence_commands, abort_sequence_commands= abort_sequence_commands, time_to_show=time_to_show, autosequence_file_name = autosequence_file_name, abort_sequence_file_name = abort_sequence_file_name)
 
 @app.route('/pidview', methods=['GET'])
 def pidview():
@@ -159,39 +161,40 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
 
 
 @socketio.on('autosequenceFile_uploaded')
-def handle_autoseqeunce(file):
+def handle_autoseqeunce(file, fileName):
+    global autosequence_file_name
     global autosequence_commands
     global time_to_show
     try:
         autosequence_commands = parse_and_check_files(file)
         time_to_show = int(int(autosequence_commands[0]['Time(ms)'])/1000)
+        autosequence_file_name = fileName
     except:
-        print('invalid autosequence file')
+        pass
 
 
 @socketio.on('abortSequenceFile_uploaded')
-def handle_abort_sequence(file):
+def handle_abort_sequence(file, fileName):
+    global abort_sequence_file_name
     global abort_sequence_commands
     try:
         abort_sequence_commands = parse_and_check_files(file)
-        print(abort_sequence_commands)
+        abort_sequence_file_name = fileName
     except:
-        print('invalid abort sequence file')
+        pass
 
 
 @socketio.on('launch_request')
 def handle_launch_request():
     global autosequence_commands
-    print("Received launch request")
     if autosequence_occuring:
-        print("Autosequence is already running")
         return None
     elif not autosequence_commands:
-        socketio.emit('no_config')
-        print("no autosequence file")
+        socketio.emit('no_autosequence')
         return None
+    elif not abort_sequence_commands:
+        socketio.emit('no_abort_sequence') 
     else:
-        print("autosequence started")
         socketio.emit('autosequence_started')
         execute_autosequence(autosequence_commands)
         
@@ -224,16 +227,25 @@ def handle_connect_request():
 
 @socketio.on('abort_request')
 def handle_abort_request():
+    global autosequence_occuring
     print("Received abort request")
     networking.send_abort_request_to_mote() # Networking function
-    execute_abort_sequence(abort_sequence_commands)
+    if (autosequence_occuring):
+        execute_abort_sequence(abort_sequence_commands)
+    else:
+        socketio.emit('no_autosequence_running')
 
 @socketio.on('cancel_request')
 def handle_cancel_request():
     global time_to_show
+    global autosequence_occuring
     print("Received cancel request at",time_to_show,"seconds")
-    global cancel
-    cancel = True
+    if (autosequence_occuring):
+        global cancel
+        cancel = True
+    else:
+        socketio.emit('no_autosequence_running')
+    
 
 @socketio.on('guion')
 def guion():
@@ -302,6 +314,7 @@ def execute_abort_sequence(commands):
         if command['Type'] == 'Actuator' :
             buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
             networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command['State'], buttonDict['Interface Type'])
+        time.sleep(command['Sleep time(ms)']/1000)
 
 
 def check_sensors_in_sequence(commands):
