@@ -184,13 +184,9 @@ def start_telemetry_thread():
 def convert_to_values(packet, mote_id):
     data = packet[0]
     parsed_data = []
-
-    if mote_id == '9':
-        print("data =", data)
-
     for i in range(len(data)//5):
         pin_num = data[5*i]
-        value = int.from_bytes(data[5*i+1:5*i+5], byteorder='little')
+        value = int.from_bytes(data[5*i+1:5*i+5], byteorder='little', signed=True) # Tim did not have signed parameter in his networking code
         parsed_data.append({'Mote id': mote_id, 'Pin': pin_num, 'Value': value})
     return parsed_data
 
