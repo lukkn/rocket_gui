@@ -13,12 +13,16 @@ from threading import Thread
 
 import configuration
 
+import app
 
 num_motes = 4
 mote_status = []
 
-sensor_dictionary = {'1, 99': 'FireX'}
+# value = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["unit"]]
+sensor_and_actator_dictionary = {'1, 99': ['FireX', None, None, None]}
 most_recent_data_packet = []
+
+actuator_states_and_sensor_tare_states = {}
 
 # Sending config and actuator commands
 sock = socket.socket(socket.AF_INET,  # Internet
@@ -60,8 +64,8 @@ def send_heartbeat():
 heartbeat_thread = Thread(target=send_heartbeat, daemon=True)
 
 def send_config_to_mote(sensor_list, actuator_list):
-    global sensor_dictionary
-    sensor_dictionary.update(create_sensor_dictionary(sensor_list))
+    global sensor_and_actator_dictionary
+    sensor_and_actator_dictionary.update(create_sensor_dictionary(sensor_list + actuator_list))
     sensors_and_actuators_list = sensor_list + actuator_list
     print("sent sensor config data to mote")
     for m in range(1, 4):
@@ -134,21 +138,30 @@ def generate_handler():
             mote_id = self.client_address[0][-1]
             data_to_send_to_frontend = convert_to_values(data, mote_id)
 
-            global sensor_dictionary
+            global sensor_and_actator_dictionary
             global most_recent_data_packet
+            global actuator_states_and_sensor_tare_states
 
             parsed_data = []
 
             for data in data_to_send_to_frontend:
+                pin_num = int(data["Pin"])
 
-                sensor_name = sensor_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
-                sensor_value = data['Value']
-
-                if (sensor_name == 'FireX'):
-                    #print('FireX status received')
+                if pin_num == 99: # fireX pin num   
                     pass
-                else:
-                    sensor_value_pair = (sensor_name, sensor_value)
+
+                elif pin_num > 99: # ack for a actuator press
+                    p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actator_dictionary[str(data["Mote id"]) + ", " + str(int(data["Pin"]) - 100)]
+                    state = data["Value"]
+                    app.actuator_ack(p_and_id, state)
+                else: # a sensor reading
+                    #        [0]             [1]                   [2]               [3]
+                    # [ ["P and ID"], ["Interface Type"], ["Sensor or Actuator"], ["unit"]]
+                    p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actator_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
+                    #sensor_value = convert_units(data["Value"], unit)
+                    sensor_value = data["Value"]
+
+                    sensor_value_pair = (p_and_id, sensor_value)
                     parsed_data.append(sensor_value_pair)
 
             most_recent_data_packet = parsed_data
@@ -181,15 +194,24 @@ def convert_to_values(packet, mote_id):
         parsed_data.append({'Mote id': mote_id, 'Pin': pin_num, 'Value': value})
     return parsed_data
 
-def create_sensor_dictionary(sensor_list):
+
+# converts list of sensors and actuators to a single dictionary for O(1) lookup time
+def create_sensor_dictionary(sensor_and_actator_list):
     dict = {}
-    for sensor in sensor_list:
-        dict[sensor["Mote id"] + ", " + sensor["Pin"]] = sensor["P and ID"]
+    for sensor in sensor_and_actator_list:
+        dict[sensor["Mote id"] + ", " + sensor["Pin"]] = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["unit"]]
     return dict
 
 def get_sensor_data():
     global most_recent_data_packet
     return most_recent_data_packet
+
+def updateTares(actuator_states_and_sensor_tare_states_from_app_dot_py):
+    global actuator_states_and_sensor_tare_states
+    actuator_states_and_sensor_tare_states = actuator_states_and_sensor_tare_states_from_app_dot_py
+
+def convert_units(value, unit):
+    pass
 
 def get_mote_ping():
     return mote_ping
