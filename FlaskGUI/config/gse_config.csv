@@ -6,11 +6,5 @@ Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit,min,max,w
 3,actuator,Binary GPIO,VNMF,6,VNMF
 3,actuator,Binary GPIO,VPTF,7,VPTF
 3,actuator,Binary GPIO,IGNTN,8,IGNTN
-2,actuator,Binary GPIO,VNTO,5,VNTO
-2,actuator,Binary GPIO,VNTF,6,VNTF
-2,actuator,Binary GPIO,VQDA,7,VQDA
-2,actuator,Binary GPIO,VNOF,8,VNOF
-
-
 
 

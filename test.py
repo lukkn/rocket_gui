@@ -1,23 +1,14 @@
-lines = [
-    1707640290.7932968,
-    1707640291.8326473,
-    1707640295.868772,
-    1707640296.9059892,
-    1707640305.4409888,
-    1707640305.734669,
-    1707640305.9313257,
-    1707640306.0643728,
-    1707640306.252793,
-    1707640307.7275302,
-    1707640307.791271,
-    1707640308.3006592,
-    1707640308.3552394,
-    1707640312.8880723,
-    1707640313.3381507,
-]
+import subprocess
 
-differences = [round((lines[i + 1] - lines[i]) * 1000, 6) for i in range(len(lines) - 1)]
+def ping_host(ip_address):
+    try:
+        # Ping the IP address with specified timeout
+        subprocess.run(["ping", "-w", str(10), ip_address], check=True)
+        print(f"{ip_address} is reachable.")
+    except subprocess.CalledProcessError:
+        print(f"{ip_address} is unreachable.")
 
-print("Differences between adjacent entries (multiplied by 1000):")
-for diff in differences:
-    print(diff)
+ping_host("192.168.1.103")
+
+
+print(subprocess.run(["ping", "-w", str(10), "192.168.1.103"]))

@@ -37,6 +37,7 @@ config_file_name = None
 
 # dictionary of modified states for sensors + actuators
 actuator_states_and_sensor_tare_states = {}
+actuator_states_from_mote = {}
 
 # Global Variable that determines if stand is armed
 armed = False
@@ -93,7 +94,7 @@ def sensors():
 
 @app.route('/actuators', methods=['GET'])
 def actuators():
-    return render_template('actuators.html', actuator_list=actuator_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
+    return render_template('actuators.html', actuator_list=actuator_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states, actuator_states_from_mote=actuator_states_from_mote)
 
 
 # methods to listen for client events
@@ -134,7 +135,6 @@ def armDisarm():
 
 @socketio.on('received_button_press')
 def handle_button_press(buttonID, state, current_time):
-
     # lookup rest of parameters for buttonID in either sensors or actuators
     # TODO: IMPORTANT; enforce uniqueness in 'P and ID' for all lines in config file
     buttonDict = [config_line for config_line in (actuator_list + sensor_list) if config_line['P and ID'] == buttonID][0] # index 0 because list comprehension returns a list containing 1 dictionary
@@ -148,9 +148,13 @@ def handle_button_press(buttonID, state, current_time):
     print('received button press: ', buttonID, state, 'Delay:',(time.time_ns() // 1_000_000) - current_time)
     if buttonDict['Sensor or Actuator'] == 'sensor':
         actuator_states_and_sensor_tare_states[buttonID] = state
-        socketio.emit('responding_with_button_data', [buttonID, state])
+        socketio.emit('responding_with_button_data', [buttonID, state]) # for taring we can just sync the state of the pages, no mote logic needed
+        networking.updateTares(actuator_states_and_sensor_tare_states)
     elif buttonDict['Sensor or Actuator'] == 'actuator' and armed:
+        print("getting ready to send actuator state to mote. the current value of actuator_states_from_mote is:", actuator_states_from_mote)
         actuator_states_and_sensor_tare_states[buttonID] = state
+        actuator_states_from_mote[buttonID] = 'unacknoweleged'
+        socketio.emit('responding_with_button_data_from_mote', [buttonID, "unacknoweleged"]) 
         socketio.emit('responding_with_button_data', [buttonID, state]) 
         networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], state_bool, buttonDict['Interface Type'])
     else:
@@ -281,6 +285,16 @@ def sensor_data_thread():
         sensors_and_data = networking.get_sensor_data()
         socketio.emit('sensor_data', [sensors_and_data, time.time_ns() // 1000000])
 
+def actuator_ack(p_and_id, state):
+    #socketio.sleep(1)
+    global actuator_states_from_mote
+    print("what is seen inside actuator_ack:", actuator_states_from_mote)
+    actuator_states_from_mote[p_and_id] = "ackefajldfaj;dlf"
+    print(actuator_states_from_mote[p_and_id])
+    print([p_and_id, state])
+    socketio.emit('responding_with_button_data_from_mote', [p_and_id, state]) 
+    print("actuator ack recd in app.py", p_and_id, state)
+    return actuator_states_from_mote
 
 # Autosequence page functions
 def parse_file(file):

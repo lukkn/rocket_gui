@@ -1,3 +1,7 @@
-Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit,min,max,window
-9,sensor,Teensy ADC,Teensy ADC,98,TNSY,None,0,1000,0
-9,actuator,Binary GPIO,LOAD_1,5,SW1,None,None,None,None
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit
+9,sensor,Teensy ADC,Data,1,Data,None
+9,sensor,Teensy ADC,RSSI,2,RSSI,None
+9,sensor,Teensy ADC,SNR,3,SNR,None
+9,sensor,Teensy ADC,FREQERR,4,FREQERR,None
+9,sensor,Teensy ADC,ERR_STATE,5,ERR_STATE,None
+9,sensor,Teensy ADC,Heartbeat,6,Heartbeat,None

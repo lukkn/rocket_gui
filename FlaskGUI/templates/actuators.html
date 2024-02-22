@@ -57,7 +57,6 @@
   </style>
 
 <body>
-    <p id="ping" style="float: right; margin: 0"></p>
     <h1>Actuators</h1>
     <table border="2">
         <thead>
@@ -66,6 +65,7 @@
                 <th>OFF</th>
                 <th>ON</th>
                 <th>Last Sent State</th>
+                <th>Last State Known by Mote</th>
             </tr>
         </thead>
         <tbody>
@@ -75,6 +75,7 @@
                     <td><button id="{{ actuator['P and ID'] }}" onclick="buttonClicked(id, 'off')" >Off</button></td>
                     <td><button id="{{ actuator['P and ID'] }}" onclick="buttonClicked(id, 'on')" >On</button></td>
                     <td id="{{ actuator['P and ID'] }}_state" >{{ actuator_states_and_sensor_tare_states[actuator['P and ID']] }}</td>
+                    <td id="{{ actuator['P and ID'] }}_Motestate">{{ actuator_states_from_mote[actuator['P and ID']] }}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -93,42 +94,24 @@
         socket.on('responding_with_button_data', function (data) {
             const buttonID = data[0]
             const buttonState = data[1]
-
             const a = document.getElementById("" + buttonID + "_state");
-
-            if (buttonState === 'off'){
-                a.textContent = buttonState;
-
-            } else if (buttonState === 'on'){
-                a.textContent = buttonState;
-
-            } else {
-                console.log("error!!!");
-            }
-
-
+            a.textContent = buttonState
+            console.log("state reflected in app.py =", buttonState)
         });
+
+        socket.on('responding_with_button_data_from_mote', function (data) {
+            console.log("are we in the socket???");
+            const buttonID = data[0]
+            const buttonState = data[1]
+            const b = document.getElementById("" + buttonID + "_Motestate");
+            b.textContent = buttonState
+            console.log("state from mote=", buttonState);
+        });
+
+        
 
         socket.on('sensor_and_actuator_config_uploaded', function() {
             location.reload();
-        });
-
-
-        let pingTimeout;
-
-        socket.on('ping', function (time) {
-            // Update ping display
-            document.getElementById("ping").textContent = `Ping: ${(Date.now() - time).toFixed(0)} milliseconds`;
-
-            // Clear the timeout when the pong response is received
-            clearTimeout(pingTimeout);
-
-            // Set a new timeout for the next expected ping
-            pingTimeout = setTimeout(function() {
-                const a = document.getElementById("ping");
-                a.textContent = "Server not responding";
-                location.reload();
-            }, 2000 + 1000); // If we get ping 1 second late attempt reload
         });
 
     </script>
