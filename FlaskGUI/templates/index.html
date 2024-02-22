@@ -34,9 +34,7 @@
             width: 100px;
             height: calc(100vh - 30px);
             font-size: 13px;
-            background-color: #0d1117;
             padding:5px ;
-            margin-right: 20px;
         }
 
         .pageLink {
@@ -65,24 +63,28 @@
 
         #systemControls {
             position: absolute;
-            right: 0;
-            color: #ecf2f8
+            top: 40px;
+            right: 10px;
+            width: 100px;
+            height: calc(100vh - 30px);
+            font-size: 13px;
+            padding:10px;
         }
 
         #systemDisplay {
-            width: calc(100vw - 170px)
+            width: calc(100vw - 130px)
         }
 
         .controlButton {
             display: block;
             background-color: transparent;
-            margin-top: 10px;
-            padding: 5px;
+            margin-top: 20px;
             cursor: pointer;
             font-size: 13px;
-            width: 105px;
+            width: 100px;
             height: 110px;
             color: #ecf2f8;
+            border: none;
         }
 
         .controlButton img{
@@ -123,29 +125,9 @@
         <div class = "pageLink"><button onclick="openPage('/pidview');"><img src = "../static/icons/pid_icon.png"></button>PID View</div>
         <div class = "pageLink"><button onclick="openPage('/autosequence');"><img src = "../static/icons/autosequence_icon.png"></button>Autosequence</div>
     </div>
-    <div id="systemControls">
-        <fieldset>
-            <legend> System Controls</legend>
-                <!-- Arm button -->
-            <button id="armDisarmButton" class = 'controlButton' name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
-                <img id = "armDisarmImg" src = ""> 
-                {% if armed %}Armed{% else %}Disarmed{% endif %}
-            </button>
 
-            <!-- Upload buttons for CSV file -->
-            <button id = "uploadButton" class = 'controlButton' >
-                <label for ="csvFile1"><img src = "../static/icons/upload_icon.png">
-                    Upload Config</label>
-                <input type="file" id="csvFile1" accept=".csv" onchange="uploadFile('csvFile1')">
-            </button>
+    
 
-            <!-- Connect button -->
-            <button id = "connectButton" class = 'controlButton' title = "Send config to MoTE" onclick="connectToMote()">
-                <img src = "../static/icons/connect_icon.png" style = "width: 70px">
-                Connect
-            </button>
-        </fieldset>
-    </div>
     <div id = "systemDisplay">
         <fieldset>
             <legend> System Status</legend>
@@ -223,6 +205,29 @@
             </table>
         </fieldset>
     </div>
+
+    <div id="systemControls">
+        <!-- Arm button -->
+        <div class = "controlButton">
+            <button id="armDisarmButton" class = 'controlButton' name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
+                <img id = "armDisarmImg" src = ""> 
+                {% if armed %}Armed{% else %}Disarmed{% endif %}
+            </button>
+        </div>
+         <!-- Upload buttons for CSV file -->
+        <div class = "controlButton">
+            <button id = "uploadButton" class = 'controlButton' >
+                <label for ="csvFile1"><img src = "../static/icons/upload_icon.png">Upload Config</label>
+                <input type="file" id="csvFile1" accept=".csv" onchange="uploadFile('csvFile1')">
+            </button>
+        </div>
+        <!-- Connect button -->
+        <div class = "controlButton">
+            <button id = "connectButton" class = 'controlButton' title = "Send config to MoTE" onclick="connectToMote()">
+                <img src = "../static/icons/connect_icon.png" style = "width: 70px">
+                Connect
+            </button>
+        </div>
     
 
     <!-- reserved for future use DO NOT DELETE

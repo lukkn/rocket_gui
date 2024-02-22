@@ -57,6 +57,7 @@ abort_sequence_commands = []
 actuator_name_exceptions = ["NULL", "STATE_IDLE", "STATE_ACTIVE"]
 
 
+
 app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app, async_mode=async_mode)
 
