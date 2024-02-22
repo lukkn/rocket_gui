@@ -115,7 +115,7 @@ def ping_mote():
                 # Building the command. Ex: "ping -c 1 google.com"
                 command = ['ping', '-w', '1', param, '1', ip_address]
                 output = subprocess.check_output(command)
-
+ 
                 avgRTT = re.search("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)", str(output)).group(2)
                 delay = float(float(avgRTT)/2)
                 mote_ping[moteID-1] = delay
@@ -159,9 +159,13 @@ def telemetry_reciever():
     #IP Adresses for HOST
     #Tim's Laptop: 192.168.1.106
     #TESTOP 1: 192.168.1.115
-    HOST, PORT = "0.0.0.0", 8888
-    with socketserver.UDPServer((HOST, PORT), generate_handler()) as server:
-        server.serve_forever()
+    try:
+        HOST, PORT = "0.0.0.0", 8888
+        with socketserver.UDPServer((HOST, PORT), generate_handler()) as server:
+            server.serve_forever()
+            print("telemetry thread started")
+    except:
+        print('telermetry thread already started, cannot start another')
 
 def start_telemetry_thread():
     telemetry_thread = Thread(target=telemetry_reciever, daemon=True)

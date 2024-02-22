@@ -33,6 +33,7 @@ actuator_list = []
 sensor_list = []
 
 mote_ping = []
+config_file_name = None
 
 # dictionary of modified states for sensors + actuators
 actuator_states_and_sensor_tare_states = {}
@@ -76,10 +77,10 @@ connection_thread_lock = Lock()
 # flask routes for webpages
 @app.route('/', methods=['GET']) # + sessionID here if needed
 def index():
-    return render_template('index.html', armed=armed)
+    return render_template('index.html', armed=armed, config_file_name = config_file_name, sensor_list=sensor_list, actuator_list=actuator_list)
 
 @app.route('/autosequence', methods=['GET'])
-def autosequence():
+def autosequence(): 
     return render_template('autosequence.html', autosequence_commands=autosequence_commands, abort_sequence_commands= abort_sequence_commands, time_to_show=time_to_show, autosequence_file_name = autosequence_file_name, abort_sequence_file_name = abort_sequence_file_name)
 
 @app.route('/pidview', methods=['GET'])
@@ -97,16 +98,22 @@ def actuators():
 
 # methods to listen for client events
 @socketio.on('uploadConfigFile')
-def loadConfigFile(CSVFileAndFileContents):
+def loadConfigFile(CSVFileAndFileContents, fileName):
+    global config_file_name
+    config_file_name = fileName
+
     CSVFile = CSVFileAndFileContents[0]
-    fileContents = CSVFileAndFileContents[1]
+    fileContents = CSVFileAndFileContents[1] 
 
     if CSVFile == 'csvFile1':
         global sensor_list
         global actuator_list
         
-        actuator_list, sensor_list = configuration.load_config(fileContents)
-        socketio.emit('sensor_and_actuator_config_uploaded')
+        try:
+            actuator_list, sensor_list = configuration.load_config(fileContents)
+            socketio.emit('sensor_and_actuator_config_uploaded')
+        except:
+            socketio.emit("config_file_header_error")
 
 @socketio.on('connect_request')
 def handle_connect_request():
@@ -246,14 +253,11 @@ def handle_cancel_request():
 def guion():
     print('guion was triggered')
     networking.start_telemetry_thread()
-    print("telemetry thread started")
-
     global sensor_thread
     with sensor_thread_lock:
         if sensor_thread is None:
             sensor_thread = socketio.start_background_task(sensor_data_thread)
     print("started sensor data thread")
-
     global connection_thread
     with connection_thread_lock:
         if connection_thread is None:

@@ -12,138 +12,145 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #21262d;
+            color: #ecf2f8;
             height: 100%;
-            margin: 20px;
+            column-gap: 10px;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        #titleBar{
             display: grid;
-            grid-template-columns: 120px auto 110px;
-            gap: 20px;
-            row-gap: 0;
+            align-items: center;
+            width: 100%;
+            height: 40px;
+            background-color: #161b22;
+            padding-left: 20px;
+        }
+
+        #pageLinks {
+            display: block;
+            float: left;
+            width: 100px;
+            height: calc(100vh - 30px);
+            font-size: 13px;
+            background-color: #0d1117;
+            padding:5px ;
+            margin-right: 20px;
+        }
+
+        .pageLink {
+            margin-top: 20px;
+            text-align: center;
+            padding: 10px;
         }
 
         .pageLink button {
             background-color: transparent;
             border: 0;
-            height: 100%;
+            height: 0px;
             cursor: pointer;
-            color: #ecf2f8;
-
         }
 
         button img {
-            width: 90%;
+            width: 50px;
             vertical-align: middle;
+            margin-bottom: 60px;
         }
-
-        #pageLinksTitle{
-            grid-row: 1;
-            grid-column: 1;
-            color: #ecf2f8;
-            text-align: center;
-        }
-
-        #pageLinks {
-            grid-row: 2 / span 4;
-            grid-column: 1;
-            display: grid;
-            grid-template-columns: 100%;
-            grid-auto-rows: 1fr;
-            gap: 5%;
-            padding: 5%;
-            font-size: 14px;
-        }
-
-        .pageLink {
-            text-align: center;
-            padding: 10px;
-            color: #ecf2f8;
-        }
-
-        #statusPanel {
-            grid-row: 1/ span 2;
-            grid-column: 2;
-        }
-
-        #configPanel {
-            border: solid;
-            grid-row: 3;
-            grid-column: 2;
-        }
-
+  
         /* Style for file input and upload button */
         input[type="file"] {
             display: none;
         }
 
-        .upload-button {
-            background-color: #3498db;
-            color:#ecf2f8;
-            margin: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            overflow: wrap;
+        #systemControls {
+            position: absolute;
+            right: 0;
+            color: #ecf2f8
         }
 
-        #connectButton {
-            background-color: #faa356;
-            margin: 10px;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            overflow: wrap;
+        #systemDisplay {
+            width: calc(100vw - 170px)
         }
-        
-        #armDisarmButton {
-            grid-column: 3;
-            grid-row: 1 / span 2;
+
+        .controlButton {
+            display: block;
             background-color: transparent;
-            color: #ecf2f8;
-            margin: 10px;
-            padding: 10px;
+            margin-top: 10px;
+            padding: 5px;
             cursor: pointer;
-            font-size: 16px;
-            width: 100px;
+            font-size: 13px;
+            width: 105px;
+            height: 110px;
+            color: #ecf2f8;
         }
 
-        table, th, td {
-            color: #ecf2f8; 
+        .controlButton img{
+            margin-bottom: 10px;
+            scale: 0.8;
+        }
+
+        th, td {
             border: solid #ecf2f8;
-            border-collapse: collapse;
             padding: 5px;
             text-align: center; 
         }
 
         table {
             width: 100%;
+            margin: auto;
+            border-collapse: collapse;
+            border-style: hidden;
         }
-        
-        th {
-            padding: 10px;
+
+        fieldset {
+            margin: 20px;
         }
+
 
     </style>
 </head>
 
 <body>
+    <div id = "titleBar">
+        <b>HOME PAGE</b>
+    </div>
+
     <!-- Page Links -->
-    <div id = "pageLinksTitle"><h2>Pages</div>
     <div id="pageLinks">
         <div class = "pageLink"><button onclick="openPage('/actuators');"><img src = "../static/icons/actuator_icon.png"></button> Actuators</div>
         <div class = "pageLink"><button onclick="openPage('/sensors');"><img src = "../static/icons/sensor_icon.png"></button> Sensors</div>
         <div class = "pageLink"><button onclick="openPage('/pidview');"><img src = "../static/icons/pid_icon.png"></button>PID View</div>
         <div class = "pageLink"><button onclick="openPage('/autosequence');"><img src = "../static/icons/autosequence_icon.png"></button>Autosequence</div>
     </div>
+    <div id="systemControls">
+        <fieldset>
+            <legend> System Controls</legend>
+                <!-- Arm button -->
+            <button id="armDisarmButton" class = 'controlButton' name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
+                <img id = "armDisarmImg" src = ""> 
+                {% if armed %}Armed{% else %}Disarmed{% endif %}
+            </button>
 
-    <!-- Status panel -->
-    <div id = "statusPanel">
+            <!-- Upload buttons for CSV file -->
+            <button id = "uploadButton" class = 'controlButton' >
+                <label for ="csvFile1"><img src = "../static/icons/upload_icon.png">
+                    Upload Config</label>
+                <input type="file" id="csvFile1" accept=".csv" onchange="uploadFile('csvFile1')">
+            </button>
 
-        <!-- Mote connection status and ping -->
-        <div>
+            <!-- Connect button -->
+            <button id = "connectButton" class = 'controlButton' title = "Send config to MoTE" onclick="connectToMote()">
+                <img src = "../static/icons/connect_icon.png" style = "width: 70px">
+                Connect
+            </button>
+        </fieldset>
+    </div>
+    <div id = "systemDisplay">
+        <fieldset>
+            <legend> System Status</legend>
             <table id = "statusTable">
-                <tr>
+                <tr style = "background-color: #ecf2f8; color: #161b22">
                     <th>MoTE number</th>
                     <th>Name</th>
                     <th>Status</th>
@@ -174,31 +181,48 @@
                     <td id = "mote4ping"></td>
                 </tr>
             </table>
-        </div>
+        </fieldset>
+
+        <fieldset>
+            <legend id="configFileName">System Configuration: {{ config_file_name }}</legend>
+            <table id="configTable">
+                <tr style = "background-color: #ecf2f8; color: #161b22">
+                    <th>Mote id</th>
+                    <th>Sensor or Actuator</th>
+                    <th>Interface Type</th>
+                    <th>Human Name</th>
+                    <th>Pin</th>
+                    <th>P and ID</th>
+                    <th>Unpowered State</th>
+                </tr>
+
+                {% for sensor in sensor_list %}
+                    <tr style = "background-color: #89929b; color: #161b22">
+                        <td>{{ sensor['Mote id'] }}</td>
+                        <td>{{ sensor['Sensor or Actuator'] }}</td>
+                        <td>{{ sensor['Interface Type'] }}</td>
+                        <td>{{ sensor['Human Name'] }}</td>
+                        <td>{{ sensor['Pin'] }}</td>
+                        <td>{{ sensor['P and ID'] }}</td>
+                        <td>{{ sensor['Unpowered State'] }}</td>
+                    </tr>
+                {% endfor %}
+
+                {% for actuator in actuator_list %}
+                    <tr style = "background-color: #c6cdd5; color: #161b22">
+                        <td>{{ actuator['Mote id'] }}</td>
+                        <td>{{ actuator['Sensor or Actuator'] }}</td>
+                        <td>{{ actuator['Interface Type'] }}</td>
+                        <td>{{ actuator['Human Name'] }}</td>
+                        <td>{{ actuator['Pin'] }}</td>
+                        <td>{{ actuator['P and ID'] }}</td>
+                        <td>{{ actuator['Unpowered State'] }}</td>
+                    </tr>
+                {% endfor %}
+
+            </table>
+        </fieldset>
     </div>
-    <!-- Arm button -->
-    <button id="armDisarmButton" name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
-        <img id = "armDisarmImg" src = "" style = "margin-bottom: 10px;"> 
-        {% if armed %}Armed{% else %}Disarmed{% endif %}
-    </button>
-
-    <!-- Config panel -->
-    <div id = "configPanel">
-        <!-- Upload buttons for CSV file -->
-        <div>
-            <label for="csvFile1" title = " Upload sensors and actuators configuration file" class="upload-button">Upload Config</label>
-            <input type="file" id="csvFile1" accept=".csv" onchange="uploadFile('csvFile1')">
-            <div id="csvFile1Message" class= "fileName"></div>
-        </div>
-        <div>
-            <button id = "connectButton" title = "Send config to MoTE" onclick="connectToMote()">Connect</button>
-        </div>
-        <table id="configTable"></table>
-    </div>
-
-    <html id="config_file">{{  config_file }}</html>
-    
-
     
 
     <!-- reserved for future use DO NOT DELETE
@@ -251,11 +275,7 @@
         function uploadFile(inputId) {
             const fileInput = document.getElementById(inputId);
             const file = fileInput.files[0];
-            console.log(`File ${file.name} uploaded`);
-
-            const fileMessage = document.getElementById(inputId + "Message");
-            fileMessage.innerHTML = `File ${file.name} uploaded`;
-            socket.emit("uploadConfigFile", [inputId, file]);
+            socket.emit("uploadConfigFile", [inputId, file], file.name);
 
         }
 
@@ -263,7 +283,6 @@
         function connectToMote(){
             socket.emit("connect_request");
         }
-
 
         socket.on('armOrDisarmResponse', function (boolean_state) {
             const armDisarmButton = document.getElementById('armDisarmButton');
@@ -292,6 +311,15 @@
                 }
             });
         });
+
+        socket.on("config_file_header_error", function(){
+            alert('Invald config file, please check header')
+        });
+
+        socket.on('sensor_and_actuator_config_uploaded', function() {
+            location.reload();
+        });
+        
     </script>
 </body>
 

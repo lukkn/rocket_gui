@@ -29,12 +29,21 @@ def get_interface_type_number(interface_name):
     return interface_list.index(interface_name) + 1
 
 
+def check_file_header(header_list):
+    example_header = ['Mote id', 'Sensor or Actuator', 'Interface Type', 'Human Name', 'Pin', 'P and ID', 'Unpowered State']
+    return header_list == example_header
 
 def load_config(file=CONFIG_FILE):
     actuators = []
     sensors = []
     decoded_string = file.decode('utf-8')
     lines = decoded_string.strip().split('\n')
+
+    config_dict = csv.DictReader(lines)
+
+    if not check_file_header(list(list(config_dict)[0].keys())):
+        raise Exception("header error")
+
     for row in csv.DictReader(lines):
         if row['Sensor or Actuator'] == 'actuator':
             actuators.append(row)
