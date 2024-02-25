@@ -38,6 +38,18 @@
             font-size: 15px;
         }
 
+        #titleBar{
+            position: absolute;
+            top: 0;
+            display: grid;
+            align-items: center;
+            width: 100%;
+            height: 40px;
+            background-color: #161b22;
+            padding-left: 20px;
+            color: #ecf2f8;
+        }
+
         /* Style for file input and upload button */
         input[type="file"] {
             display: none;
@@ -60,7 +72,7 @@
         }
         #timer{
             position: fixed;
-            top: 0;
+            top: 40px;
             left: 0;
             font-size: 50px;
             padding: 5px 10px;
@@ -98,6 +110,8 @@
             margin: 0;
         }
         #configContainer {
+            position: absolute;
+            top: 50px;
             float: left;
             width: 100%;
             height: calc(100vh - 90px);
@@ -148,7 +162,7 @@
         }
         .collapsible-menu label {
             position: absolute;
-            top: 0;
+            top: -10px;
             right: 0;
             cursor: pointer;
             width: 100px;
@@ -183,6 +197,10 @@
 </head>
 
 <body>
+    <div id = "titleBar">
+        <b>Autosequence</b>
+    </div>
+
     <div id="configContainer">
         <div id="timer">0 s</div>
         <div id="configButtons">
@@ -230,11 +248,11 @@
         </button>
     </form>
 
-    <html id="autosequence_commands">{{ autosequence_commands }}</html>
-    <html id="abort_sequence_commands">{{ abort_sequence_commands }}</html>
-    <html id="autosequence_file_name">{{ autosequence_file_name }}</html>
-    <html id="abort_sequence_file_name">{{ abort_sequence_file_name }}</html>
-    <html id="time_to_show">{{ time_to_show }}</html>
+    <html id="autosequence_commands" style = "color: #21262d">{{ autosequence_commands }}</html>
+    <html id="abort_sequence_commands" style = "color: #21262d">{{ abort_sequence_commands }}</html>
+    <html id="autosequence_file_name" style = "color: #21262d">{{ autosequence_file_name }}</html>
+    <html id="abort_sequence_file_name" style = "color: #21262d">{{ abort_sequence_file_name }}</html>
+    <html id="time_to_show" style = "color: #21262d">{{ time_to_show }}</html>
 
     <script>
         var socket = io.connect('http://' + document.domain + ':' + location.port);
