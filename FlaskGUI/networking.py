@@ -142,7 +142,7 @@ def generate_handler():
             global most_recent_data_packet
             global actuator_states_and_sensor_tare_states
 
-            parsed_data = []
+            sensor_value_dict = {}
 
             for data in data_to_send_to_frontend:
                 pin_num = int(data["Pin"])
@@ -159,12 +159,10 @@ def generate_handler():
                     # [ ["P and ID"], ["Interface Type"], ["Sensor or Actuator"], ["unit"]]
                     p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actator_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
                     #sensor_value = convert_units(data["Value"], unit)
-                    sensor_value = data["Value"]
 
-                    sensor_value_pair = (p_and_id, sensor_value)
-                    parsed_data.append(sensor_value_pair)
+                    sensor_value_dict[p_and_id] = data["Value"]
 
-            most_recent_data_packet = parsed_data
+            most_recent_data_packet = sensor_value_dict
 
     return TelemetryRecieveHandler
 

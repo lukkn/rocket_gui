@@ -11,14 +11,21 @@
 </head>
 
 <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #21262d;
+        color: #ecf2f8;
+        height: 100%;
+        column-gap: 10px;
+        margin: 0;
+        font-size: 14px;
+    }
     #listContainer {
-        width: 30%;
-        float: left;
+        width: 100%;
         margin-right: 2%;
     }
     #chartContainer {
-        width: 65%;
-        float: left;
+        width: 100%;
     }
     #addChart {
         margin-bottom: 1%;
@@ -28,11 +35,24 @@
         height: 100%;
         margin-top: 10px;
     }
+    #titleBar{
+        display: grid;
+        align-items: center;
+        width: 100%;
+        height: 40px;
+        background-color: #161b22;
+        padding-left: 20px;
+    }
+    table {
+        width: 100%
+    }
 </style>
 
 <body>
-    <p id="ping" style="float: right; margin: 0"></p>
-    <h1>Sensor Data</h1>
+    <div id = "titleBar">
+        <b>Sensors</b>
+    </div>
+
     <div id = "listContainer">
         <table border="2" id="sensorsTable">
             <thead>
@@ -60,6 +80,7 @@
             </tbody>
         </table>
     </div>
+
     <div id="chartContainer">
         <button id="addChart" onClick = "addChart()">Add Chart</button>
     </div>
@@ -68,28 +89,26 @@
 
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-        socket.on('sensor_data', function (data) {
+        socket.on('sensor_data', function (data, timestamp) {
             //console.log('sensor_data emit contents: ', data)
             //console.log('sensor_data emit contents: ', data)
             // right now sending data as a list, index0 = data, index1 = timestamp of data and time of transmission
-            const listOfSensorIDValueTuples = data[0]
-            const timestamp = data[1]
+            const sensorDataDict = data
+            const timestamp = timestamp
 
             console.log('received sensor data')
 
-            listOfSensorIDValueTuples.forEach(function (sensorTuple) {
-                const sensorID = sensorTuple[0];
-                const sensorValue = sensorTuple[1];
+            for((sensorID, sensorValue) in sensorDataDict){
                 const dataCell = document.getElementById(sensorID + '_data');
 
                 dataCell.textContent = sensorValue.toFixed(3);
-            });
+            }
 
             // update data for charts
             const startTime = performance.now();
 
             // second param is number of data points to store for graphing
-            updateData(listOfSensorIDValueTuples, 20*15);
+            updateData(sensorDataDict, 20*15);
 
             // plot updated data for each chart
             const canvasList = document.getElementsByTagName('canvas');

@@ -10,6 +10,8 @@ import math
 
 import configuration
 import networking
+import autosequence
+import sensors
 
 # temporarily append our library directory to sys.path so we can use eventlet. DO NOT REMOVE
 sys.path.append(os.path.abspath("./python_flask_and_flaskio_and_eventlet_libraries"))
@@ -53,11 +55,6 @@ time_to_show = 0
 abort_sequence_file_name = None
 abort_sequence_commands = []
 
-# contains names for non-command lines in autosequence 
-actuator_name_exceptions = ["NULL", "STATE_IDLE", "STATE_ACTIVE"]
-
-
-
 app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app, async_mode=async_mode)
 
@@ -94,7 +91,7 @@ def sensors():
     return render_template('sensors.html', sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
 
 @app.route('/actuators', methods=['GET'])
-def actuators():
+def autosequence():
     return render_template('actuators.html', actuator_list=actuator_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states, actuator_states_from_mote=actuator_states_from_mote)
 
 
@@ -113,6 +110,7 @@ def loadConfigFile(CSVFileAndFileContents, fileName):
         
         try:
             actuator_list, sensor_list = configuration.load_config(fileContents)
+            sensors.initialize_sensor_offset(sensor_list)
             socketio.emit('sensor_and_actuator_config_uploaded')
         except:
             socketio.emit("config_file_header_error")
@@ -280,12 +278,14 @@ def update_connection_status():
 
 # Sensor page functions
 def sensor_data_thread():
-    socketio.sleep(1)
+    socketio.sleep(1) 
     while True:
         socketio.sleep(1/20)
         sensors_and_data = networking.get_sensor_data()
         socketio.emit('sensor_data', [sensors_and_data, time.time_ns() // 1000000])
 
+
+# Actuator functions
 def actuator_ack(p_and_id, state):
     #socketio.sleep(1)
     global actuator_states_from_mote
@@ -298,19 +298,6 @@ def actuator_ack(p_and_id, state):
     return actuator_states_from_mote
 
 # Autosequence page functions
-def parse_file(file):
-    file_content = [line.rstrip('\n') for line in file.decode("utf-8").splitlines() if line.strip()]
-    header = file_content[0].split(",")
-    command_list = [line.split(",") for line in file_content[1:]]
-    sleep_times_list = [abs(int(command_list[i][2]) - int(command_list[i+1][2])) for i in range(len(command_list)-1)] + [0] # 0 on the end so we dont go out of range and instead delay for 0 seconds after autoseq is finished
-    formatted_commands = []
-    index = 0
-    for command in command_list:
-        command_line = {'P and ID': command[0], 'State': command[1], 'Time(ms)': command[2], 'Comments': command[3], 'Sleep time(ms)': sleep_times_list[index], 'Complete': False}
-        index += 1
-        formatted_commands.append(command_line)
-    return header, formatted_commands
-
 
 def execute_autosequence(commands):
     global autosequence_occuring
@@ -356,27 +343,14 @@ def execute_abort_sequence(commands):
             networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command['State'], buttonDict['Interface Type'])
         time.sleep(command['Sleep time(ms)']/1000)
 
-def check_actuators_in_sequence(commands):
-    file_valid = True
-    for command in commands:
-        if not any(actuator['P and ID'] == command['P and ID'] for actuator in actuator_list):
-            command['Type'] = 'Placeholder'
-            if command['P and ID'] not in actuator_name_exceptions:
-                command['Type'] = 'Invalid'
-                file_valid = False
-        else:
-            command['Type'] = 'Actuator'
-    return file_valid
-
-
 def check_file_format(header):
     return header[0] == 'P and ID' and header[1] == 'State' and header[2] == 'Time(ms)' and header[3] == 'Comments'
 
 def parse_and_check_files(file):
-    header, commands = parse_file(file)
+    header, commands = autosequence.parse_file(file)
     if not check_file_format(header): 
         socketio.emit('file_header_error')
-    elif not check_actuators_in_sequence(commands):
+    elif not autosequence.check_actuators_in_sequence(commands, actuator_list):
         print ('file_actuators_error')
         socketio.emit('file_actuators_error')
     else:
