@@ -455,6 +455,9 @@ void setup()
     
     Serial.println("Hello World!");
 
+
+/*
+
     Serial.print("\nInitializing SD card...");
 
     // we'll use the initialization code from the utility libraries
@@ -490,6 +493,9 @@ void setup()
     root.open("/mote_number.txt");
     moteID = root.read();
    
+
+   */
+    moteID = '1';
     Serial.println("Mote number:");
     Serial.println(moteID);
 

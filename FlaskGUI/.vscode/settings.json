@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./python_flask_and_flaskio_and_eventlet_libraries"
+    ]
+}
