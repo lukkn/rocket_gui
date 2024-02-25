@@ -1,0 +1,7 @@
+P and ID,State,Time(ms),Comments
+VPTE,True,-5000,Autosequence Start
+VNTB,True,-3000,Open Valve VPTE
+VFTV,True,0,Open Valve VNNP
+VNTO,False,2000,Close Valve VNNP
+VOTF,False,2500,Close Valve VPTE
+
