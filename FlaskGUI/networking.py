@@ -15,16 +15,16 @@ import threading
 from threading import Thread
 
 import configuration
+import sensor
 
 # this causes the file to run twice
 #import app
 
-num_motes = 4
-mote_status = []
+start_time = time.time()
 mote_ping = [None, None, None, None]
 
 # value = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["unit"]]
-sensor_and_actator_dictionary = {'1, 99': ['FireX', None, None, None]}
+sensor_and_actuator_dictionary = {'1, 99': ['FireX', None, None, None]}
 most_recent_data_packet = []
 
 actuator_states_and_sensor_tare_states = {}
@@ -69,8 +69,8 @@ def send_heartbeat():
 heartbeat_thread = Thread(target=send_heartbeat, daemon=True)
 
 def send_config_to_mote(sensor_list, actuator_list):
-    global sensor_and_actator_dictionary
-    sensor_and_actator_dictionary.update(create_sensor_dictionary(sensor_list + actuator_list))
+    global sensor_and_actuator_dictionary
+    sensor_and_actuator_dictionary.update(create_sensor_dictionary(sensor_list + actuator_list))
     sensors_and_actuators_list = sensor_list + actuator_list
     print("sent sensor config data to mote")
     for m in range(1, 4):
@@ -137,7 +137,7 @@ def generate_handler():
             mote_id = self.client_address[0][-1]
             data_to_send_to_frontend = convert_to_values(data, mote_id)
 
-            global sensor_and_actator_dictionary
+            global sensor_and_actuator_dictionary
             global most_recent_data_packet
             global actuator_states_and_sensor_tare_states
 
@@ -146,22 +146,24 @@ def generate_handler():
             for data in data_to_send_to_frontend:
                 pin_num = int(data["Pin"])
 
-                if pin_num == 99: # fireX pin num
+                if pin_num == 99: 
+                    # fireX pin num
                     pass
-
-                elif pin_num > 99: # ack for a actuator press
-                    p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actator_dictionary[str(data["Mote id"]) + ", " + str(int(data["Pin"]) - 100)]
+                elif pin_num > 99: 
+                    # ack for a actuator press
+                    p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(int(data["Pin"]) - 100)]
                     state = data["Value"]
                     #app.actuator_ack(p_and_id, state)
-                else: # a sensor reading
-                    #        [0]             [1]                   [2]               [3]
-                    # [ ["P and ID"], ["Interface Type"], ["Sensor or Actuator"], ["Unit"]]
-                    p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actator_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
+                else: 
+                    # a sensor reading
+                    p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
                     #sensor_value = convert_units(data["Value"], unit)
 
                     sensor_value_dict[p_and_id] = data["Value"]
 
             most_recent_data_packet = sensor_value_dict
+            sensor.log_sensor_data(time.time() - start_time, sensor_value_dict)
+
 
     return TelemetryRecieveHandler
 
@@ -190,9 +192,9 @@ def convert_to_values(packet, mote_id):
 
 
 # converts list of sensors and actuators to a single dictionary for O(1) lookup time
-def create_sensor_dictionary(sensor_and_actator_list):
+def create_sensor_dictionary(sensor_and_actuator_list):
     dict = {}
-    for sensor in sensor_and_actator_list:
+    for sensor in sensor_and_actuator_list:
         dict[sensor["Mote id"] + ", " + sensor["Pin"]] = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["Unit"]]
     return dict
 

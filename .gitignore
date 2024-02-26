@@ -42,6 +42,7 @@ FlaskGUI/libs/pythonping/__pycache__/
 
 sensor_data_log
 motesoft/Logs
+FlaskGUI/logs
 
 motesoft/firmware/.gitignore
 motesoft/firmware/.vscode/
