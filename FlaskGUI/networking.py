@@ -3,9 +3,8 @@ import socketserver
 import time
 
 # For ping
-import platform # to identify os
-import subprocess # to execute shell commands
-import re # for regular expressions
+from pythonping import ping
+
 
 # For threading
 import threading
@@ -17,6 +16,7 @@ import app
 
 num_motes = 4
 mote_status = []
+mote_ping = [None, None, None, None]
 
 # value = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["unit"]]
 sensor_and_actator_dictionary = {'1, 99': ['FireX', None, None, None]}
@@ -107,26 +107,20 @@ def send_config_to_mote(sensor_list, actuator_list):
         sock.sendto(config_command, (ip, 8888))
         time.sleep(0.1)
 
-mote_ping = [None, None, None, None]
-
 def ping_mote():
     while True:
         for moteID in range(1, 5):
             ip_address = get_ip(mote_id=moteID)
-            try:
-                # Option for the number of packets as a function of
-                param = '-n' if platform.system().lower()=='windows' else '-c'
-                # Building the command. Ex: "ping -c 1 google.com"
-                command = ['ping', '-w', '1', param, '1', ip_address]
-                output = subprocess.check_output(command)
-
-                avgRTT = re.search("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)", str(output)).group(2)
-                delay = float(float(avgRTT)/2)
+            pingResponse = ping(ip_address, count=1, timeout=0.100) # 100msec ping is too high
+            success = pingResponse.stats_packets_returned
+            delay = pingResponse.rtt_avg_ms
+            if success > 0:
                 mote_ping[moteID-1] = delay
-                print("thread ping", delay)
-            except:
-                print("ping for mote " +  str(moteID) +  " returned error code 1")
-        time.sleep(5)
+                #print("thread ping", delay)
+            else:
+                mote_ping[moteID-1] = None
+                #print("ping for mote " +  str(moteID) +  " returned error code 1")
+        time.sleep(1)
 
 ping_thread = Thread(target=ping_mote, daemon=True)   # Make a new thread to run ping_mote function
 
