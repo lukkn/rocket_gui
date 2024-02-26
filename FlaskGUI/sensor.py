@@ -1,7 +1,8 @@
 import networking
 import csv
+from datetime import datetime
 
-sensor_log_path = "FlaskGUI/logs/sensor_log_0.csv"
+sensor_log_path = None
 
 internal_temp = 20 # assume room temp
 SCALE_INTERNAL_TEMP = False
@@ -11,17 +12,21 @@ sensor_units = {}
 sensor_mote = {}
 
 def initialize_sensor_info(sensor_list):
-    header = ["Timestamp"]
+    header = "Timestamp"
 
     for sensor in sensor_list:
         sensor_offset[sensor['P and ID']] = 0
         sensor_units[sensor['P and ID']] = sensor["Unit"]
         sensor_mote[sensor['P and ID']] = sensor['Mote id']
-        header.append(sensor["P and ID"])
+        header += "," + (sensor["P and ID"])
 
     # initialize sensor_log
+    global sensor_log_path
+    dt_string = datetime.now().strftime("%d%m%Y_%H%M%S")
+    sensor_log_path = "FlaskGUI/logs/sensor_log_" + dt_string + ".csv"
+
     with open(sensor_log_path, "w") as file:
-        csv.writer(file).writerow(header)
+        file.write(header + "\n")
         file.flush()
         file.close()
 
@@ -73,18 +78,16 @@ def unit_convert(sensor_data_dict):
 
 def log_sensor_data(timestamp, sensor_data_dict):
 
-    data_to_log = {}
-    data_to_log['Timestamp'] = timestamp
+    data_to_log = str(timestamp)
     unit_converted_data = unit_convert(sensor_data_dict)
 
     for sensor in sensor_offset:
         if sensor in sensor_data_dict:
-            data_to_log[sensor] = str([sensor_data_dict[sensor], unit_converted_data[sensor], sensor_offset[sensor]])
+            data_to_log += "," + str([sensor_data_dict[sensor], unit_converted_data[sensor], sensor_offset[sensor]])
         else: 
-            data_to_log [sensor] = None
+            data_to_log += "," + None
 
     with open(sensor_log_path, "a") as file:
-        writer = csv.DictWriter(file, data_to_log.keys())
-        writer.writerow(data_to_log)
+        file.write(data_to_log + "\n")
         file.flush()
         file.close()

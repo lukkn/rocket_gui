@@ -34,9 +34,6 @@ actuator_states_and_sensor_tare_states = {}
 sock = socket.socket(socket.AF_INET,  # Internet
                      socket.SOCK_DGRAM)  # UDP
 
-def get_mote_status(num):
-    return mote_status[num - 1]
-
 def get_ip(mote_id=None):
     if mote_id == None:
         return '127.0.0.1'

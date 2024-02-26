@@ -110,12 +110,11 @@ def loadConfigFile(CSVFileAndFileContents, fileName):
 
         try:
             actuator_list, sensor_list = configuration.load_config(fileContents)
+            sensor.initialize_sensor_info(sensor_list)
             socketio.emit('sensor_and_actuator_config_uploaded')
         except:
             socketio.emit("config_file_header_error")
-
-        sensor.initialize_sensor_info(sensor_list)
-
+            
 @socketio.on('connect_request')
 def handle_connect_request():
     print("Attempting to send config to MoTE")
