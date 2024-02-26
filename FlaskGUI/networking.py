@@ -2,11 +2,12 @@ import socket
 import socketserver
 import time
 
-import sys
-import os
+import sys, os
 
 # For ping
 # if there are yellow error squiggles under some import stuff ignore it
+custom_libs_path = os.path.abspath("./libs")
+sys.path.insert(0, custom_libs_path)
 from pythonping import ping
 
 
