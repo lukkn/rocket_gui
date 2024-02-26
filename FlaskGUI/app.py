@@ -2,7 +2,6 @@
 from threading import Lock
 import json
 import os
-import random
 import time
 import webbrowser
 import sys
@@ -14,7 +13,7 @@ import autosequence
 import sensor
 
 # temporarily append our library directory to sys.path so we can use eventlet. DO NOT REMOVE
-#sys.path.append(os.path.abspath("./python_flask_and_flaskio_and_eventlet_libraries"))
+sys.path.append(os.path.abspath("./python_flask_and_flaskio_and_eventlet_libraries"))
 
 # these libraries located in the folder named: 'python_flask_and_flaskio_and_eventlet_libraries'
 # dot notation is used to navigate to the next folder
@@ -29,7 +28,8 @@ from flask_socketio import SocketIO
 async_mode = None
 
 # could use used to make unique id's for webpages
-sessionid = str(random.random())[2:]
+sessionID = str(time.time()).split('.')[0]
+print("sessionID", sessionID)
 
 # TODO: better way than using global variables, verify config file
 # GLOBAL VARIABLES for sensors and actuators
@@ -74,27 +74,27 @@ connection_thread_lock = Lock()
 # webbrowser.open_new('http://127.0.0.1:5000/sensors')
 # webbrowser.open_new('http://127.0.0.1:5000/actuators')
 # webbrowser.open_new('http://127.0.0.1:5000/pidview')
-# webbrowser.open_new('http://127.0.0.1:5001/') # + sessionID here if needed
+webbrowser.open_new('http://127.0.0.1:5001/' + sessionID) # + sessionID here if needed
 
 
 # flask routes for webpages
-@app.route('/', methods=['GET']) # + sessionID here if needed
+@app.route('/' + sessionID, methods=['GET']) # + sessionID here if needed
 def index():
-    return render_template('index.html', armed=armed, config_file_name = config_file_name, sensor_list=sensor_list, actuator_list=actuator_list)
+    return render_template('index.html', armed=armed, config_file_name = config_file_name, sensor_list=sensor_list, actuator_list=actuator_list, sessionID=sessionID)
 
-@app.route('/autosequence', methods=['GET'])
+@app.route('/autosequence' + sessionID, methods=['GET'])
 def autosequence():
     return render_template('autosequence.html', autosequence_commands=autosequence_commands, abort_sequence_commands= abort_sequence_commands, time_to_show=time_to_show, autosequence_file_name = autosequence_file_name, abort_sequence_file_name = abort_sequence_file_name)
 
-@app.route('/pidview', methods=['GET'])
+@app.route('/pidview' + sessionID, methods=['GET'])
 def pidview():
     return render_template('pidview.html', actuator_list=actuator_list, sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
 
-@app.route('/sensors', methods=['GET'])
+@app.route('/sensors' + sessionID, methods=['GET'])
 def sensors():
     return render_template('sensors.html', sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
 
-@app.route('/actuators', methods=['GET'])
+@app.route('/actuators' + sessionID, methods=['GET'])
 def actuators():
     return render_template('actuators.html', actuator_list=actuator_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states, actuator_states_from_mote=actuator_states_from_mote)
 

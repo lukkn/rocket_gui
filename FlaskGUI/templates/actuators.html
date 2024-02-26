@@ -2,119 +2,132 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Actuators</title>
-    <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actuators</title>
+  <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
 </head>
 
 <style>
-    #sensors-container {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 0 auto;
-      border-collapse: collapse;
-    }
-    table {
-      width: 100%;
-      border: 1px solid #ddd;
-    }
-    th {
-      background-color: #636C78;
-      color: white;
-      text-align: left;
-      padding: 12px;
-    }
-    td {
-      background-color: #f2f2f2;
-      padding: 8px;
-      border-right: 1px solid #ddd;
-    }
-    td:last-child {
-      border-right: none;
-    }
-    .right-aligned {
-      text-align: right; /* Aligns content to the right */
-    }
-    .button {
-      display: inline-flex; /* Allows you to set margins and padding */
-      padding: 5px 15px;
-      background-color: #C9C9C9;
-      color: #5E5C5C;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-  
-    .button:hover{
-  
-      background-color: #b6b6b6; 
-    }
-  
-    .button:active{
-      background-color: #9F9D9D
-    }
-  </style>
+  #sensors-container {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    border-collapse: collapse;
+  }
+
+  table {
+    width: 100%;
+    border: 1px solid #ddd;
+  }
+
+  th {
+    background-color: #636C78;
+    color: white;
+    text-align: left;
+    padding: 12px;
+  }
+
+  td {
+    background-color: #f2f2f2;
+    padding: 8px;
+    border-right: 1px solid #ddd;
+  }
+
+  td:last-child {
+    border-right: none;
+  }
+
+  .right-aligned {
+    text-align: right;
+    /* Aligns content to the right */
+  }
+
+  .button {
+    display: inline-flex;
+    /* Allows you to set margins and padding */
+    padding: 5px 15px;
+    background-color: #C9C9C9;
+    color: #5E5C5C;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .button:hover {
+
+    background-color: #b6b6b6;
+  }
+
+  .button:active {
+    background-color: #9F9D9D
+  }
+</style>
 
 <body>
-    <h1>Actuators</h1>
-    <table border="2">
-        <thead>
-            <tr>
-                <th>Actuator Name</th>
-                <th>OFF</th>
-                <th>ON</th>
-                <th>Last Sent State</th>
-                <th>Last State Known by Mote</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for actuator in actuator_list %}
-                <tr>
-                    <td>{{ actuator['P and ID'] }}</td>
-                    <td><button id="{{ actuator['P and ID'] }}" onclick="buttonClicked(id, 'off')" >Off</button></td>
-                    <td><button id="{{ actuator['P and ID'] }}" onclick="buttonClicked(id, 'on')" >On</button></td>
-                    <td id="{{ actuator['P and ID'] }}_state" >{{ actuator_states_and_sensor_tare_states[actuator['P and ID']] }}</td>
-                    <td id="{{ actuator['P and ID'] }}_Motestate">{{ actuator_states_from_mote[actuator['P and ID']] }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+  <h1>Actuators</h1>
+  <table border="2">
+    <thead>
+      <tr>
+        <th>Actuator Name</th>
+        <th>OFF</th>
+        <th>ON</th>
+        <th>Last Sent State</th>
+        <th>Last State Known by Mote</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for actuator in actuator_list %}
+      <tr>
+        <td>{{ actuator['P and ID'] }}</td>
+        <td><button id="{{ actuator['P and ID'] }}" onclick="buttonClicked(id, 'off')">Off</button></td>
+        <td><button id="{{ actuator['P and ID'] }}" onclick="buttonClicked(id, 'on')">On</button></td>
+        <td id="{{ actuator['P and ID'] }}_state">{{ actuator_states_and_sensor_tare_states[actuator['P and ID']] }}
+        </td>
+        <td id="{{ actuator['P and ID'] }}_Motestate">{{ actuator_states_from_mote[actuator['P and ID']] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-    <script>
+  <script>
 
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-        function buttonClicked(id, state) {
-            const current_time = Date.now();
-            socket.emit('received_button_press', id, state, current_time);
-        }
+    function buttonClicked(id, state) {
+      const current_time = Date.now();
+      socket.emit('received_button_press', id, state, current_time);
+    }
 
 
-        socket.on('responding_with_button_data', function (data) {
-            const buttonID = data[0]
-            const buttonState = data[1]
-            const a = document.getElementById("" + buttonID + "_state");
-            a.textContent = buttonState
-            console.log("state reflected in app.py =", buttonState)
-        });
+    socket.on('responding_with_button_data', function (data) {
+      const buttonID = data[0]
+      const buttonState = data[1]
+      const a = document.getElementById("" + buttonID + "_state");
+      a.textContent = buttonState
+      console.log("state reflected in app.py =", buttonState)
+    });
 
-        socket.on('responding_with_button_data_from_mote', function (data) {
-            console.log("are we in the socket???");
-            const buttonID = data[0]
-            const buttonState = data[1]
-            const b = document.getElementById("" + buttonID + "_Motestate");
-            b.textContent = buttonState
-            console.log("state from mote=", buttonState);
-        });
+    socket.on('responding_with_button_data_from_mote', function (data) {
+      console.log("are we in the socket???");
+      const buttonID = data[0]
+      const buttonState = data[1]
+      const b = document.getElementById("" + buttonID + "_Motestate");
+      b.textContent = buttonState
+      console.log("state from mote=", buttonState);
+    });
 
-        
+    
+    socket.on('disconnect', function (reason) {
+      console.log("Disconnected from server, reason: " + reason);
+      close();
+    });
 
-        socket.on('sensor_and_actuator_config_uploaded', function() {
-            location.reload();
-        });
+    socket.on('sensor_and_actuator_config_uploaded', function () {
+      location.reload();
+    });
 
-    </script>
+  </script>
 
 
 </body>

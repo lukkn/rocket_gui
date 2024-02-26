@@ -409,6 +409,12 @@
         socket.on('abort', function(){
             showAbortSequence();
         });
+
+        socket.on('disconnect', function (reason) {
+            console.log("Disconnected from server, reason: " + reason);
+            close();
+        });
+
         socket.on('valid_file_received', function(){
             location.reload();
         });

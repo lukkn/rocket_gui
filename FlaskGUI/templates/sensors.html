@@ -208,6 +208,11 @@
             }, 2000 + 1000); // If we get ping 1 second late attempt reload
         });
 
+        socket.on('disconnect', function (reason) {
+            console.log("Disconnected from server, reason: " + reason);
+            close();
+        });
+
     </script>
 
 </body>

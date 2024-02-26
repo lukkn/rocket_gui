@@ -2,7 +2,11 @@ import socket
 import socketserver
 import time
 
+import sys
+import os
+
 # For ping
+sys.path.append(os.path.abspath("./python_flask_and_flaskio_and_eventlet_libraries"))
 from pythonping import ping
 
 
@@ -12,7 +16,8 @@ from threading import Thread
 
 import configuration
 
-import app
+# this causes the file to run twice
+#import app
 
 num_motes = 4
 mote_status = []
@@ -147,7 +152,7 @@ def generate_handler():
                 elif pin_num > 99: # ack for a actuator press
                     p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actator_dictionary[str(data["Mote id"]) + ", " + str(int(data["Pin"]) - 100)]
                     state = data["Value"]
-                    app.actuator_ack(p_and_id, state)
+                    #app.actuator_ack(p_and_id, state)
                 else: # a sensor reading
                     #        [0]             [1]                   [2]               [3]
                     # [ ["P and ID"], ["Interface Type"], ["Sensor or Actuator"], ["Unit"]]

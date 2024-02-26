@@ -465,12 +465,12 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
         self.log("info", format, *args)
 
     def log(self, type: str, message: str, *args: t.Any) -> None:
-        pass # added to supress get requests
-        # _log(
-        #     type,
-        #     f"{self.address_string()} - - [{self.log_date_time_string()}] {message}\n",
-        #     *args,
-        # )
+        return
+        _log(
+            type,
+            f"{self.address_string()} - - [{self.log_date_time_string()}] {message}\n",
+            *args,
+        )
 
 
 def _ansi_style(value: str, *styles: str) -> str:
@@ -850,7 +850,7 @@ class BaseWSGIServer(HTTPServer):
 
             messages.append(f" * Running on {scheme}://{display_hostname}:{self.port}")
 
-        messages = [] # added to supress all messages
+        messages = []
         _log("info", "\n".join(messages))
 
 

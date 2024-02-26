@@ -35,7 +35,7 @@ def unit_convert(sensor_data_dict):
 
         match sensor['Unit']:
             case "PSI_1K":
-                if sensor_mote[sensor] == '2':
+                if sensor_mote[sensor] == '2': # if mote 2
                     value = 250 * val_in_volts - 125
                 else:
                     value = 2* 250 * val_in_volts - 125

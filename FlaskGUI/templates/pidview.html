@@ -370,27 +370,14 @@
         socket.on('responding_with_button_data', function (data) {
             updateButtonColor(data);
         });
+
+        socket.on('disconnect', function (reason) {
+            console.log("Disconnected from server, reason: " + reason);
+            close();
+        });
         
         socket.on('sensor_and_actuator_config_uploaded', function() {
             location.reload();
-        });
-
-
-        let pingTimeout;
-
-        socket.on('ping', function (time) {
-            // Update ping display
-            document.getElementById("ping").textContent = `Ping: ${(Date.now() - time).toFixed(0)} milliseconds`;
-
-            // Clear the timeout when the pong response is received
-            clearTimeout(pingTimeout);
-
-            // Set a new timeout for the next expected ping
-            pingTimeout = setTimeout(function() {
-                const a = document.getElementById("ping");
-                a.textContent = "Server not responding";
-                location.reload();
-            }, 2000 + 1000); // If we get ping 1 second late attempt reload
         });
 
     </script>

@@ -120,10 +120,10 @@
 
     <!-- Page Links -->
     <div id="pageLinks">
-        <div class = "pageLink"><button onclick="openPage('/actuators');"><img src = "../static/icons/actuator_icon.png"></button> Actuators</div>
-        <div class = "pageLink"><button onclick="openPage('/sensors');"><img src = "../static/icons/sensor_icon.png"></button> Sensors</div>
-        <div class = "pageLink"><button onclick="openPage('/pidview');"><img src = "../static/icons/pid_icon.png"></button>PID View</div>
-        <div class = "pageLink"><button onclick="openPage('/autosequence');"><img src = "../static/icons/autosequence_icon.png"></button>Autosequence</div>
+        <div class = "pageLink"><button onclick="openPage('/actuators' + '{{ sessionID }}');"><img src = "../static/icons/actuator_icon.png"></button> Actuators</div>
+        <div class = "pageLink"><button onclick="openPage('/sensors' + '{{ sessionID }}');"><img src = "../static/icons/sensor_icon.png"></button> Sensors</div>
+        <div class = "pageLink"><button onclick="openPage('/pidview' + '{{ sessionID }}');"><img src = "../static/icons/pid_icon.png"></button>PID View</div>
+        <div class = "pageLink"><button onclick="openPage('/autosequence' + '{{ sessionID }}');"><img src = "../static/icons/autosequence_icon.png"></button>Autosequence</div>
     </div>
 
 
@@ -322,6 +322,11 @@
 
         socket.on("config_file_header_error", function(){
             alert('Invalid config file, please check header')
+        });
+
+        socket.on('disconnect', function (reason) {
+            console.log("Disconnected from server, reason: " + reason);
+            location.reload();
         });
 
         socket.on('sensor_and_actuator_config_uploaded', function() {
