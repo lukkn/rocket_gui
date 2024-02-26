@@ -5,23 +5,19 @@ import os
 import time
 import webbrowser
 import sys
-import math
 
+# Define the path to the custom library directory and import the custom libs
+# if there are yellow error squiggles under some import stuff ignore it
+custom_libs_path = os.path.abspath("./libs")
+sys.path.insert(0, custom_libs_path)
+from flask import Flask, render_template
+from flask_socketio import SocketIO
+
+# import other project files
 import configuration
 import networking
 import autosequence
 import sensor
-
-# temporarily append our library directory to sys.path so we can use eventlet. DO NOT REMOVE
-sys.path.append(os.path.abspath("./libs"))
-
-# these libraries located in the folder named: 'libs'
-# dot notation is used to navigate to the next folder
-#from libs.flask import Flask, render_template
-#from libs.flask_socketio import SocketIO
-
-from flask import Flask, render_template
-from flask_socketio import SocketIO
 
 
 # Socket IO config

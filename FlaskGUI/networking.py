@@ -6,7 +6,7 @@ import sys
 import os
 
 # For ping
-sys.path.append(os.path.abspath("./libs"))
+# if there are yellow error squiggles under some import stuff ignore it
 from pythonping import ping
 
 
