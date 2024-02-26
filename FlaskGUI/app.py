@@ -14,12 +14,16 @@ import autosequence
 import sensor
 
 # temporarily append our library directory to sys.path so we can use eventlet. DO NOT REMOVE
-sys.path.append(os.path.abspath("./python_flask_and_flaskio_and_eventlet_libraries"))
+#sys.path.append(os.path.abspath("./python_flask_and_flaskio_and_eventlet_libraries"))
 
 # these libraries located in the folder named: 'python_flask_and_flaskio_and_eventlet_libraries'
 # dot notation is used to navigate to the next folder
-from python_flask_and_flaskio_and_eventlet_libraries.flask import Flask, render_template
-from python_flask_and_flaskio_and_eventlet_libraries.flask_socketio import SocketIO
+#from python_flask_and_flaskio_and_eventlet_libraries.flask import Flask, render_template
+#from python_flask_and_flaskio_and_eventlet_libraries.flask_socketio import SocketIO
+
+from flask import Flask, render_template
+from flask_socketio import SocketIO
+
 
 # Socket IO config
 async_mode = None
