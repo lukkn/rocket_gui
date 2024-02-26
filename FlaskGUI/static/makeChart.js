@@ -146,12 +146,9 @@ function removeCheckboxes(canvasID, sensorList){
     });
 }
 
-function updateData(sensorTupleList, dataLength) {
-    sensorTupleList.forEach (function (sensorTuple) {
-        const sensorName = sensorTuple[0];
-        const sensorValue = sensorTuple[1];
-
-        let data = dataDict[sensorName];
+function updateData(sensorDataDict, dataLength) {
+    for(const [sensorID, sensorValue] of Object.entries(sensorDataDict)){
+        let data = dataDict[sensorID];
         data.push(sensorValue);
 
         if (data.length > dataLength) {
@@ -159,7 +156,7 @@ function updateData(sensorTupleList, dataLength) {
             // TODO: next ambitious person should make a circlular buffer class
             data.shift();
         }
-    });
+    }
 }
 
 function handleGraphCheckbox(canvasID, checkboxID, sensor){

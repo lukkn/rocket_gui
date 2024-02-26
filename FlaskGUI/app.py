@@ -11,7 +11,7 @@ import math
 import configuration
 import networking
 import autosequence
-import sensors
+import sensor
 
 # temporarily append our library directory to sys.path so we can use eventlet. DO NOT REMOVE
 sys.path.append(os.path.abspath("./python_flask_and_flaskio_and_eventlet_libraries"))
@@ -79,7 +79,7 @@ def index():
     return render_template('index.html', armed=armed, config_file_name = config_file_name, sensor_list=sensor_list, actuator_list=actuator_list)
 
 @app.route('/autosequence', methods=['GET'])
-def autosequence(): 
+def autosequence():
     return render_template('autosequence.html', autosequence_commands=autosequence_commands, abort_sequence_commands= abort_sequence_commands, time_to_show=time_to_show, autosequence_file_name = autosequence_file_name, abort_sequence_file_name = abort_sequence_file_name)
 
 @app.route('/pidview', methods=['GET'])
@@ -91,7 +91,7 @@ def sensors():
     return render_template('sensors.html', sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
 
 @app.route('/actuators', methods=['GET'])
-def autosequence():
+def actuators():
     return render_template('actuators.html', actuator_list=actuator_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states, actuator_states_from_mote=actuator_states_from_mote)
 
 
@@ -102,23 +102,35 @@ def loadConfigFile(CSVFileAndFileContents, fileName):
     config_file_name = fileName
 
     CSVFile = CSVFileAndFileContents[0]
-    fileContents = CSVFileAndFileContents[1] 
+    fileContents = CSVFileAndFileContents[1]
 
     if CSVFile == 'csvFile1':
         global sensor_list
         global actuator_list
-        
+
         try:
             actuator_list, sensor_list = configuration.load_config(fileContents)
-            sensors.initialize_sensor_offset(sensor_list)
             socketio.emit('sensor_and_actuator_config_uploaded')
         except:
             socketio.emit("config_file_header_error")
+
+        sensor.initialize_sensor_offset(sensor_list)
 
 @socketio.on('connect_request')
 def handle_connect_request():
     print("Attempting to send config to MoTE")
     networking.send_config_to_mote(sensor_list, actuator_list) # Networking function
+    networking.start_telemetry_thread()
+    global sensor_thread
+    with sensor_thread_lock:
+        if sensor_thread is None:
+            sensor_thread = socketio.start_background_task(sensor_data_thread)
+    print("started sensor data thread")
+    global connection_thread
+    with connection_thread_lock:
+        if connection_thread is None:
+            connection_thread = socketio.start_background_task(update_connection_status)
+    print("started connection status thread")
 
 @socketio.on('armOrDisarmRequest')
 def armDisarm():
@@ -153,8 +165,8 @@ def handle_button_press(buttonID, state, current_time):
         print("getting ready to send actuator state to mote. the current value of actuator_states_from_mote is:", actuator_states_from_mote)
         actuator_states_and_sensor_tare_states[buttonID] = state
         actuator_states_from_mote[buttonID] = 'unacknoweleged'
-        socketio.emit('responding_with_button_data_from_mote', [buttonID, "unacknoweleged"]) 
-        socketio.emit('responding_with_button_data', [buttonID, state]) 
+        socketio.emit('responding_with_button_data_from_mote', [buttonID, "unacknoweleged"])
+        socketio.emit('responding_with_button_data', [buttonID, state])
         networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], state_bool, buttonDict['Interface Type'])
     else:
         print("stand is disarmed!!! " + buttonID + " was not set to " + state)
@@ -208,11 +220,11 @@ def handle_launch_request():
         socketio.emit('no_autosequence')
         return None
     elif not abort_sequence_commands:
-        socketio.emit('no_abort_sequence') 
+        socketio.emit('no_abort_sequence')
     else:
         socketio.emit('autosequence_started')
         execute_autosequence(autosequence_commands)
-        
+
 
 @socketio.on('start_timer')
 def broadcast_time():
@@ -250,22 +262,19 @@ def handle_cancel_request():
         cancel = True
     else:
         socketio.emit('no_autosequence_running')
-    
+
 
 @socketio.on('guion')
 def guion():
     print('guion was triggered')
-    networking.start_telemetry_thread()
-    global sensor_thread
-    with sensor_thread_lock:
-        if sensor_thread is None:
-            sensor_thread = socketio.start_background_task(sensor_data_thread)
-    print("started sensor data thread")
-    global connection_thread
-    with connection_thread_lock:
-        if connection_thread is None:
-            connection_thread = socketio.start_background_task(update_connection_status)
-    print("started connection status thread")
+
+@socketio.on('tare')
+def handle_tare(sensorID, bool):
+    if bool: 
+        sensor.tare(sensorID)
+    else:
+        sensor.untare(sensorID)
+    
 
 # Home page functions
 def update_connection_status():
@@ -278,11 +287,12 @@ def update_connection_status():
 
 # Sensor page functions
 def sensor_data_thread():
-    socketio.sleep(1) 
+    socketio.sleep(1)
     while True:
         socketio.sleep(1/20)
-        sensors_and_data = networking.get_sensor_data()
-        socketio.emit('sensor_data', [sensors_and_data, time.time_ns() // 1000000])
+        sensors_and_data = sensor.get_sensor_data()
+        # timestamp = time.time_ns() // 1000000
+        socketio.emit('sensor_data', sensors_and_data)
 
 
 # Actuator functions
@@ -293,7 +303,7 @@ def actuator_ack(p_and_id, state):
     actuator_states_from_mote[p_and_id] = "ackefajldfaj;dlf"
     print(actuator_states_from_mote[p_and_id])
     print([p_and_id, state])
-    socketio.emit('responding_with_button_data_from_mote', [p_and_id, state]) 
+    socketio.emit('responding_with_button_data_from_mote', [p_and_id, state])
     print("actuator ack recd in app.py", p_and_id, state)
     return actuator_states_from_mote
 
@@ -328,7 +338,7 @@ def execute_autosequence(commands):
 def execute_abort_sequence(commands):
     global autosequence_occuring
     global cancel
-    
+
     autosequence_occuring = False
     cancel = True
 
@@ -348,14 +358,14 @@ def check_file_format(header):
 
 def parse_and_check_files(file):
     header, commands = autosequence.parse_file(file)
-    if not check_file_format(header): 
+    if not check_file_format(header):
         socketio.emit('file_header_error')
     elif not autosequence.check_actuators_in_sequence(commands, actuator_list):
         print ('file_actuators_error')
         socketio.emit('file_actuators_error')
     else:
-        socketio.emit('valid_file_received')  
-        return commands 
+        socketio.emit('valid_file_received')
+        return commands
 
 # start the app
 if __name__ == '__main__':

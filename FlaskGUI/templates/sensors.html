@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -71,8 +72,8 @@
                         <td>{{ sensor['P and ID'] }}</td>
                         <td id="{{ sensor['P and ID'] }}_data" style="min-width: 100px; max-width: 100px; overflow-wrap: break-word;">No Data</td>
                         <td>{{ sensor['unit'] }}</td>
-                        <td><button id="{{ sensor['P and ID'] }}" onclick="buttonClicked(id, 'tare')" >Tare</button></td>
-                        <td><button id="{{ sensor['P and ID'] }}" onclick="buttonClicked(id, 'untare')" >Untare</button></td>
+                        <td><button id="{{ sensor['P and ID'] }}" onclick="tare(id, true)" >Tare</button></td>
+                        <td><button id="{{ sensor['P and ID'] }}" onclick="tare(id, false)"  >Untare</button></td>
                         <td id="{{ sensor['P and ID'] }}_state" style="min-width: 50px; max-width: 50px; overflow-wrap: break-word;">{{ actuator_states_and_sensor_tare_states[sensor['P and ID']] }}</td>
                         <script> sensorList.push("{{ sensor['P and ID'] }}") </script>
                     </tr>
@@ -89,19 +90,21 @@
 
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-        socket.on('sensor_data', function (data, timestamp) {
+        socket.on('sensor_data', function (sensorDataDict) {
             //console.log('sensor_data emit contents: ', data)
             //console.log('sensor_data emit contents: ', data)
             // right now sending data as a list, index0 = data, index1 = timestamp of data and time of transmission
-            const sensorDataDict = data
-            const timestamp = timestamp
 
-            console.log('received sensor data')
 
-            for((sensorID, sensorValue) in sensorDataDict){
-                const dataCell = document.getElementById(sensorID + '_data');
+            console.log('received sensor data');
+            console.log(sensorDataDict);
 
-                dataCell.textContent = sensorValue.toFixed(3);
+            for(const [sensorID, sensorValue] of Object.entries(sensorDataDict)){
+
+                console.log(sensorID)
+                console.log(sensorValue)
+                
+                document.getElementById(sensorID + '_data').textContent = sensorValue.toFixed(3);
             }
 
             // update data for charts
@@ -119,14 +122,10 @@
 
             console.log('performance.now() showing difference of: ', endTime - startTime);
 
-            const a = document.getElementById("ping");
-            a.textContent = `Time from back to front is: ${Date.now() - timestamp} milliseconds`;
-
         });
 
-        function buttonClicked(id, state) {
-            const current_time = Date.now();
-            socket.emit('received_button_press', id, state, current_time);
+        function tare(sensorID, state) {
+            socket.emit('tare', sensorID, state);
         }
 
 

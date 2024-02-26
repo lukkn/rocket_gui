@@ -1,4 +1,4 @@
-Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit,Unpowered State
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,Unit,Unpowered State
 1,sensor,Teensy ADC,Teensy ADC,14,TNSY,Volts,None
 1,actuator,Binary GPIO,Red Led,8,RLED,None,None
 1,actuator,Binary GPIO,Green Led,11,GLED,None,None

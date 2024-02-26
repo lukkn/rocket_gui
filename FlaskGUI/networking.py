@@ -82,10 +82,10 @@ def send_config_to_mote(sensor_list, actuator_list):
             print("heartbeat thread already started")
 
         try:
-            ping_thread.start() 
+            ping_thread.start()
         except:
             print("ping thread already started")
-            
+
 
     print (sensors_and_actuators_list)
     for sensor in sensors_and_actuators_list:
@@ -119,7 +119,7 @@ def ping_mote():
                 # Building the command. Ex: "ping -c 1 google.com"
                 command = ['ping', '-w', '1', param, '1', ip_address]
                 output = subprocess.check_output(command)
- 
+
                 avgRTT = re.search("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)", str(output)).group(2)
                 delay = float(float(avgRTT)/2)
                 mote_ping[moteID-1] = delay
@@ -147,7 +147,7 @@ def generate_handler():
             for data in data_to_send_to_frontend:
                 pin_num = int(data["Pin"])
 
-                if pin_num == 99: # fireX pin num   
+                if pin_num == 99: # fireX pin num
                     pass
 
                 elif pin_num > 99: # ack for a actuator press
@@ -156,7 +156,7 @@ def generate_handler():
                     app.actuator_ack(p_and_id, state)
                 else: # a sensor reading
                     #        [0]             [1]                   [2]               [3]
-                    # [ ["P and ID"], ["Interface Type"], ["Sensor or Actuator"], ["unit"]]
+                    # [ ["P and ID"], ["Interface Type"], ["Sensor or Actuator"], ["Unit"]]
                     p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actator_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
                     #sensor_value = convert_units(data["Value"], unit)
 
@@ -197,7 +197,7 @@ def convert_to_values(packet, mote_id):
 def create_sensor_dictionary(sensor_and_actator_list):
     dict = {}
     for sensor in sensor_and_actator_list:
-        dict[sensor["Mote id"] + ", " + sensor["Pin"]] = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["unit"]]
+        dict[sensor["Mote id"] + ", " + sensor["Pin"]] = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["Unit"]]
     return dict
 
 def get_sensor_data():

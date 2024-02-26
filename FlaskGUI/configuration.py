@@ -30,7 +30,7 @@ def get_interface_type_number(interface_name):
 
 
 def check_file_header(header_list):
-    example_header = ['Mote id', 'Sensor or Actuator', 'Interface Type', 'Human Name', 'Pin', 'P and ID', 'unit', 'Unpowered State']
+    example_header = ['Mote id', 'Sensor or Actuator', 'Interface Type', 'Human Name', 'Pin', 'P and ID', 'Unit', 'Unpowered State']
     return header_list == example_header
 
 def load_config(file=CONFIG_FILE):
