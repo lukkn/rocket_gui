@@ -118,7 +118,7 @@ def loadConfigFile(CSVFileAndFileContents, fileName):
         except:
             socketio.emit("config_file_header_error")
 
-        sensor.initialize_sensor_offset(sensor_list)
+        sensor.initialize_sensor_info(sensor_list)
 
 @socketio.on('connect_request')
 def handle_connect_request():

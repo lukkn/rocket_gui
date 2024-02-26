@@ -167,9 +167,6 @@ def generate_handler():
     return TelemetryRecieveHandler
 
 def telemetry_reciever():
-    #IP Adresses for HOST
-    #Tim's Laptop: 192.168.1.106
-    #TESTOP 1: 192.168.1.115
     try:
         HOST, PORT = "0.0.0.0", 8888
         with socketserver.UDPServer((HOST, PORT), generate_handler()) as server:
