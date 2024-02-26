@@ -6,7 +6,7 @@ import sys
 import os
 
 # For ping
-sys.path.append(os.path.abspath("./python_flask_and_flaskio_and_eventlet_libraries"))
+sys.path.append(os.path.abspath("./libs"))
 from pythonping import ping
 
 
