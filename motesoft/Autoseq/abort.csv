@@ -1,6 +1,0 @@
-P and ID,State,Time(ms),Comments
-VNNP,False,0,Close VNNP Ox Main Valve
-VNND,False,10,Open VNND FireX
-VNNF,False,20,Close VNNF Fuel Main Valve
-VNND,True,30,Close VNND FireX
-VPTE,False,40,Close VPTE End Engine Purge
