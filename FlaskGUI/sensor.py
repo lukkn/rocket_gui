@@ -1,7 +1,6 @@
 import networking
 import csv
 from datetime import datetime
-import time
 
 sensor_log_path = None
 
@@ -12,11 +11,6 @@ sensor_offset = {}
 sensor_units = {}
 
 def initialize_sensor_info(sensor_list):
-    # header = "Timestamp"
-
-    # for sensor in sensor_list:
-    #     
-    #     header += "," + (sensor["P and ID"])
 
     csv_header_list = ['Timestamp (ms)']
     for sensor in sensor_list:
@@ -89,7 +83,10 @@ def log_sensor_data(timestamp, sensor_data_dict):
     data_to_log = [timestamp]
 
     for sensor in sensor_offset:
-        data_to_log.extend([sensor_data_dict[sensor], unit_converted_data[sensor], sensor_offset[sensor]])
+        try:
+            data_to_log.extend([sensor_data_dict[sensor], unit_converted_data[sensor], sensor_offset[sensor]])
+        except: 
+            data_to_log.extend([None, None, None])
 
     with open(sensor_log_path, "a") as file:
         csv.writer(file).writerow(data_to_log)

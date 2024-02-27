@@ -17,6 +17,7 @@ from threading import Thread
 
 import configuration
 import sensor
+import actuator
 
 # this causes the file to run twice
 #import app
@@ -147,7 +148,7 @@ def generate_handler():
                     # ack for a actuator press
                     p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(int(data["Pin"]) - 100)]
                     state = data["Value"]
-                    #app.actuator_ack(p_and_id, state)
+                    actuator.log_actuator_ack(p_and_id, state)
                 else: 
                     # a sensor reading
                     p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]

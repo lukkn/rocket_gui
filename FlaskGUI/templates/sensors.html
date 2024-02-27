@@ -74,7 +74,6 @@
                         <td>{{ sensor['unit'] }}</td>
                         <td><button id="{{ sensor['P and ID'] }}" onclick="tare(id, true)" >Tare</button></td>
                         <td><button id="{{ sensor['P and ID'] }}" onclick="tare(id, false)"  >Untare</button></td>
-                        <td id="{{ sensor['P and ID'] }}_state" style="min-width: 50px; max-width: 50px; overflow-wrap: break-word;">{{ actuator_states_and_sensor_tare_states[sensor['P and ID']] }}</td>
                         <script> sensorList.push("{{ sensor['P and ID'] }}") </script>
                     </tr>
                 {% endfor %}

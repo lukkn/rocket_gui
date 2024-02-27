@@ -18,7 +18,7 @@ import configuration
 import networking
 import autoseq
 import sensor
-
+import actuator
 
 # Socket IO config
 async_mode = None
@@ -36,10 +36,6 @@ sensor_list = []
 
 mote_ping = []
 config_file_name = None
-
-# dictionary of modified states for sensors + actuators
-actuator_states_and_sensor_tare_states = {}
-actuator_states_from_mote = {}
 
 # Global Variable that determines if stand is armed
 armed = False
@@ -62,6 +58,8 @@ sensor_thread = None
 sensor_thread_lock = Lock()
 connection_thread = None
 connection_thread_lock = Lock()
+actuator_thread = None
+actuator_thread_lock = Lock()
 
 #i am in webthocket hell
 #lmao skill issue
@@ -84,21 +82,22 @@ def autosequence():
 
 @app.route('/pidview' + sessionID, methods=['GET'])
 def pidview():
-    return render_template('pidview.html', actuator_list=actuator_list, sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
+    return render_template('pidview.html', actuator_list=actuator_list, sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator.actuator_states)
 
 @app.route('/sensors' + sessionID, methods=['GET'])
 def sensors():
-    return render_template('sensors.html', sensor_list=sensor_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states)
+    return render_template('sensors.html', sensor_list=sensor_list)
 
 @app.route('/actuators' + sessionID, methods=['GET'])
 def actuators():
-    return render_template('actuators.html', actuator_list=actuator_list, actuator_states_and_sensor_tare_states=actuator_states_and_sensor_tare_states, actuator_states_from_mote=actuator_states_from_mote)
+    return render_template('actuators.html', actuator_list=actuator_list, actuator_states=actuator.actuator_states, actuator_acks = actuator.actuator_acks)
 
 
 # methods to listen for client events
 @socketio.on('uploadConfigFile')
 def loadConfigFile(CSVFileAndFileContents, fileName):
     global config_file_name
+    global actuator_states
     config_file_name = fileName
 
     CSVFile = CSVFileAndFileContents[0]
@@ -110,10 +109,12 @@ def loadConfigFile(CSVFileAndFileContents, fileName):
 
         try:
             actuator_list, sensor_list = configuration.load_config(fileContents)
-            sensor.initialize_sensor_info(sensor_list)
             socketio.emit('sensor_and_actuator_config_uploaded')
         except:
             socketio.emit("config_file_header_error")
+        
+        sensor.initialize_sensor_info(sensor_list)
+        actuator.initialize_actuator_states(actuator_list)
             
 @socketio.on('connect_request')
 def handle_connect_request():
@@ -130,6 +131,11 @@ def handle_connect_request():
         if connection_thread is None:
             connection_thread = socketio.start_background_task(update_connection_status)
     print("started connection status thread")
+    global actuator_thread
+    with actuator_thread_lock:
+        if actuator_thread is None:
+            actuator_thread = socketio.start_background_task(actuator_data_thread)
+    print("started actuator data thread")
 
 @socketio.on('armOrDisarmRequest')
 def armDisarm():
@@ -143,33 +149,21 @@ def armDisarm():
     socketio.emit('armOrDisarmResponse', armed)
     print('variable armed is now: ', armed)
 
-@socketio.on('received_button_press')
+@socketio.on('actuator_button_press')
 def handle_button_press(buttonID, state, current_time):
-    # lookup rest of parameters for buttonID in either sensors or actuators
-    # TODO: IMPORTANT; enforce uniqueness in 'P and ID' for all lines in config file
-    buttonDict = [config_line for config_line in (actuator_list + sensor_list) if config_line['P and ID'] == buttonID][0] # index 0 because list comprehension returns a list containing 1 dictionary
-
-    state_bool = True if state == "on" else False if state == "off" else None
+    state_bool = True if state == "On" else False if state == "Off" else None
+    buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == buttonID][0]
 
     if state_bool is None:
         print(f"Invalid state {state}, no command sent")
         return
 
     print('received button press: ', buttonID, state, 'Delay:',(time.time_ns() // 1_000_000) - current_time)
-    if buttonDict['Sensor or Actuator'] == 'sensor':
-        actuator_states_and_sensor_tare_states[buttonID] = state
-        socketio.emit('responding_with_button_data', [buttonID, state]) # for taring we can just sync the state of the pages, no mote logic needed
-        networking.updateTares(actuator_states_and_sensor_tare_states)
-    elif buttonDict['Sensor or Actuator'] == 'actuator' and armed:
-        print("getting ready to send actuator state to mote. the current value of actuator_states_from_mote is:", actuator_states_from_mote)
-        actuator_states_and_sensor_tare_states[buttonID] = state
-        actuator_states_from_mote[buttonID] = 'unacknoweleged'
-        socketio.emit('responding_with_button_data_from_mote', [buttonID, "unacknoweleged"])
-        socketio.emit('responding_with_button_data', [buttonID, state])
+    if armed:
+        actuator.actuator_acks[buttonID] = False
         networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], state_bool, buttonDict['Interface Type'])
     else:
         print("stand is disarmed!!! " + buttonID + " was not set to " + state)
-
 
 @socketio.on('actuator_button_coordinates')
 def actuator_button_coordinates(get_request_or_coordinate_data):
@@ -290,18 +284,14 @@ def sensor_data_thread():
         #timestamp = time.time_ns() // 1000000
         socketio.emit('sensor_data', sensors_and_data)
 
-
-# Actuator functions
-def actuator_ack(p_and_id, state):
-    #socketio.sleep(1)
-    global actuator_states_from_mote
-    print("what is seen inside actuator_ack:", actuator_states_from_mote)
-    actuator_states_from_mote[p_and_id] = "ackefajldfaj;dlf"
-    print(actuator_states_from_mote[p_and_id])
-    print([p_and_id, state])
-    socketio.emit('responding_with_button_data_from_mote', [p_and_id, state])
-    print("actuator ack recd in app.py", p_and_id, state)
-    return actuator_states_from_mote
+# Actuator page functions
+def actuator_data_thread():
+    socketio.sleep(1)
+    while True:
+        socketio.sleep(1/20)
+        actuator_data = (actuator.get_actuator_states(), actuator.get_actuator_acks())
+        #timestamp = time.time_ns() // 1000000
+        socketio.emit('update_actuator_data', actuator_data)
 
 # Autosequence page functions
 
