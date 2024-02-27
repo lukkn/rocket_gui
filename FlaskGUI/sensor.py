@@ -11,8 +11,6 @@ SCALE_INTERNAL_TEMP = False
 sensor_offset = {}
 sensor_units = {}
 
-sensor_fl = None
-
 def initialize_sensor_info(sensor_list):
     # header = "Timestamp"
 
@@ -33,10 +31,10 @@ def initialize_sensor_info(sensor_list):
     dt_string = datetime.now().strftime("%d%m%Y_%H%M%S")
     sensor_log_path = "FlaskGUI/logs/sensor_log_" + dt_string + ".csv"
 
-    sensor_fl = open(sensor_log_path, "w")
-    csv.writer(sensor_fl).writerow(csv_header_list)
-    sensor_fl.flush()
-    sensor_fl.close()
+    with open(sensor_log_path, "w") as file:
+        csv.writer(file).writerow(csv_header_list)
+        file.flush()
+        file.close()
 
 
 def get_sensor_data():
@@ -86,12 +84,14 @@ def unit_convert(sensor_data_dict):
 
 
 def log_sensor_data(timestamp, sensor_data_dict):
+
     unit_converted_data = unit_convert(sensor_data_dict)
     data_to_log = [timestamp]
 
     for sensor in sensor_offset:
         data_to_log.extend([sensor_data_dict[sensor], unit_converted_data[sensor], sensor_offset[sensor]])
 
-    if sensor_fl != None:
-        csv.writer(sensor_fl).writerow(data_to_log)
-        sensor_fl.flush()
+    with open(sensor_log_path, "a") as file:
+        csv.writer(file).writerow(data_to_log)
+        file.flush()
+        file.close()

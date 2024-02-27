@@ -154,7 +154,7 @@ def generate_handler():
                     #sensor_value = convert_units(data["Value"], unit)
                     most_recent_data_packet[p_and_id] = data["Value"]
             
-            print(most_recent_data_packet["TNSY"])
+            #print(most_recent_data_packet["TNSY"])
             sensor.log_sensor_data(time.time() - start_time, most_recent_data_packet)
 
 
