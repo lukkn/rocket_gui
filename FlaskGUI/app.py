@@ -16,7 +16,7 @@ from flask_socketio import SocketIO
 # import other project files
 import configuration
 import networking
-import autosequence
+import autoseq
 import sensor
 
 
@@ -191,12 +191,10 @@ def handle_autoseqeunce(file, fileName):
     global autosequence_file_name
     global autosequence_commands
     global time_to_show
-    try:
-        autosequence_commands = parse_and_check_files(file)
-        time_to_show = int(int(autosequence_commands[0]['Time(ms)'])/1000)
-        autosequence_file_name = fileName
-    except:
-        print("an autosequence file error occured")
+    autosequence_commands = parse_and_check_files(file)
+    time_to_show = int(int(autosequence_commands[0]['Time(ms)'])/1000)
+    autosequence_file_name = fileName
+    #print("an autosequence file error occured")
 
 
 @socketio.on('abortSequenceFile_uploaded')
@@ -245,7 +243,6 @@ def broadcast_time():
 def handle_abort_request():
     global autosequence_occuring
     print("Received abort request")
-    networking.send_abort_request_to_mote() # Networking function
     if (autosequence_occuring):
         execute_abort_sequence(abort_sequence_commands)
     else:
@@ -290,7 +287,7 @@ def sensor_data_thread():
     while True:
         socketio.sleep(1/20)
         sensors_and_data = sensor.get_sensor_data()
-        # timestamp = time.time_ns() // 1000000
+        #timestamp = time.time_ns() // 1000000
         socketio.emit('sensor_data', sensors_and_data)
 
 
@@ -356,10 +353,10 @@ def check_file_format(header):
     return header[0] == 'P and ID' and header[1] == 'State' and header[2] == 'Time(ms)' and header[3] == 'Comments'
 
 def parse_and_check_files(file):
-    header, commands = autosequence.parse_file(file)
+    header, commands = autoseq.parse_file(file)
     if not check_file_format(header):
         socketio.emit('file_header_error')
-    elif not autosequence.check_actuators_in_sequence(commands, actuator_list):
+    elif not autoseq.check_actuators_in_sequence(commands, actuator_list):
         print ('file_actuators_error')
         socketio.emit('file_actuators_error')
     else:

@@ -1,7 +1,7 @@
-Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit,min,max,window
-3,sensor,SPI_ADC_2ch,PNTB,0,PNTB,None,0,5,0
-3,sensor,SPI_ADC_2ch,PNPC,1,PNPC,None,0,5,0
-3,sensor,SPI_ADC_2ch,POTB,2,POTB,None,0,5,0
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,Unit,Unpowered State
+3,sensor,SPI_ADC_2ch,PNTB,0,PNTB,None
+3,sensor,SPI_ADC_2ch,PNPC,1,PNPC,None
+3,sensor,SPI_ADC_2ch,POTB,2,POTB,None
 3,actuator,Binary GPIO,VNMO,5,VNMO
 3,actuator,Binary GPIO,VNMF,6,VNMF
 3,actuator,Binary GPIO,VPTF,7,VPTF

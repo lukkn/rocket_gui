@@ -1,33 +1,33 @@
-Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,Unpowered State
-3,sensor,SPI_ADC_2ch PGA128,PNTB,0,PNTB,
-3,sensor,SPI_ADC_2ch PGA128,PNPC,1,PNPC,
-3,sensor,SPI_ADC_2ch PGA128,POTB,2,POTB,
-3,actuator,Binary GPIO,VNMO,5,VNMO,
-3,actuator,Binary GPIO,VNMF,6,VNMF,
-3,actuator,Binary GPIO,VPTF,7,VPTF,
-3,actuator,Binary GPIO,IGNTN,8,IGNTN,
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,Unit,Unpowered State
+3,sensor,SPI_ADC_2ch PGA128,PNTB,0,PNTB,None,None
+3,sensor,SPI_ADC_2ch PGA128,PNPC,1,PNPC,None,None
+3,sensor,SPI_ADC_2ch PGA128,POTB,2,POTB,None,None
+3,actuator,Binary GPIO,VNMO,5,VNMO,None,None
+3,actuator,Binary GPIO,VNMF,6,VNMF,None,None
+3,actuator,Binary GPIO,VPTF,7,VPTF,None,None
+3,actuator,Binary GPIO,IGNTN,8,IGNTN,None,None
 
-1,actuator,servoPWM,Nitrogen engine purge,0,VPTE,Open
-1,actuator,Binary GPIO,Fuel bang-bang,0,VNTB,Closed
-1,actuator,servoPWM,Fuel tank vent,1,VFTV,Closed
-1,actuator,Binary GPIO,Ox bang-bang,0,VNTO,Closed
-1,actuator,servoPWM,Ox tank fill,0,VOTF,Open
+1,actuator,servoPWM,Nitrogen engine purge,0,VPTE,None,Open
+1,actuator,Binary GPIO,Fuel bang-bang,0,VNTB,None,Closed
+1,actuator,servoPWM,Fuel tank vent,1,VFTV,None,Closed
+1,actuator,Binary GPIO,Ox bang-bang,0,VNTO,None,Closed
+1,actuator,servoPWM,Ox tank fill,0,VOTF,None,Open
 
-2,sensor,i2c ADC 1ch,Nitrogen storage bottle pressure,0,PNTB,None
-2,sensor,i2c ADC 1ch,Ox storage bottle pressure,1,POTB,None
-2,sensor,Teensy ADC,Teensy ADC,14,TNSY,None
-2,sensor,i2c ADC 1ch,Pressure Transducer PNNP,10,PNNP,
-2,sensor,i2c ADC 1ch,Pressure Transducer PNND,11,PNND,
-2,sensor,i2c ADC 1ch,Pressure Transducer PFPI,12,PFPI,
-2,sensor,i2c ADC 1ch,Pressure Transducer POPI,13,POPI,
-2,sensor,i2c ADC 1ch,Pressure Transducer PNEO,2,PNEO,
-2,sensor,i2c ADC 1ch,Pressure Transducer PNEF,3,PNEF,
-2,actuator,Binary GPIO,12V DUMMY PWR,22,VOPB 
-2,actuator,Binary GPIO,Solenoid VNND,32,VNND,
-2,actuator,Binary GPIO,Solenoid VNNP,31,VNNP,
-2,actuator,Binary GPIO,Solenoid VNMO,23,VXND,
-2,actuator,Binary GPIO,VNTO,5,VNTO,
-2,actuator,Binary GPIO,VNTF,6,VNNF,
-2,actuator,Binary GPIO,VQDA,7,VQDA,
-2,actuator,Binary GPIO,VNOF,8,VNOF,
+2,sensor,i2c ADC 1ch,Nitrogen storage bottle pressure,0,PNTB,None,None
+2,sensor,i2c ADC 1ch,Ox storage bottle pressure,1,POTB,None,None
+2,sensor,Teensy ADC,Teensy ADC,14,TNSY,None,None
+2,sensor,i2c ADC 1ch,Pressure Transducer PNNP,10,PNNP,None,None
+2,sensor,i2c ADC 1ch,Pressure Transducer PNND,11,PNND,None,None
+2,sensor,i2c ADC 1ch,Pressure Transducer PFPI,12,PFPI,None,None
+2,sensor,i2c ADC 1ch,Pressure Transducer POPI,13,POPI,None,None
+2,sensor,i2c ADC 1ch,Pressure Transducer PNEO,2,PNEO,Nones,None
+2,sensor,i2c ADC 1ch,Pressure Transducer PNEF,3,PNEF,None,None
+2,actuator,Binary GPIO,12V DUMMY PWR,22,VOPB,None,None
+2,actuator,Binary GPIO,Solenoid VNND,32,VNND,None,None
+2,actuator,Binary GPIO,Solenoid VNNP,31,VNNP,None,None
+2,actuator,Binary GPIO,Solenoid VNMO,23,VXND,None,None
+2,actuator,Binary GPIO,VNTO,5,VNTO,None,None
+2,actuator,Binary GPIO,VNTF,6,VNNF,None,None
+2,actuator,Binary GPIO,VQDA,7,VQDA,None,None
+2,actuator,Binary GPIO,VNOF,8,VNOF,None,None
 

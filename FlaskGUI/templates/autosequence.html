@@ -14,8 +14,8 @@
             background-color: #21262d;
             height: 100%;
             overflow: hidden;
+            margin: 0;
         }
-
         button {
             margin: 10px;
             padding: 10px;
@@ -54,11 +54,6 @@
         input[type="file"] {
             display: none;
         }
-        #configButtons{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
         #csvFileMessage{
             padding: 10px;
             display: flex;
@@ -66,39 +61,44 @@
             justify-content: center;
             color: #ecf2f8;
         }
-        #configContents {
-            margin: auto;
-            width: 90%;
-        }
         #timer{
             position: fixed;
             top: 40px;
             left: 0;
             font-size: 50px;
-            padding: 5px 10px;
+            padding: 0px 10px;
             margin: 10px;
             border-radius: 5px;
             background-color: #77bdfb;
+            height: 60px;
 
         }
+        #controlButtons{
+            position: fixed;
+            top: 50px;
+            left: 110px;
+            width: calc(100% - 200px)
+        }
+
         #launchButton {
             background-color: #7ce38b;
             font-size: 20px;
             width: 50%;
+            height: 60px;
             padding: 10px;
             margin: 0;
-            margin-bottom: 15px;
             float: left;
         }
         #cancelButton {
             background-color: #faa356;
             font-size: 20px;
             width: 50%;
+            height: 60px;
             padding: 10px;
             margin: 0;
-            margin-bottom: 20px;
             float: left;
         }
+        
         #abortButton {
             position: fixed;
             bottom: 0;
@@ -112,70 +112,22 @@
         #configContainer {
             position: absolute;
             top: 50px;
-            float: left;
             width: 100%;
             height: calc(100vh - 90px);
-            margin-bottom: 100px;
-            overflow: hidden;
-        }
-        .uploadButtonContainers{
-            padding-top: 15px;
-            display: block;
-            text-align: center;
-        }
-        .upload-button {
-            background-color: #77bdfb;
-            color: #ecf2f8;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            overflow: wrap;
-            margin: 10px;
-            width: 180px;
-            text-align: center;
-        }
-        #viewAbortSequence {
-            position: fixed;
-            top: 0;
-            right: 0;
         }
         img {
             width: 50px;
             vertical-align: middle;
             padding: 8px;
         }
-        .menu-content {
-            max-height: 0;
-            overflow: hidden;
-            background-color: #ecf2f8;
-            border-radius: 5px;
-            color: #21262d;
-            opacity: 0.8;
-            width: 90%;
-            margin: auto;
-            margin-top: 10px; 
-            margin-bottom: 10px;
-        }
-        .collapsible-menu table{
-            color: #21262d;
-            padding: 5px;
-        }
-        .collapsible-menu label {
-            position: absolute;
-            top: -10px;
-            right: 0;
-            cursor: pointer;
-            width: 100px;
-            text-align: center;
-            font-size: 13px;
-            padding: 15px;
-            color: #ecf2f8;
-        }
-        input#menu {
+        input#switch {
             display: none;
         }
-        input:checked ~ .menu-content {
-            max-height: 100%;
+        #redlineSwitch {
+            position: fixed;
+            top: 50px;
+            right: 0;
+
         }
 
         .autosequenceActiveRow {
@@ -188,9 +140,94 @@
             color: #21262d;
         }
         
+
+        #frame {
+            margin: 70px auto;
+            width: 90%;
+            max-width: 100%;
+            text-align: center;        
+        }
+ 
+        #frame input[type=radio] {
+            display: none;
+        }
+ 
+        #overflow {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #frame1:checked~#slides .inner {
+            margin-left: 0;
+        }
+ 
+        #frame2:checked~#slides .inner {
+            margin-left: -100%;
+        }
+ 
+        #frame3:checked~#slides .inner {
+            margin-left: -200%;
+        }
+ 
+        #slides .inner {
+            transition: margin-left 400ms cubic-bezier(0.770, 0.000, 0.175, 1.000);
+            width: 300%;
+            line-height: 0.8;
+            height: calc(100vh - 240px);
+        }
+
+        #slides .frame {
+            width: calc(100%/3);
+            float: left;
+            height: 100%;
+            color: #ecf2f8;
+        }
+
+        #bullets {
+            width: 100%;
+            height: 30px;
+        }
+ 
+        #bullets label {
+            display: inline-block;
+            width: calc((100% - 9px) /3);
+            height: 25px;
+            background: #ecf2f8;
+            vertical-align: middle;
+            padding-top: 5px;
+        }
+ 
+        #frame1:checked~#bullets label:nth-child(1),
+        #frame2:checked~#bullets label:nth-child(2),
+        #frame3:checked~#bullets label:nth-child(3) {
+            background: #444;
+            color: #ecf2f8;
+        }
+
+        .uploadButton {
+            width: 30px;
+            height: 30px;
+            border: none;
+            float: left;
+            margin-right: 10px;
+        }
+
+        .uploadButton img{
+            cursor: pointer;
+            width: 80%;
+            padding: 0;
+        }
+
         .fileName{
             color: #fa7970;
             text-align: center;
+            float: left;
+            margin-top: 10px;
+        }
+
+        .fileUploadDisplay{
+            display: inline-block;
+            margin-bottom: 5px;
         }
 
     </style>
@@ -204,41 +241,86 @@
     <div id="configContainer">
         <div id="timer">0 s</div>
         <div id="configButtons">
-            <div class = "uploadButtonContainers"> 
-                <label for="autosequenceFile" class="upload-button">Upload Autosequence</label>
-                <input type="file" id="autosequenceFile" accept=".csv" onchange="submitCSV('autosequenceFile')">
-                <br><br> <div class = "fileName" id = "autosequenceFileName">No autosequence file</div>
-            </div>
-            <div class = "uploadButtonContainers">
-                <label for="abortSequenceFile" class="upload-button">Upload Abort Sequence</label>
-                <input type="file" id="abortSequenceFile" accept=".csv" onchange="submitCSV('abortSequenceFile')">
-                <br><br> <div class = "fileName" id = "abortSequenceFileName">No abort sequence file</div>
-            </div>
+
+        <div id = "controlButtons">
+            <form onsubmit="return false;">
+                <button id="launchButton" onclick="launch()">
+                LAUNCH
+                </button>
+            </form>
+            <form onsubmit="return false;">
+                <button id="cancelButton" onclick="cancel()">
+                    CANCEL
+                </button>
+            </form>
+        </div>
+            
+        <div id="redlineSwitch">
+            <input type="checkbox" id="switch">
+            <label for="switch"><img src = "../static/icons/menu_icon.png"></label>
         </div>
 
-        <div class="collapsible-menu">
-            <input type="checkbox" id="menu">
-            <label for="menu"><img src = "../static/icons/menu_icon.png">
-                <br> Abort Sequence</label>
-            <div class="menu-content">
-                <table id = "abortSequenceTable">
-                </table>
+        
+        
+        <div id="frame">
+            <input type="radio" name="frame" id="frame1" checked />
+            <input type="radio" name="frame" id="frame2" />
+            <input type="radio" name="frame" id="frame3" />
+            <div id="bullets">
+                <label for="frame1">Autosequence</label>
+                <label for="frame2">Abort Sequence</label>
+                <label for="frame3">Redline</label>
             </div>
-        </div>
-
-        <form onsubmit="return false;">
-            <button id="launchButton" onclick="launch()">
-            LAUNCH
-            </button>
-        </form>
-        <form onsubmit="return false;">
-            <button id="cancelButton" onclick="cancel()">
-               CANCEL
-            </button>
-        </form>
-        <div id="configContents">
-            <table id="autosequenceTable">
-            </table>
+            <div id="slides">
+                <div id="overflow">
+                    <div class="inner">
+                        <div class="frame autosequenceSlide">
+                            <div class="frame-content">
+                                <br>
+                                <div class = "fileUploadDisplay">
+                                    <div class = 'uploadButton'>
+                                        <label for="autosequenceFile"><img src = "../static/icons/upload_icon.png"></label>
+                                        <input type="file" id="autosequenceFile" accept=".csv" onchange="submitCSV('autosequenceFile')">
+                                    </div>
+                                    <div class = "fileName" id = "autosequenceFileName">No autosequence file</div> 
+                                </div>
+                                <br>
+                                <table id="autosequenceTable">
+                                </table>
+                            </div>
+                        </div>
+                        <div class="frame abortSequenceSlide">
+                            <div class="frame-content">
+                                <br>
+                                <div class = "fileUploadDisplay">
+                                    <div class = 'uploadButton'>
+                                        <label for="abortSequenceFile"><img src = "../static/icons/upload_icon.png"></label>
+                                        <input type="file" id="abortSequenceFile" accept=".csv" onchange="submitCSV('abortSequenceFile')">
+                                    </div>
+                                    <div class = "fileName" id = "abortSequenceFileName">No abort sequence file</div>
+                                </div>
+                                <br>
+                                <table id = "abortSequenceTable">
+                                </table>
+                            </div>
+                        </div>
+                        <div class="frame redlineSlide">
+                            <div class="frame-content">
+                                <br>
+                                <div class = "fileUploadDisplay">
+                                    <div class = 'uploadButton'>
+                                        <label for="autosequenceFile"><img src = "../static/icons/upload_icon.png"></label>
+                                        <input type="file" id="autosequenceFile" accept=".csv" onchange="submitCSV('autosequenceFile')">
+                                    </div>
+                                    <div class = "fileName" id = "redlineFileName">No redline file</div>
+                                </div>
+                                <br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </div>
     
@@ -274,7 +356,6 @@
             }
             if (abort_sequence_commands.length > 0) {
                 displayCSV(abort_sequence_commands, "abortSequence")
-                document.getElementById('menu').checked = true;
             }
             if (autosequence_file_name != 'None') {
                 fileName = document.getElementById("autosequenceFileName")
@@ -351,17 +432,18 @@
         }
 
         function cancel(){
+            document.getElementById('frame1').checked = true;
             socket.emit('cancel_request');
             location.reload;
         }
 
         function abort(){
-            document.getElementById('menu').checked = true;
+            document.getElementById('frame2').checked = true;
             socket.emit('abort_request');
         }
 
         function launch() {
-            // TODO: make sure autosequence and abort sequence both uploaded before launch
+            document.getElementById('frame1').checked = true;
             socket.emit('launch_request');
             socket.on('autosequence_started', function() {
                 socket.emit('start_timer');
@@ -370,9 +452,6 @@
             });
         }
 
-        function showAbortSequence() {
-            // TODO: display abort sequence
-        }
 
         socket.on('autosequence_command_sent', function (command) {
             rowID = command['P and ID'] + command['State'] + command['Time(ms)'];
@@ -404,10 +483,6 @@
 
         socket.on('no_autosequence_running', function(){
             alert ("No autosequence running.")
-        });
-
-        socket.on('abort', function(){
-            showAbortSequence();
         });
 
         socket.on('disconnect', function (reason) {

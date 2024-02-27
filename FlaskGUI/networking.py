@@ -26,7 +26,7 @@ mote_ping = [None, None, None, None]
 
 # value = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["unit"]]
 sensor_and_actuator_dictionary = {'1, 99': ['FireX', None, None, None]}
-most_recent_data_packet = []
+most_recent_data_packet = {}
 
 actuator_states_and_sensor_tare_states = {}
 
@@ -89,8 +89,6 @@ def send_config_to_mote(sensor_list, actuator_list):
         except:
             print("ping thread already started")
 
-
-    print (sensors_and_actuators_list)
     for sensor in sensors_and_actuators_list:
         #skip labjacks
         if int(sensor['Mote id']) >= 10:
@@ -139,8 +137,6 @@ def generate_handler():
             global most_recent_data_packet
             global actuator_states_and_sensor_tare_states
 
-            sensor_value_dict = {}
-
             for data in data_to_send_to_frontend:
                 pin_num = int(data["Pin"])
 
@@ -156,11 +152,10 @@ def generate_handler():
                     # a sensor reading
                     p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
                     #sensor_value = convert_units(data["Value"], unit)
-
-                    sensor_value_dict[p_and_id] = data["Value"]
-
-            most_recent_data_packet = sensor_value_dict
-            sensor.log_sensor_data(time.time() - start_time, sensor_value_dict)
+                    most_recent_data_packet[p_and_id] = data["Value"]
+            
+            print(most_recent_data_packet["TNSY"])
+            sensor.log_sensor_data(time.time() - start_time, most_recent_data_packet)
 
 
     return TelemetryRecieveHandler
