@@ -253,7 +253,6 @@
         // var screenHeight = window.screen.availHeight;
 
         document.addEventListener('DOMContentLoaded', function() {
-            socket.emit('guion');
 
             // update the button color on page load or reload
             // TODO: make this dependent on something more robust
@@ -305,18 +304,24 @@
             }
         });
 
-        socket.on('mote_ping', function(mote_pings) {
-            mote_pings.forEach(function(mote_ping, mote_num){
+        socket.on('mote_status', function(mote_info_list) {
+            console.log(mote_info_list)
+            mote_info_list.forEach(function(mote_info, mote_num){
+                mote_ping = mote_info[1]
+                mote_status = mote_info[0]
+
                 connection = document.getElementById('mote' + (mote_num+1) + 'connection');
                 ping = document.getElementById('mote' + (mote_num+1) + 'ping');
-                if (mote_ping == null){
+                if (mote_status == false){
                     connection.style.color = "#fa7970";
                     connection.textContent = "Disconnected";
                     ping.textContent = "";
                 } else {
                     connection.style.color = "#7ce38b";
                     connection.textContent = "Connected";
-                    ping.textContent = mote_ping.toString();
+                    if (mote_ping != null) {
+                        ping.textContent = mote_ping.toString();
+                    }
                 }
             });
         });

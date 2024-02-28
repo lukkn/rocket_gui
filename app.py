@@ -34,7 +34,7 @@ print("sessionID", sessionID)
 actuator_list = []
 sensor_list = []
 
-mote_ping = []
+mote_status = []
 config_file_name = None
 
 # Global Variable that determines if stand is armed
@@ -58,17 +58,9 @@ sensor_thread = None
 sensor_thread_lock = Lock()
 connection_thread = None
 connection_thread_lock = Lock()
-actuator_thread = None
-actuator_thread_lock = Lock()
 
 #i am in webthocket hell
 #lmao skill issue
-
-
-# webbrowser.open_new('http://127.0.0.1:5000/sensors')
-# webbrowser.open_new('http://127.0.0.1:5000/actuators')
-# webbrowser.open_new('http://127.0.0.1:5000/pidview')
-webbrowser.open_new('http://127.0.0.1:5001/' + sessionID) # + sessionID here if needed
 
 
 # flask routes for webpages
@@ -116,26 +108,11 @@ def loadConfigFile(CSVFileAndFileContents, fileName):
         sensor.initialize_sensor_info(sensor_list)
         actuator.initialize_actuator_states(actuator_list)
             
+
 @socketio.on('connect_request')
 def handle_connect_request():
     print("Attempting to send config to MoTE")
     networking.send_config_to_mote(sensor_list, actuator_list) # Networking function
-    networking.start_telemetry_thread()
-    global sensor_thread
-    with sensor_thread_lock:
-        if sensor_thread is None:
-            sensor_thread = socketio.start_background_task(sensor_data_thread)
-    print("started sensor data thread")
-    global connection_thread
-    with connection_thread_lock:
-        if connection_thread is None:
-            connection_thread = socketio.start_background_task(update_connection_status)
-    print("started connection status thread")
-    global actuator_thread
-    with actuator_thread_lock:
-        if actuator_thread is None:
-            actuator_thread = socketio.start_background_task(actuator_data_thread)
-    print("started actuator data thread")
 
 @socketio.on('armOrDisarmRequest')
 def armDisarm():
@@ -253,11 +230,6 @@ def handle_cancel_request():
     else:
         socketio.emit('no_autosequence_running')
 
-
-@socketio.on('guion')
-def guion():
-    print('guion was triggered')
-
 @socketio.on('tare')
 def handle_tare(sensorID, bool):
     if bool: 
@@ -268,33 +240,28 @@ def handle_tare(sensorID, bool):
 
 # Home page functions
 def update_connection_status():
-    global mote_ping
+    print("started connection status thread")
+    global mote_status
     while True:
-        mote_ping = networking.get_mote_ping()
-        socketio.emit('mote_ping', mote_ping)
+        mote_status = networking.get_mote_status()
+        socketio.emit('mote_status', mote_status)
         socketio.sleep(1)
 
 
-# Sensor page functions
-def sensor_data_thread():
+# Sensor and actuator acks page functions
+def sensor_data_and_actuator_acks_thread():
+    print("started sensor data thread")
     socketio.sleep(1)
     while True:
         socketio.sleep(1/20)
         sensors_and_data = sensor.get_sensor_data()
-        #timestamp = time.time_ns() // 1000000
-        socketio.emit('sensor_data', sensors_and_data)
-
-# Actuator page functions
-def actuator_data_thread():
-    socketio.sleep(1)
-    while True:
-        socketio.sleep(1/20)
         actuator_data = (actuator.get_actuator_states(), actuator.get_actuator_acks())
         #timestamp = time.time_ns() // 1000000
+        socketio.emit('sensor_data', sensors_and_data)
         socketio.emit('update_actuator_data', actuator_data)
 
-# Autosequence page functions
 
+# Autosequence page functions
 def execute_autosequence(commands):
     global autosequence_occuring
     global time_to_show
@@ -329,7 +296,6 @@ def execute_abort_sequence(commands):
     cancel = True
 
     for command in commands:
-        timeAtBeginning = time.perf_counter()
         stringState = 'on' if command['State'] == True else 'off' # on/off state used in webpages
         socketio.emit('responding_with_button_data', [command['P and ID'], stringState])
         command['Completed'] = True
@@ -338,8 +304,7 @@ def execute_abort_sequence(commands):
         if command['Type'] == 'Actuator' :
             buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
             networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command['State'], buttonDict['Interface Type'])
-        while (time.perf_counter() - timeAtBeginning) < command['Sleep time(ms)']/1000:
-            socketio.sleep(.0001)
+        time.sleep(command['Sleep time(ms)']/1000)
 
 def check_file_format(header):
     return header[0] == 'P and ID' and header[1] == 'State' and header[2] == 'Time(ms)' and header[3] == 'Comments'
@@ -355,6 +320,25 @@ def parse_and_check_files(file):
         socketio.emit('valid_file_received')
         return commands
 
-# start the app
+
+
+
+# start all background threads
+networking.start_telemetry_thread()
+
+with sensor_thread_lock:
+    if sensor_thread is None:
+        sensor_thread = socketio.start_background_task(sensor_data_and_actuator_acks_thread)
+
+with connection_thread_lock:
+    if connection_thread is None:
+        connection_thread = socketio.start_background_task(update_connection_status)
+
+
+# open the GUI interface (this is the last thing that runs besides functions)
+webbrowser.open_new('http://127.0.0.1:5001/' + sessionID) # + sessionID here if needed
+
+
+# start the app (this is the first thing that runs)
 if __name__ == '__main__':
     socketio.run(app, port=5001, debug=False)

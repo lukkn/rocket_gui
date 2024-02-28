@@ -4,12 +4,9 @@ import time
 
 import sys, os
 
-# For ping
-# if there are yellow error squiggles under some import stuff ignore it
-custom_libs_path = os.path.abspath("./libs")
+custom_libs_path = os.path.abspath("./libs2")
 sys.path.insert(0, custom_libs_path)
-from pythonping import ping
-
+from ping3 import ping
 
 # For threading
 import threading
@@ -23,7 +20,8 @@ import actuator
 #import app
 
 start_time = time.time()
-mote_ping = [None, None, None, None]
+mote_status = [[False, None], [False, None], [False, None], [False, None]]
+last_mote_time = [0, 0, 0, 0]
 
 # value = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["unit"]]
 sensor_and_actuator_dictionary = {'1, 99': ['FireX', None, None, None]}
@@ -57,6 +55,7 @@ def send_actuator_command(mote_id, pin_num, state, interface_type='Binary GPIO')
     sock.sendto(bytes([int(pin_num), config_byte]), (ip, 8888))
 
 def send_heartbeat():
+    print("Started heartbeat thread")
     while True:
         # send 3 UDP packets for redundancy
         send_actuator_command(1, 100, True, interface_type='Heartbeat')
@@ -66,11 +65,13 @@ def send_heartbeat():
         time.sleep(2.5)
 
 heartbeat_thread = Thread(target=send_heartbeat, daemon=True)
+heartbeat_thread.start()
 
 def send_config_to_mote(sensor_list, actuator_list):
     global sensor_and_actuator_dictionary
     sensor_and_actuator_dictionary.update(create_sensor_dictionary(sensor_list + actuator_list))
     sensors_and_actuators_list = sensor_list + actuator_list
+
     print("sent sensor config data to mote")
     for m in range(1, 4):
         reset_command = bytearray(2)
@@ -79,16 +80,6 @@ def send_config_to_mote(sensor_list, actuator_list):
         reset_command[1] |= 0b00111111 & configuration.get_interface_type_number('Clear_Config')
 
         sock.sendto(reset_command, (get_ip(m), 8888))
-
-        try:
-            heartbeat_thread.start()
-        except:
-            print("heartbeat thread already started")
-
-        try:
-            ping_thread.start()
-        except:
-            print("ping thread already started")
 
     for sensor in sensors_and_actuators_list:
         #skip labjacks
@@ -110,22 +101,23 @@ def send_config_to_mote(sensor_list, actuator_list):
         time.sleep(0.1)
 
 def ping_mote():
+    print("Started pinging thread")
     while True:
         for moteID in range(1, 5):
             ip_address = get_ip(mote_id=moteID)
-            pingResponse = ping(ip_address, count=1, timeout=0.100) # 100msec ping is too high
-            success = pingResponse.stats_packets_returned
-            delay = pingResponse.rtt_avg_ms
-            if success > 0:
-                mote_ping[moteID-1] = delay
-                #print("thread ping", delay)
+
+            if time.time() - last_mote_time[moteID - 1] >= 1:
+                mote_status[moteID - 1] = [False, None]
             else:
-                mote_ping[moteID-1] = None
-                #print("ping for mote " +  str(moteID) +  " returned error code 1")
+                # don't attempt to ping if the box is not there
+                pingRepsonse = ping(ip_address, unit='ms', timeout=1)
+                if pingRepsonse is not None:
+                    mote_status[moteID - 1] = [True, round(pingRepsonse, 2)]
+
         time.sleep(1)
 
 ping_thread = Thread(target=ping_mote, daemon=True)   # Make a new thread to run ping_mote function
-
+ping_thread.start()
 
 def generate_handler():
     class TelemetryRecieveHandler(socketserver.BaseRequestHandler):
@@ -134,46 +126,49 @@ def generate_handler():
             mote_id = self.client_address[0][-1]
             data_to_send_to_frontend = convert_to_values(data, mote_id)
 
+            mote_status[int(mote_id) - 1][0] = True
+            last_mote_time[int(mote_id) - 1] = time.time()
+
             global sensor_and_actuator_dictionary
             global most_recent_data_packet
             global actuator_states_and_sensor_tare_states
 
-            for data in data_to_send_to_frontend:
-                pin_num = int(data["Pin"])
+            if sensor_and_actuator_dictionary != {'1, 99': ['FireX', None, None, None]}:
+                try:
 
-                if pin_num == 99: 
-                    # fireX pin num
-                    pass
-                elif pin_num > 99: 
-                    # ack for a actuator press
-                    p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(int(data["Pin"]) - 100)]
-                    state = data["Value"]
-                    actuator.log_actuator_ack(p_and_id, state)
-                else: 
-                    # a sensor reading
-                    p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
-                    #sensor_value = convert_units(data["Value"], unit)
-                    most_recent_data_packet[p_and_id] = data["Value"]
-            
-            #print(most_recent_data_packet["TNSY"])
-            sensor.log_sensor_data(time.time() - start_time, most_recent_data_packet)
+                    for data in data_to_send_to_frontend:
+                        pin_num = int(data["Pin"])
 
+                        if pin_num == 99: 
+                            # fireX pin num
+                            pass
+                        elif pin_num > 99: 
+                            # ack for a actuator press
+                            p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(int(data["Pin"]) - 100)]
+                            state = data["Value"]
+                            actuator.log_actuator_ack(p_and_id, state)
+                        else: 
+                            # a sensor reading
+                            p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
+                            #sensor_value = convert_units(data["Value"], unit)
+                            most_recent_data_packet[p_and_id] = data["Value"]
+                    
+                    #print(most_recent_data_packet["TNSY"])
+                    sensor.log_sensor_data(time.time() - start_time, most_recent_data_packet)
+                except:
+                    print("You fucked up! Restart the goddamn Motes!!!")
 
     return TelemetryRecieveHandler
 
 def telemetry_reciever():
-    try:
-        HOST, PORT = "0.0.0.0", 8888
-        with socketserver.UDPServer((HOST, PORT), generate_handler()) as server:
-            server.serve_forever()
-            print("telemetry thread started")
-    except:
-        print('telermetry thread already started, cannot start another')
+    print("Started telemetry thread")
+    HOST, PORT = "0.0.0.0", 8888
+    with socketserver.UDPServer((HOST, PORT), generate_handler()) as server:
+        server.serve_forever()
 
 def start_telemetry_thread():
     telemetry_thread = Thread(target=telemetry_reciever, daemon=True)
     telemetry_thread.start()
-
 
 def convert_to_values(packet, mote_id):
     data = packet[0]
@@ -183,7 +178,6 @@ def convert_to_values(packet, mote_id):
         value = int.from_bytes(data[5*i+1:5*i+5], byteorder='little', signed=True) # Tim did not have signed parameter in his networking code
         parsed_data.append({'Mote id': mote_id, 'Pin': pin_num, 'Value': value})
     return parsed_data
-
 
 # converts list of sensors and actuators to a single dictionary for O(1) lookup time
 def create_sensor_dictionary(sensor_and_actuator_list):
@@ -203,5 +197,5 @@ def updateTares(actuator_states_and_sensor_tare_states_from_app_dot_py):
 def convert_units(value, unit):
     pass
 
-def get_mote_ping():
-    return mote_ping
+def get_mote_status():
+    return mote_status
