@@ -23,7 +23,7 @@ def initialize_sensor_info(sensor_list):
     # initialize sensor_log
     global sensor_log_path
     dt_string = datetime.now().strftime("%d%m%Y_%H%M%S")
-    sensor_log_path = "FlaskGUI/logs/sensor_log_" + dt_string + ".csv"
+    sensor_log_path = "logs/sensor_log_" + dt_string + ".csv"
 
     with open(sensor_log_path, "w") as file:
         csv.writer(file).writerow(csv_header_list)

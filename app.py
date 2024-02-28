@@ -41,15 +41,10 @@ config_file_name = None
 armed = False
 
 # Autosequence
-autosequence_file_name = None
-autosequence_commands = []
-cancel = False # has cancel button been pressed
+
+autosequence_cancel = False # has cancel button been pressed
 autosequence_occuring = False # this will be used to block most functions while autosequence is occuring
 time_to_show = 0
-
-# Abort sequence
-abort_sequence_file_name = None
-abort_sequence_commands = []
 
 app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app, async_mode=async_mode)
@@ -70,7 +65,7 @@ def index():
 
 @app.route('/autosequence' + sessionID, methods=['GET'])
 def autosequence():
-    return render_template('autosequence.html', autosequence_commands=autosequence_commands, abort_sequence_commands= abort_sequence_commands, time_to_show=time_to_show, autosequence_file_name = autosequence_file_name, abort_sequence_file_name = abort_sequence_file_name)
+    return render_template('autosequence.html', autosequence_commands=autoseq.autosequence_commands, abort_sequence_commands= autoseq.abort_sequence_commands, time_to_show=time_to_show, autosequence_file_name = autoseq.autosequence_file_name, abort_sequence_file_name = autoseq.abort_sequence_file_name, redline_file_name = autoseq.redline_file_name, redline_states = autoseq.redline_states )
 
 @app.route('/pidview' + sessionID, methods=['GET'])
 def pidview():
@@ -89,7 +84,6 @@ def actuators():
 @socketio.on('uploadConfigFile')
 def loadConfigFile(CSVFileAndFileContents, fileName):
     global config_file_name
-    global actuator_states
     config_file_name = fileName
 
     CSVFile = CSVFileAndFileContents[0]
@@ -107,6 +101,7 @@ def loadConfigFile(CSVFileAndFileContents, fileName):
         
         sensor.initialize_sensor_info(sensor_list)
         actuator.initialize_actuator_states(actuator_list)
+        autoseq.initialize_sensors_and_actuators(sensor_list, actuator_list)
             
 
 @socketio.on('connect_request')
@@ -159,39 +154,36 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
 
 @socketio.on('autosequenceFile_uploaded')
 def handle_autoseqeunce(file, fileName):
-    global autosequence_file_name
-    global autosequence_commands
     global time_to_show
-    autosequence_commands = parse_and_check_files(file)
-    time_to_show = int(int(autosequence_commands[0]['Time(ms)'])/1000)
-    autosequence_file_name = fileName
+    message = autoseq.parse_and_check_sequence_files('autosequence', fileName, file)
+    time_to_show = int(int(autoseq.autosequence_commands[0]['Time(ms)'])/1000)
+    socketio.emit(message)
     #print("an autosequence file error occured")
 
 
 @socketio.on('abortSequenceFile_uploaded')
 def handle_abort_sequence(file, fileName):
-    global abort_sequence_file_name
-    global abort_sequence_commands
-    try:
-        abort_sequence_commands = parse_and_check_files(file)
-        abort_sequence_file_name = fileName
-    except:
-        print("an abort sequence file error occured")
+    message = autoseq.parse_and_check_sequence_files('abort_sequence', fileName, file)
+    socketio.emit(message)
+
+@socketio.on('redlineFile_uploaded')
+def handle_redline(file, fileName):
+    message = autoseq.parse_and_check_redline(file, fileName)
+    socketio.emit(message)
 
 
 @socketio.on('launch_request')
 def handle_launch_request():
-    global autosequence_commands
     if autosequence_occuring:
         return None
-    elif not autosequence_commands:
+    elif not autoseq.autosequence_commands:
         socketio.emit('no_autosequence')
         return None
-    elif not abort_sequence_commands:
+    elif not autoseq.abort_sequence_commands:
         socketio.emit('no_abort_sequence')
     else:
         socketio.emit('autosequence_started')
-        execute_autosequence(autosequence_commands)
+        execute_autosequence()
 
 
 @socketio.on('start_timer')
@@ -203,7 +195,7 @@ def broadcast_time():
         timeAtBeginning = time.perf_counter()
         socketio.emit('current_time', time_to_show)
         while (time.perf_counter() - timeAtBeginning) < 1:
-            if cancel or not autosequence_occuring:
+            if autosequence_cancel or not autosequence_occuring:
                 print("timer stopped, thread ended")
                 return None
             socketio.sleep(.01)
@@ -215,7 +207,7 @@ def handle_abort_request():
     global autosequence_occuring
     print("Received abort request")
     if (autosequence_occuring):
-        execute_abort_sequence(abort_sequence_commands)
+        execute_abort_sequence()
     else:
         socketio.emit('no_autosequence_running')
 
@@ -225,8 +217,8 @@ def handle_cancel_request():
     global autosequence_occuring
     print("Received cancel request at",time_to_show,"seconds")
     if (autosequence_occuring):
-        global cancel
-        cancel = True
+        global autosequence_cancel
+        autosequence_cancel = True
     else:
         socketio.emit('no_autosequence_running')
 
@@ -255,6 +247,7 @@ def sensor_data_and_actuator_acks_thread():
     while True:
         socketio.sleep(1/20)
         sensors_and_data = sensor.get_sensor_data()
+        autoseq.redline_check(sensors_and_data)
         actuator_data = (actuator.get_actuator_states(), actuator.get_actuator_acks())
         #timestamp = time.time_ns() // 1000000
         socketio.emit('sensor_data', sensors_and_data)
@@ -262,15 +255,15 @@ def sensor_data_and_actuator_acks_thread():
 
 
 # Autosequence page functions
-def execute_autosequence(commands):
+def execute_autosequence():
     global autosequence_occuring
     global time_to_show
-    global cancel
+    global autosequence_cancel
 
     autosequence_occuring = True
-    cancel = False
-    time_to_show = int(int(autosequence_commands[0]['Time(ms)'])/1000)
-    for command in commands:
+    autosequence_cancel = False
+    time_to_show = int(int(autoseq.autosequence_commands[0]['Time(ms)'])/1000)
+    for command in autoseq.autosequence_commands:
         timeAtBeginning = time.perf_counter()
         stringState = 'on' if command['State'] == True else 'off' # on/off state used in webpages
         socketio.emit('responding_with_button_data', [command['P and ID'], stringState])
@@ -281,21 +274,21 @@ def execute_autosequence(commands):
             buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
             networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command['State'], buttonDict['Interface Type'])
         while (time.perf_counter() - timeAtBeginning) < command['Sleep time(ms)']/1000:
-            if cancel or not autosequence_occuring:
+            if autosequence_cancel or not autosequence_occuring:
                 autosequence_occuring = False
                 print("Launch cancelled")
                 return None
             socketio.sleep(.0001)
     autosequence_occuring = False
 
-def execute_abort_sequence(commands):
+def execute_abort_sequence():
     global autosequence_occuring
-    global cancel
+    global autosequence_cancel
 
     autosequence_occuring = False
-    cancel = True
+    autosequence_cancel = True
 
-    for command in commands:
+    for command in autoseq.abort_sequence_commands:
         stringState = 'on' if command['State'] == True else 'off' # on/off state used in webpages
         socketio.emit('responding_with_button_data', [command['P and ID'], stringState])
         command['Completed'] = True
@@ -306,19 +299,6 @@ def execute_abort_sequence(commands):
             networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command['State'], buttonDict['Interface Type'])
         time.sleep(command['Sleep time(ms)']/1000)
 
-def check_file_format(header):
-    return header[0] == 'P and ID' and header[1] == 'State' and header[2] == 'Time(ms)' and header[3] == 'Comments'
-
-def parse_and_check_files(file):
-    header, commands = autoseq.parse_file(file)
-    if not check_file_format(header):
-        socketio.emit('file_header_error')
-    elif not autoseq.check_actuators_in_sequence(commands, actuator_list):
-        print ('file_actuators_error')
-        socketio.emit('file_actuators_error')
-    else:
-        socketio.emit('valid_file_received')
-        return commands
 
 
 
