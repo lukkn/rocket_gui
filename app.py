@@ -329,6 +329,7 @@ def execute_abort_sequence(commands):
     cancel = True
 
     for command in commands:
+        timeAtBeginning = time.perf_counter()
         stringState = 'on' if command['State'] == True else 'off' # on/off state used in webpages
         socketio.emit('responding_with_button_data', [command['P and ID'], stringState])
         command['Completed'] = True
@@ -337,7 +338,8 @@ def execute_abort_sequence(commands):
         if command['Type'] == 'Actuator' :
             buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
             networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command['State'], buttonDict['Interface Type'])
-        time.sleep(command['Sleep time(ms)']/1000)
+        while (time.perf_counter() - timeAtBeginning) < command['Sleep time(ms)']/1000:
+            socketio.sleep(.0001)
 
 def check_file_format(header):
     return header[0] == 'P and ID' and header[1] == 'State' and header[2] == 'Time(ms)' and header[3] == 'Comments'
