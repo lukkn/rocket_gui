@@ -20,33 +20,94 @@
         column-gap: 10px;
         margin: 0;
         font-size: 14px;
+        border-collapse: collapse;
+        display: block;
+    }
+    button {
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+    }
+    .sidebar{
+        position: fixed;
+        top: 40px;
+        height: 100%;
+        width: 60px;
+        background-color:#161b22;
+        text-align: center;
     }
     #listContainer {
-        width: 100%;
-        margin-right: 2%;
+        position: fixed; 
+        top: 40px;
+        left: -10px;
+        width: calc(100% - 60px);
+        margin: 0 0 0 70px;
+        float: left;
+        max-height: 0;
+        overflow: hidden;
+        background-color:#21262d;
     }
-    #chartContainer {
-        width: 100%;
+    input:checked ~ #listContainer{
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    input:checked ~ #chartContainer{
+        top: 200px;
+        height: calc(100% - 260px);
+    }
+    #chartContainer{
+        position: fixed;
+        top: 50px;
+        left: 70px;
+        height: calc(100% - 60px);
+        width: calc(100% - 70px);
+        overflow-y: auto;
     }
     #addChart {
         margin-bottom: 1%;
     }
     canvas {
-        border: 1px solid;
-        height: 100%;
-        margin-top: 10px;
+        float: left;
+        background-color: #ecf2f8;
+        color: #161b22;
+    }
+    .container {
+        position: relative;
+        float: left;
+        min-width: 250px;
+        margin: 10px;
+        padding: 10px;
+        background-color: #ecf2f8;
+    }
+    .removeButton {
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: 15px;
     }
     #titleBar{
+        position: fixed;
         display: grid;
         align-items: center;
         width: 100%;
         height: 40px;
         background-color: #161b22;
         padding-left: 20px;
+        margin-bottom: 10px;
     }
     table {
-        width: 100%
+        width: 100%;
+        text-align: center;
     }
+    th {
+        padding: 10px 5px; 
+    }
+
+    table, th, td {
+        border: solid;
+        border-collapse: collapse;
+    }
+    
 </style>
 
 <body>
@@ -54,44 +115,45 @@
         <b>Sensors</b>
     </div>
 
-    <div id = "listContainer">
-        <table border="2" id="sensorsTable">
-            <thead>
-                <tr>
-                    <th>Sensor Name</th>
-                    <th>Data</th>
-                    <th>Units</th>
-                    <th>Tare</th>
-                    <th>Untare</th>
-                    <th>Last Sent <br> Command</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sensor in sensor_list %}
+    <div class = "sidebar">
+        <input type = "checkbox" id = "table" style = "display: none">
+        <label for = "table" title = "show table" style = "cursor: pointer;"><img src = "../static/icons/table_icon.png" style = "width: 30px; margin-top: 10px;"></label>
+        <div id = "listContainer">
+            <table id="sensorsTable">
+                <thead style = "background-color:#ecf2f8; color:#161b22">
                     <tr>
-                        <td>{{ sensor['P and ID'] }}</td>
-                        <td id="{{ sensor['P and ID'] }}_data" style="min-width: 100px; max-width: 100px; overflow-wrap: break-word;">No Data</td>
-                        <td>{{ sensor['unit'] }}</td>
-                        <td><button id="{{ sensor['P and ID'] }}" onclick="tare(id, true)" >Tare</button></td>
-                        <td><button id="{{ sensor['P and ID'] }}" onclick="tare(id, false)"  >Untare</button></td>
-                        <script> sensorList.push("{{ sensor['P and ID'] }}") </script>
+                        <th>Sensor Name</th>
+                        <th>Data</th>
+                        <th>Units</th>
+                        <th>Tare</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for sensor in sensor_list %}
+                        <tr>
+                            <td>{{ sensor['P and ID'] }}</td>
+                            <td id="{{ sensor['P and ID'] }}_data" style="min-width: 100px; max-width: 100px; overflow-wrap: break-word;">No Data</td>
+                            <td>{{ sensor['Unit'] }}</td>
+                            <td><button id="{{ sensor['P and ID'] }}" onclick="tare(id, true)" >Tare</button><button id="{{ sensor['P and ID'] }}" onclick="tare(id, false)"  >Untare</button></td>
+                            <script> sensorList.push("{{ sensor['P and ID'] }}") </script>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <button id="addChart" title = "add chart" onClick = "addChart()" style = "margin-top: 20px; background-color: transparent;"><img src = "../static/icons/add_icon.png" style = "width: 30px"></button>
+        <div id="chartContainer"></div>
     </div>
 
-    <div id="chartContainer">
-        <button id="addChart" onClick = "addChart()">Add Chart</button>
-    </div>
+    
+
+    
 
     <script>
 
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
         socket.on('sensor_data', function (sensorDataDict) {
-            console.log(sensorDataDict);
-
             for(const [sensorID, sensorValue] of Object.entries(sensorDataDict)){
                 document.getElementById(sensorID + '_data').textContent = sensorValue.toFixed(3);
             }
@@ -99,9 +161,9 @@
             updateData(sensorDataDict, 20*15);
 
             // plot updated data for each chart
-            const canvasList = document.getElementsByTagName('canvas');
-            for (canvas of canvasList){
-                plotLines(canvas.id);
+            const containerList = document.getElementsByTagName('container');
+            for (container of containerList){
+                plotLines(container.id.replace("container", ""));
             }
         });
 
@@ -140,35 +202,37 @@
             const chartNumber = chartCounter;
             chartCounter ++;
 
+            // create new div for chart and checkboxes
+            var container = document.createElement("container");
+            container.id = "container" + chartNumber;
+            container.className = "container";
+            container.setAttribute("style", "width: calc(50% - 40px);");
+            document.getElementById("chartContainer").appendChild(container);
+
             // create new canvas in chartContainer
             var canvas = document.createElement("canvas");
             canvas.id = "chart" + chartNumber;
-            canvas.width = 600;
-            canvas.height = 300;
-            canvas.style.display = "block";
-            document.getElementById("chartContainer").appendChild(canvas);
+            container.appendChild(canvas);
+            canvas.width = canvas.parentElement.clientWidth - 20;
 
 
             var removeButton = document.createElement("button");
             removeButton.id = "removeButton" + chartNumber;
-            removeButton.textContent = "Remove Chart";
+            removeButton.textContent = "X";
+            removeButton.className = "removeButton"
             removeButton.addEventListener('click', function() {
                 removeChart(chartNumber);
             });
-            document.getElementById("chartContainer").appendChild(removeButton);
+            container.appendChild(removeButton);
 
-            createEmptyChart(canvas.id, sensorList);
+            createEmptyChart(container.id, sensorList);
         }
 
         function removeChart(chartNumber){
-            canvasID = "chart" + chartNumber;
-            const canvas = document.getElementById(canvasID);
-            document.getElementById("chartContainer").removeChild(canvas);
-
-            const removeButton = document.getElementById("removeButton" + chartNumber);
-            document.getElementById("chartContainer").removeChild(removeButton);
-
-            removeCheckboxes(canvasID, sensorList);
+            containerID = "container" + chartNumber;
+            const container = document.getElementById(containerID);
+            document.getElementById("chartContainer").removeChild(container);
+            removeCheckboxes(containerID, sensorList);
         }
 
 

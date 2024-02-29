@@ -25,7 +25,6 @@ def initialize_sensor_info(sensor_list):
     global sensor_log_path
     dt_string = datetime.now().strftime("%d%m%Y_%H%M%S")
     sensor_log_path += dt_string + ".csv"
-
     with open(sensor_log_path, "w") as file:
         csv.writer(file).writerow(csv_header_list)
         file.flush()

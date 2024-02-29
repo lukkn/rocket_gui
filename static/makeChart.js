@@ -16,12 +16,14 @@ var dataDict = Object.create(null);
 var maxLabel = -Infinity;
 var minLabel = Infinity;
 
-function plotLines(canvasID) {
-    defineScale(canvasID);
+function plotLines(chartNumber) {
+    const canvasID = "chart" + chartNumber
+    const containerID = "container" + chartNumber
+    defineScale(containerID);
 
     const canvas = document.getElementById(canvasID);
     const context = canvas.getContext('2d');
-    const activeSensors = activeSensorsList[canvasID];
+    const activeSensors = activeSensorsList[containerID];
 
     // clear canvas
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -30,13 +32,13 @@ function plotLines(canvasID) {
     context.beginPath();
     context.moveTo(40, canvas.height);
     context.lineTo(40, 0);
-    context.strokeStyle = 'black';
+    context.strokeStyle = '#161b22';
     context.stroke();
 
     const yStep = (maxLabel - minLabel) / 10;
 
     // Draw grid and y-axis labels
-    context.fillStyle = 'black';
+    context.fillStyle = '#161b22';
     context.font = 'bold 12px Arial';
     for (let i = 0; i <= 10; i++) {
         // determine position
@@ -44,13 +46,13 @@ function plotLines(canvasID) {
 
         // draw labels
         const yLabel = (minLabel + i * yStep).toFixed(1);
-        context.fillText(yLabel, 10, yPosition);
+        context.fillText(yLabel, 5, yPosition);
 
         // draw grid lines
         context.beginPath();
         context.moveTo(40, yPosition);
         context.lineTo(canvas.width, yPosition);
-        context.strokeStyle = 'LightGray';
+        context.strokeStyle = '#89929b';
         context.stroke();
     }
 
@@ -76,10 +78,10 @@ function plotLines(canvasID) {
     });
 }
 
-function defineScale(canvasID){
+function defineScale(containerID){
 
     // Find the data range of all active plots on the canvas
-    const activeSensors = activeSensorsList[canvasID];
+    const activeSensors = activeSensorsList[containerID];
     const activeData = [];
 
     activeSensors.forEach(function (sensor) {
@@ -90,19 +92,18 @@ function defineScale(canvasID){
     minLabel = Math.floor(Math.min(...activeData));
 }
 
-function createEmptyChart(canvasID, sensorsList){
-    createCheckboxes(canvasID, sensorsList);
-    activeSensorsList[canvasID] = [];
+function createEmptyChart(containerID, sensorsList){
+    activeSensorsList[containerID] = [];
+    createCheckboxes(containerID, sensorsList);
     sensorsList.forEach(function(sensorName) {
         dataDict[sensorName] = [];
     });
 
 }
 
-function createCheckboxes(canvasID, sensorList){
+function createCheckboxes(containerID, sensorList){
     // Create empty chart in the canvas with checkboxes for each sensor
-    const canvas = document.getElementById(canvasID);
-    const container = document.getElementById("chartContainer");
+    const container = document.getElementById(containerID);
     let index = 0;
 
     sensorList.forEach(function (sensor) {
@@ -113,14 +114,14 @@ function createCheckboxes(canvasID, sensorList){
         // Create checkboxes
         let checkbox = document.createElement('INPUT');
         checkbox.type = "checkbox";
-        checkbox.class = canvas.id;
-        checkbox.id = canvas.id + sensor + "Checkbox";
+        checkbox.class = container.id;
+        checkbox.id = container.id + sensor + "Checkbox";
         checkbox.addEventListener('change', function() {
-            handleGraphCheckbox(canvas.id, checkbox.id, sensor);
+            handleGraphCheckbox(container.id, checkbox.id, sensor);
         })
 
         let label = document.createElement('label')
-        label.id = canvas.id + sensor + "Label";
+        label.id = container.id + sensor + "Label";
         label.htmlFor = "id";
         label.style.color = sensorColors[sensor];
         label.appendChild(document.createTextNode(sensor));
@@ -128,18 +129,15 @@ function createCheckboxes(canvasID, sensorList){
         container.appendChild(checkbox);
         container.appendChild(label);
     });
-
-    // Create entry in dictionary for current chart
-    activeSensorsList[canvas.id] = [];
 }
 
-function removeCheckboxes(canvasID, sensorList){
-    const canvas = document.getElementById(canvasID);
+function removeCheckboxes(containerID, sensorList){
+    const canvas = document.getElementById(containerID);
     const container = document.getElementById("chartContainer");
 
     sensorList.forEach(function (sensor) {
-        const checkbox = document.getElementById(canvasID + sensor + "Checkbox");
-        const label = document.getElementById(canvasID + sensor + "Label");
+        const checkbox = document.getElementById(containerID + sensor + "Checkbox");
+        const label = document.getElementById(containerID + sensor + "Label");
 
         container.removeChild(checkbox);
         container.removeChild(label);
@@ -149,18 +147,19 @@ function removeCheckboxes(canvasID, sensorList){
 function updateData(sensorDataDict, dataLength) {
     for(const [sensorID, sensorValue] of Object.entries(sensorDataDict)){
         let data = dataDict[sensorID];
-        data.push(sensorValue);
-
-        if (data.length > dataLength) {
-            // Discard the oldest data points
-            // TODO: next ambitious person should make a circlular buffer class
-            data.shift();
+        if (data != undefined){
+            data.push(sensorValue);
+            if (data.length > dataLength) {
+                // Discard the oldest data points
+                // TODO: next ambitious person should make a circlular buffer class
+                data.shift();
+            }
         }
     }
 }
 
-function handleGraphCheckbox(canvasID, checkboxID, sensor){
-    let activeSensors = activeSensorsList[canvasID]
+function handleGraphCheckbox(containerID, checkboxID, sensor){
+    let activeSensors = activeSensorsList[containerID]
 
     checkbox = document.getElementById(checkboxID);
     if (checkbox.checked){
