@@ -90,25 +90,11 @@
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
         socket.on('sensor_data', function (sensorDataDict) {
-            //console.log('sensor_data emit contents: ', data)
-            //console.log('sensor_data emit contents: ', data)
-            // right now sending data as a list, index0 = data, index1 = timestamp of data and time of transmission
-
-
-            console.log('received sensor data');
             console.log(sensorDataDict);
 
             for(const [sensorID, sensorValue] of Object.entries(sensorDataDict)){
-
-                console.log(sensorID)
-                console.log(sensorValue)
-                
                 document.getElementById(sensorID + '_data').textContent = sensorValue.toFixed(3);
             }
-
-            // update data for charts
-            const startTime = performance.now();
-
             // second param is number of data points to store for graphing
             updateData(sensorDataDict, 20*15);
 
@@ -117,10 +103,6 @@
             for (canvas of canvasList){
                 plotLines(canvas.id);
             }
-            const endTime = performance.now();
-
-            console.log('performance.now() showing difference of: ', endTime - startTime);
-
         });
 
         function tare(sensorID, state) {

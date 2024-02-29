@@ -40,7 +40,6 @@ libs/h11/tests/__pycache__/
 libs/werkzeug/middleware/__pycache__/
 libs/pythonping/__pycache__/
 
-sensor_data_log
 motesoft/Logs
 logs
 

@@ -4,6 +4,7 @@ import time
 
 import sys, os
 
+# DO NOT REMOVE: ignore error, path is appended and libary will import at runtime
 custom_libs_path = os.path.abspath("./libs2")
 sys.path.insert(0, custom_libs_path)
 from ping3 import ping
@@ -16,8 +17,7 @@ import configuration
 import sensor
 import actuator
 
-# this causes the file to run twice
-#import app
+
 
 start_time = time.time()
 mote_status = [[False, None], [False, None], [False, None], [False, None]]
@@ -122,9 +122,9 @@ ping_thread.start()
 def generate_handler():
     class TelemetryRecieveHandler(socketserver.BaseRequestHandler):
         def handle(self):
-            data = self.request
+            packet_data = self.request
             mote_id = self.client_address[0][-1]
-            data_to_send_to_frontend = convert_to_values(data, mote_id)
+            data_list = convert_to_values(packet_data, mote_id)
 
             mote_status[int(mote_id) - 1][0] = True
             last_mote_time[int(mote_id) - 1] = time.time()
@@ -133,30 +133,38 @@ def generate_handler():
             global most_recent_data_packet
             global actuator_states_and_sensor_tare_states
 
-            if sensor_and_actuator_dictionary != {'1, 99': ['FireX', None, None, None]}:
-                try:
+            # check for config
+            if sensor_and_actuator_dictionary == {'1, 99': ['FireX', None, None, None]}:
+                return
+            
+            sensor_data = {}
+            actuator_data = {}
 
-                    for data in data_to_send_to_frontend:
-                        pin_num = int(data["Pin"])
+            for data in data_list:
+                pin_num = int(data["Pin"])
 
-                        if pin_num == 99: 
-                            # fireX pin num
-                            pass
-                        elif pin_num > 99: 
-                            # ack for a actuator press
-                            p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(int(data["Pin"]) - 100)]
-                            state = data["Value"]
-                            actuator.log_actuator_ack(p_and_id, state)
-                        else: 
-                            # a sensor reading
-                            p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
-                            #sensor_value = convert_units(data["Value"], unit)
-                            most_recent_data_packet[p_and_id] = data["Value"]
+                if pin_num == 99: 
+                    # fireX pin num
+                    pass
+                elif pin_num > 99: 
+                    # ack for a actuator press
+                    p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(int(data["Pin"]) - 100)]
+                    state = data["Value"]
+                    actuator.log_actuator_ack(p_and_id, state)
+                    actuator_data[p_and_id] = state
                     
-                    #print(most_recent_data_packet["TNSY"])
-                    sensor.log_sensor_data(time.time() - start_time, most_recent_data_packet)
-                except:
-                    print("You fucked up! Restart the goddamn Motes!!!")
+                else: 
+                    # a sensor reading
+                    p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
+                    sensor_data[p_and_id] = data["Value"]
+
+            if sensor_data:
+                most_recent_data_packet = sensor_data
+                sensor.log_sensor_data(time.time() - start_time, sensor_data)
+            if actuator_data:
+                actuator.log_actuator_data(time.time() - start_time, actuator_data)
+                
+        
 
     return TelemetryRecieveHandler
 

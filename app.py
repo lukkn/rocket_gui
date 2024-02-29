@@ -176,6 +176,8 @@ def handle_redline(file, fileName):
 def handle_launch_request():
     if autosequence_occuring:
         return None
+    elif armed == False:
+        return None
     elif not autoseq.autosequence_commands:
         socketio.emit('no_autosequence')
         return None
