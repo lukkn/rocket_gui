@@ -38,9 +38,7 @@
             font-size: 15px;
         }
 
-        #titleBar{
-            position: absolute;
-            top: 0;
+        #titleBar {
             display: grid;
             align-items: center;
             width: 100%;
@@ -48,6 +46,40 @@
             background-color: #161b22;
             padding-left: 20px;
             color: #ecf2f8;
+            font-size: 14px;
+        }
+        #titleBar img{
+            width: 20px;
+            padding: 0;
+        }
+        #systemOverview {
+            display: block;
+            position: absolute;
+            top: 10px;
+            right: 60px;
+        }
+        .connectionStatus{
+            float: left;
+            margin-left: 5px;
+        }
+        #armDisarmButton{
+            background-color: transparent;
+            position: absolute;
+            right: 0;
+        }
+
+        #systemTimeContainer{
+            display: block;
+            position: absolute;
+            left: calc(50vw - 30px);
+        }
+        #systemTimeIcon{
+            float: left;
+            margin-right: 10px;
+        }
+        #systemTime{
+            float: left;
+            margin-top: 2px;
         }
 
         /* Style for file input and upload button */
@@ -237,9 +269,22 @@
 </head>
 
 <body>
-    <div id = "titleBar">
+    <div id="titleBar">
         <b>Autosequence</b>
-    </div>
+        <button id="armDisarmButton" onclick="socket.emit('armOrDisarmRequest');" >
+          <img id = "armDisarmImg" src = "../static/icons/disarmed_icon.png"> 
+        </button>
+        <div  id = "systemOverview">
+          <div class = "connectionStatus" title = "Purge Panel"><img id = "mote1connection" src = "../static/icons/red_1_icon.png"></div>
+          <div class = "connectionStatus" title = "Pneumatics Panel"><img id = "mote2connection" src = "../static/icons/red_2_icon.png"></div>
+          <div class = "connectionStatus" title = "Tank Stand"><img id = "mote3connection" src = "../static/icons/red_3_icon.png"></div>
+          <div class = "connectionStatus" title = "LoRA"><img id = "mote4connection" src = "../static/icons/red_4_icon.png"></div>
+        </div>
+        <div id = "systemTimeContainer" title = "System Time">
+          <img id = "systemTimeIcon" src = "../static/icons/time_icon.png">
+          <div id = "systemTime">0s</div>
+        </div>
+      </div>
 
     <div id="configContainer">
         <div id="timer">0 s</div>
@@ -505,6 +550,31 @@
 
         socket.on('file_sensors_error', function(){
             alert("File contains invalid sensors")
+        });
+
+        socket.on('mote_status_and_system_time', function(mote_info_list, system_time) {
+            mote_info_list.forEach(function(mote_info, mote_num){
+                const mote_status = mote_info[0]
+                const connection = document.getElementById('mote' + (mote_num+1) + 'connection');
+                if (mote_status == false){
+                connection.src = "../static/icons/red_" + (mote_num+1) + "_icon.png"
+                } else {
+                connection.src = "../static/icons/green_" + (mote_num+1) + "_icon.png"
+                }
+            });
+            const time = document.getElementById("systemTime")
+            time.textContent = Math.trunc(system_time) + "s"
+            });
+
+        socket.on('armOrDisarmResponse', function (boolean_state) {
+            const armDisarmButton = document.getElementById('armDisarmButton');
+            console.log(armDisarmImg);
+            // Toggle the text and color
+            if (boolean_state) {
+                armDisarmButton.innerHTML = '<img id = "armDisarmImg" src = "../static/icons/armed_icon.png">';
+            } else {
+                armDisarmButton.innerHTML = '<img id = "armDisarmImg" src = "../static/icons/disarmed_icon.png">';
+            }
         });
 
         window.onbeforeunload = confirmExit;

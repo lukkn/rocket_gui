@@ -75,11 +75,53 @@
   .onButtonWhenOn {
     background-color: #7ce38b;
   }
+  #systemOverview {
+    display: block;
+    position: absolute;
+    top: 10px;
+    right: 60px;
+  }
+  .connectionStatus{
+    float: left;
+    margin-left: 5px;
+  }
+  #armDisarmButton{
+    background-color: transparent;
+    position: absolute;
+    right: 0;
+  }
+
+  #systemTimeContainer{
+    display: block;
+    position: absolute;
+    left: calc(50vw - 30px);
+  }
+  #systemTimeIcon{
+    float: left;
+    margin-right: 10px;
+  }
+  #systemTime{
+    float: left;
+    margin-top: 2px;
+  }
 </style>
 
 <body>
   <div id="titleBar">
     <b>Actuators</b>
+    <button id="armDisarmButton" onclick="socket.emit('armOrDisarmRequest');" >
+      <img id = "armDisarmImg" src = "../static/icons/disarmed_icon.png"> 
+    </button>
+    <div  id = "systemOverview">
+      <div class = "connectionStatus" title = "Purge Panel"><img id = "mote1connection" src = "../static/icons/red_1_icon.png"></div>
+      <div class = "connectionStatus" title = "Pneumatics Panel"><img id = "mote2connection" src = "../static/icons/red_2_icon.png"></div>
+      <div class = "connectionStatus" title = "Tank Stand"><img id = "mote3connection" src = "../static/icons/red_3_icon.png"></div>
+      <div class = "connectionStatus" title = "LoRA"><img id = "mote4connection" src = "../static/icons/red_4_icon.png"></div>
+    </div>
+    <div id = "systemTimeContainer" title = "System Time">
+      <img id = "systemTimeIcon" src = "../static/icons/time_icon.png">
+      <div id = "systemTime">0s</div>
+    </div>
   </div>
   <table>
     <thead>
@@ -103,7 +145,7 @@
             class="onButtonWhen{{ actuator_states[actuator['P and ID']] }}"
             onclick="buttonClicked(name, 'On')">On</button>
         </td>
-        <td id="{{ actuator['P and ID'] }}_ack"><img id="{{ actuator['P and ID'] }}_ack_img" src=""></td>
+        <td id="{{ actuator['P and ID'] }}_ack"><img id="{{ actuator['P and ID'] }}_ack_img" src="../static/icons/noack_icon.png"></td>
       </tr>
       {% endfor %}
     </tbody>
@@ -115,7 +157,6 @@
     var actuator_acks = JSON.parse('{{ actuator_acks|tojson|safe }}');
 
     document.addEventListener('DOMContentLoaded', function () {
-      console.log(actuator_acks)
       actuator_list.forEach(function (actuator) {
         const ack_image = document.getElementById(actuator['P and ID'] + "_ack_img")
         if (actuator_acks[actuator['P and ID']] == true) {
@@ -163,6 +204,31 @@
     socket.on('sensor_and_actuator_config_uploaded', function () {
       location.reload();
     });
+
+    socket.on('mote_status_and_system_time', function(mote_info_list, system_time) {
+      mote_info_list.forEach(function(mote_info, mote_num){
+        const mote_status = mote_info[0]
+        const connection = document.getElementById('mote' + (mote_num+1) + 'connection');
+        if (mote_status == false){
+          connection.src = "../static/icons/red_" + (mote_num+1) + "_icon.png"
+        } else {
+          connection.src = "../static/icons/green_" + (mote_num+1) + "_icon.png"
+        }
+      });
+      const time = document.getElementById("systemTime")
+      time.textContent = Math.trunc(system_time) + "s"
+    });
+
+    socket.on('armOrDisarmResponse', function (boolean_state) {
+            const armDisarmButton = document.getElementById('armDisarmButton');
+            console.log(armDisarmImg);
+            // Toggle the text and color
+            if (boolean_state) {
+                armDisarmButton.innerHTML = '<img id = "armDisarmImg" src = "../static/icons/armed_icon.png">';
+            } else {
+                armDisarmButton.innerHTML = '<img id = "armDisarmImg" src = "../static/icons/disarmed_icon.png">';
+            }
+        });
 
   </script>
 

@@ -27,6 +27,23 @@
             background-color: #161b22;
             padding-left: 20px;
         }
+        #titleBar img{
+            width: 20px;
+            padding: 0;
+        }
+        #systemTimeContainer{
+            display: block;
+            position: absolute;
+            left: calc(50vw - 30px);
+        }
+        #systemTimeIcon{
+            float: left;
+            margin-right: 10px;
+        }
+        #systemTime{
+            float: left;
+            margin-top: 2px;
+        }
 
         #pageLinks {
             display: block;
@@ -116,6 +133,10 @@
 <body>
     <div id = "titleBar">
         <b>Home</b>
+        <div id = "systemTimeContainer" title = "System Time">
+            <img id = "systemTimeIcon" src = "../static/icons/time_icon.png">
+            <div id = "systemTime">0s</div>
+          </div>
     </div>
 
     <!-- Page Links -->
@@ -303,8 +324,7 @@
             }
         });
 
-        socket.on('mote_status', function(mote_info_list) {
-            console.log(mote_info_list)
+        socket.on('mote_status_and_system_time', function(mote_info_list, system_time) {
             mote_info_list.forEach(function(mote_info, mote_num){
                 mote_ping = mote_info[1]
                 mote_status = mote_info[0]
@@ -323,6 +343,8 @@
                     }
                 }
             });
+            const time = document.getElementById("systemTime")
+            time.textContent = Math.trunc(system_time) + "s"
         });
 
         socket.on("config_file_header_error", function(){
