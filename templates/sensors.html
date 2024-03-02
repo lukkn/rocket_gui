@@ -137,10 +137,18 @@
         border: solid;
         border-collapse: collapse;
     }
-    
-</style>
+    #watermark {
+        position: absolute;
+        top: 35vh;
+        left: calc(25vw + 40px);
+        width: 50vw;
+        z-index: -1;
+        opacity: 0.05;
+    }
 
+</style>
 <body>
+    <img id = "watermark" src = "../static/icons/logo.png">
     <div id="titleBar">
         <b>Sensors</b>
         <button id="armDisarmButton" onclick="socket.emit('armOrDisarmRequest');" >

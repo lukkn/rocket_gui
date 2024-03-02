@@ -19,15 +19,6 @@
     font-size: 14px;
   }
 
-  #titleBar {
-    display: grid;
-    align-items: center;
-    width: 100%;
-    height: 40px;
-    background-color: #161b22;
-    padding-left: 20px;
-  }
-
   th {
     padding: 10px;
     border-bottom: double #ecf2f8 5px;
@@ -75,6 +66,14 @@
   .onButtonWhenOn {
     background-color: #7ce38b;
   }
+  #titleBar {
+    display: grid;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    background-color: #161b22;
+    padding-left: 20px;
+  }
   #systemOverview {
     display: block;
     position: absolute;
@@ -104,9 +103,18 @@
     float: left;
     margin-top: 2px;
   }
-</style>
+  #watermark {
+        position: absolute;
+        top: 35vh;
+        left: 25vw;
+        width: 50vw;
+        z-index: -1;
+        opacity: 0.05;
+  }
 
+</style>
 <body>
+    <img id = "watermark" src = "../static/icons/logo.png">
   <div id="titleBar">
     <b>Actuators</b>
     <button id="armDisarmButton" onclick="socket.emit('armOrDisarmRequest');" >

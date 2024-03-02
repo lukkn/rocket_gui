@@ -6,7 +6,7 @@ import networking
 sensor_log_path = "logs/sensor_log_"
 
 internal_temp = 20 # assume room temp
-SCALE_INTERNAL_TEMP = False
+SCALE_INTERNAL_TEMP = True
 
 sensor_offset = {}
 sensor_units = {}
@@ -46,11 +46,12 @@ def tare(sensorID):
 def untare(sensorID):
     sensor_offset[sensorID] = 0
 
+def process_sensor_dict(sensor_data_dict):
+    processed_dict = {}
+    global internal_temp
 
-def unit_convert(sensor_data_dict):
     for sensor in sensor_data_dict:
-        # convert adc to volts
-        raw_value = sensor_data_dict[sensor]
+        raw_value = sensor_data_dict[sensor] - sensor_offset[sensor]
         val_in_volts = raw_value / 1000.0
 
         match sensor_units[sensor]:
@@ -72,19 +73,27 @@ def unit_convert(sensor_data_dict):
                 raw_value = val_in_volts*1014.54 - 32.5314
             case "lbs_engine":
                 raw_value = (-val_in_volts*5128.21 - 11.2821)/2
+            case "alt_ft":
+                raw_value = raw_value * 3.281 #m to ft. Dammit Kamer!
+            case "g_force":
+                raw_value = raw_value * 0.00102 # cm/s^2 to G
             case _ :
-                print("Unexpected Unit")
-    return sensor_data_dict
+                pass
+                #print("Unexpected Unit")
+        
+        processed_dict[sensor] = raw_value
+
+    return processed_dict
 
 
 def log_sensor_data(timestamp, sensor_data_dict):
 
-    unit_converted_data = unit_convert(sensor_data_dict)
+    processed_data_dict = process_sensor_dict(sensor_data_dict)
     data_to_log = [timestamp]
 
     for sensor in sensor_offset:
         try:
-            data_to_log.extend([sensor_data_dict[sensor], unit_converted_data[sensor], sensor_offset[sensor]])
+            data_to_log.extend([sensor_data_dict[sensor], processed_data_dict[sensor], sensor_offset[sensor]])
         except: 
             data_to_log.extend([None, None, None])
 

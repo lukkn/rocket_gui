@@ -1,0 +1,23 @@
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,Unit,Unpowered State
+3,sensor,SPI_ADC_2ch PGA128,PNTB,0,PNTB,PSI_M5k
+3,sensor,SPI_ADC_2ch PGA128,PNPC,1,PNPC,PSI_M1k
+3,sensor,SPI_ADC_2ch PGA128,POTB,2,POTB,PSI_M1k
+3,actuator,Binary GPIO,VNMO,5,VNMO
+3,actuator,Binary GPIO,VNMF,6,VNMF
+3,actuator,Binary GPIO,VPTF,7,VPTF
+3,actuator,Binary GPIO,IGNTN,8,IGNTN
+2,actuator,Binary GPIO,VNTO,5,VNTO
+2,actuator,Binary GPIO,VNTF,6,VNTF
+2,actuator,Binary GPIO,VQDA,7,VQDA
+2,actuator,Binary GPIO,VNOF,8,VNOF
+1,sensor,SPI_ADC_1ch,POTR,0,POTR,PSI_H5k
+1,sensor,SPI_ADC_1ch,PFTR,1,PFTR,PSI_H5k
+1,sensor,SPI_ADC_1ch,POIM,2,POIM,PSI_S1k
+1,sensor,SPI_ADC_1ch,PFIM,3,PFIM,PSI_S1k
+1,sensor,SPI_ADC_1ch,PMCC,4,PMCC,PSI_S1k
+1,sensor,SPI_ADC_2ch PGA128,TOTR,10,TOTR,Degrees C
+1,sensor,ADC Internal Temp,Icarus Av Temp,8,ITMP,C Internal
+1,sensor,Icarus_ALT,Altitude,49,ALTM,alt_ft
+1,sensor,Icarus_IMU,Acceleration X,50,IMUX,g_force
+1,sensor,Icarus_IMU,Acceleration Y,51,IMUY,g_force
+1,sensor,Icarus_IMU,Acceleration Z,52,IMUZ,g_force

@@ -272,10 +272,11 @@ def execute_autosequence():
         socketio.emit('responding_with_button_data', [command['P and ID'], stringState])
         command['Completed'] = True
         socketio.emit('autosequence_command_sent', command)
+        command_bool = True if command['State'].lower() == 'true' else False
         # send actuator to mote #
         if command['Type'] == 'Actuator' :
             buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
-            networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command['State'], buttonDict['Interface Type'])
+            networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command_bool, buttonDict['Interface Type'])
         while (time.perf_counter() - timeAtBeginning) < command['Sleep time(ms)']/1000:
             if autosequence_cancel or not autosequence_occuring:
                 autosequence_occuring = False
@@ -296,15 +297,12 @@ def execute_abort_sequence():
         socketio.emit('responding_with_button_data', [command['P and ID'], stringState])
         command['Completed'] = True
         socketio.emit('abort_sequence_command_sent', command)
+        command_bool = True if command['State'].lower() == 'true' else False
         # send actuator to mote #
         if command['Type'] == 'Actuator' :
             buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
-            networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command['State'], buttonDict['Interface Type'])
+            networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command_bool, buttonDict['Interface Type'])
         time.sleep(command['Sleep time(ms)']/1000)
-
-
-
-
 
 # start all background threads
 networking.start_telemetry_thread()

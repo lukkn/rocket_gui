@@ -121,16 +121,23 @@
             border-collapse: collapse;
             border-style: hidden;
         }
-
         fieldset {
             margin: 20px;
         }
-
+        #watermark {
+            position: absolute;
+            top: 35vh;
+            left: 25vw;
+            width: 50vw;
+            z-index: -1;
+            opacity: 0.05;
+        }
 
     </style>
 </head>
 
 <body>
+    <img id = "watermark" src = "../static/icons/logo.png">
     <div id = "titleBar">
         <b>Home</b>
         <div id = "systemTimeContainer" title = "System Time">
