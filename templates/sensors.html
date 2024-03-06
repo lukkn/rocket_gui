@@ -152,7 +152,7 @@
     <div id="titleBar">
         <b>Sensors</b>
         <button id="armDisarmButton" onclick="socket.emit('armOrDisarmRequest');" >
-          <img id = "armDisarmImg" src = "../static/icons/disarmed_icon.png"> 
+          <img id = "armDisarmImg" src = "{% if armed %}../static/icons/armed_icon.png{% else %}../static/icons/disarmed_icon.png{% endif %}"> 
         </button>
         <div  id = "systemOverview">
           <div class = "connectionStatus" title = "Purge Panel"><img id = "mote1connection" src = "../static/icons/red_1_icon.png"></div>

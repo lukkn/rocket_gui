@@ -65,7 +65,7 @@ def index():
 
 @app.route('/autosequence' + sessionID, methods=['GET'])
 def autosequence():
-    return render_template('autosequence.html', autosequence_commands=autoseq.autosequence_commands, abort_sequence_commands= autoseq.abort_sequence_commands, time_to_show=time_to_show, autosequence_file_name = autoseq.autosequence_file_name, abort_sequence_file_name = autoseq.abort_sequence_file_name, redline_file_name = autoseq.redline_file_name, redline_states = autoseq.redline_states )
+    return render_template('autosequence.html', autosequence_commands=autoseq.autosequence_commands, abort_sequence_commands= autoseq.abort_sequence_commands, time_to_show=time_to_show, autosequence_file_name = autoseq.autosequence_file_name, abort_sequence_file_name = autoseq.abort_sequence_file_name, redline_file_name = autoseq.redline_file_name, redline_states = autoseq.redline_states, armed = armed)
 
 @app.route('/pidview' + sessionID, methods=['GET'])
 def pidview():
@@ -73,7 +73,7 @@ def pidview():
 
 @app.route('/sensors' + sessionID, methods=['GET'])
 def sensors():
-    return render_template('sensors.html', sensor_list=sensor_list)
+    return render_template('sensors.html', sensor_list=sensor_list, armed = armed)
 
 @app.route('/actuators' + sessionID, methods=['GET'])
 def actuators():
@@ -175,13 +175,13 @@ def handle_redline(file, fileName):
 def handle_launch_request():
     if autosequence_occuring:
         return None
-    elif armed == False:
-        return None
     elif not autoseq.autosequence_commands:
         socketio.emit('no_autosequence')
         return None
     elif not autoseq.abort_sequence_commands:
         socketio.emit('no_abort_sequence')
+    elif armed == False:
+        socketio.emit('stand_disarmed')
     else:
         socketio.emit('autosequence_started')
         execute_autosequence()
@@ -289,7 +289,7 @@ def execute_autosequence():
                 autosequence_occuring = False
                 print("Launch cancelled")
                 return None
-            socketio.sleep(.0001)
+            socketio.sleep(.001)
     autosequence_occuring = False
 
 def execute_abort_sequence():

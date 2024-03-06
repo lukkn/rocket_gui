@@ -240,7 +240,7 @@
         <!-- Arm button -->
         <div class = "controlButton">
             <button id="armDisarmButton" class = 'controlButton' name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
-                <img id = "armDisarmImg" src = ""> 
+                <img id = "armDisarmImg" src = "{% if armed %}../static/icons/armed_icon.png{% else %}../static/icons/disarmed_icon.png{% endif %}"> 
                 {% if armed %}Armed{% else %}Disarmed{% endif %}
             </button>
         </div>
@@ -278,22 +278,6 @@
         // used to get screen dimensions for opening small windows
         // var screenWidth = window.screen.availWidth;
         // var screenHeight = window.screen.availHeight;
-
-        document.addEventListener('DOMContentLoaded', function() {
-
-            // update the button color on page load or reload
-            // TODO: make this dependent on something more robust
-            const armDisarmButton = document.getElementById('armDisarmButton');
-            const armDisarmImg = document.getElementById("armDisarmImg");
-
-            if (armDisarmButton.innerText.includes('Armed')) {
-                armDisarmImg.src = "../static/icons/armed_icon.png";
-            } else if (armDisarmButton.innerText.includes('Disarmed')) {
-                armDisarmImg.src = "../static/icons/disarmed_icon.png";
-            } else {console.log('button text is invalid', armDisarmButton.innerHTML);}
-        });
-
-
 
         //window.open(`/actuators`, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=0, top=0`);
         //window.open(`/sensors`, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=${screenWidth}, top=${screenHeight}`);

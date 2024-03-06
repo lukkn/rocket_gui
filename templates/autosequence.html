@@ -37,6 +37,10 @@
             color: #ecf2f8;
             font-size: 15px;
         }
+        th {
+            background-color: #ecf2f8;
+            color: #21262d;
+        }
 
         #titleBar {
             display: grid;
@@ -272,7 +276,7 @@
     <div id="titleBar">
         <b>Autosequence</b>
         <button id="armDisarmButton" onclick="socket.emit('armOrDisarmRequest');" >
-          <img id = "armDisarmImg" src = "../static/icons/disarmed_icon.png"> 
+          <img id = "armDisarmImg" src = "{% if armed %}../static/icons/armed_icon.png{% else %}../static/icons/disarmed_icon.png{% endif %}"> 
         </button>
         <div  id = "systemOverview">
           <div class = "connectionStatus" title = "Purge Panel"><img id = "mote1connection" src = "../static/icons/red_1_icon.png"></div>
@@ -398,16 +402,15 @@
         var abort_sequence_commands = JSON.parse('{{ abort_sequence_commands|tojson|safe }}');
         var redline_states = JSON.parse('{{ redline_states|tojson|safe }}');
         var time_to_show = '{{ time_to_show }}';
-        var autosequence_file_name = '{{autosequence_file_name}}'
-        var abort_sequence_file_name = '{{abort_sequence_file_name}}'
-        var redline_file_name = '{{redline_file_name}}'
+        var autosequence_file_name = '{{ autosequence_file_name }}'
+        var abort_sequence_file_name = '{{ abort_sequence_file_name }}'
+        var redline_file_name = '{{ redline_file_name }}'
         
 
         // once all elements are loaded
         document.addEventListener('DOMContentLoaded', function() {
             const timer = document.getElementById("timer");
             timer.innerText = time_to_show + " s";
-            console.log(redline_states)
             if (autosequence_commands.length > 0){
                 displayCSV(autosequence_commands, "autosequence", ['P and ID', 'State', 'Time(ms)', 'Comments']);
             }
@@ -549,15 +552,19 @@
         });
         
         socket.on('file_header_error', function(){
-            alert("File has wrong headers, check formatting")
+            alert("File has wrong headers, please check formatting")
         });
 
         socket.on('file_actuators_error', function(){
-            alert("File contains invalid actuators")
+            alert("File contains invalid actuators.")
         });
 
         socket.on('file_sensors_error', function(){
-            alert("File contains invalid sensors")
+            alert("File contains invalid sensors.")
+        });
+
+        socket.on('stand_disarmed', function(){
+            alert("Stand is disarmed.")
         });
 
         socket.on('mote_status_and_system_time', function(mote_info_list, system_time) {
@@ -576,7 +583,6 @@
 
         socket.on('armOrDisarmResponse', function (boolean_state) {
             const armDisarmButton = document.getElementById('armDisarmButton');
-            console.log(armDisarmImg);
             // Toggle the text and color
             if (boolean_state) {
                 armDisarmButton.innerHTML = '<img id = "armDisarmImg" src = "../static/icons/armed_icon.png">';
