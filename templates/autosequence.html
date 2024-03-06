@@ -264,20 +264,11 @@
             display: inline-block;
             margin-bottom: 5px;
         }
-        #watermark {
-            position: absolute;
-            top: 35vh;
-            left: 25vw;
-            width: 50vw;
-            z-index: -1;
-            opacity: 0.05;
-        }
 
     </style>
 </head>
 
 <body>
-    <img id = "watermark" src = "../static/icons/logo.png">
     <div id="titleBar">
         <b>Autosequence</b>
         <button id="armDisarmButton" onclick="socket.emit('armOrDisarmRequest');" >
@@ -473,7 +464,7 @@
             // create table body
             commands.forEach(function(command) {
                 var row = document.createElement('tr');
-                row.id = command['P and ID'] + command['State'] + command['Time(ms)'];
+                row.id = sequenceName + command['P and ID'] + command['State'] + command['Time(ms)'];
                 if (command['Completed']){
                     row.className = sequenceName + "ActiveRow"
                 }
@@ -503,25 +494,33 @@
             socket.emit('launch_request');
             socket.on('autosequence_started', function() {
                 socket.emit('start_timer');
-                socket.on('start_timer_ack', function() {
-                });
+                socket.on('start_timer_ack', function() {});
+                
+                console.log("clearing active rows");
+                var lst = document.getElementsByClassName('autosequenceActiveRow')
+                for (var i = lst.length - 1; i >= 0; i--) {
+                    lst[i].className = 'inactiveRow'
+                }
+                var lst = document.getElementsByClassName('abortSequenceActiveRow')
+                for (var i = lst.length - 1; i >= 0; i--) {
+                    lst[i].className = 'inactiveRow'
+                }
+                
             });
         }
 
 
         socket.on('autosequence_command_sent', function (command) {
-            rowID = command['P and ID'] + command['State'] + command['Time(ms)'];
+            rowID = "autosequence" + command['P and ID'] + command['State'] + command['Time(ms)'];
             row = document.getElementById(rowID)
             row.className = 'autosequenceActiveRow'
         });
 
         socket.on('abort_sequence_command_sent', function (command) {
-            rowID = command['P and ID'] + command['State'] + command['Time(ms)'];
+            rowID = "abortSequence" + command['P and ID'] + command['State'] + command['Time(ms)'];
             row = document.getElementById(rowID)
             row.className = 'abortSequenceActiveRow'
         });
-
-
 
         socket.on('current_time', function(time_to_show){
             const timer = document.getElementById("timer");

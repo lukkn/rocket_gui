@@ -10,8 +10,8 @@ def log_actuator_ack(p_and_id, binary_state):
     global actuator_acks
     actuator_acks[p_and_id] = True
 
-    state = "On" if binary_state == 1 else "Off" if binary_state == 0 else None
-    actuator_states[p_and_id] = state
+    # state = "On" if binary_state == 1 else "Off" if binary_state == 0 else None
+    # actuator_states[p_and_id] = state
 
 def initialize_actuator_states(actuator_list):
     global actuator_states

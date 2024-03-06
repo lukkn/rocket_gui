@@ -38,13 +38,18 @@ def get_ip(mote_id=None):
         return '127.0.0.1'
     return '192.168.1.' + str(100 + (int(mote_id)))
 
-def send_actuator_command(mote_id, pin_num, state, interface_type='Binary GPIO'):
+def send_actuator_command(mote_id, pin_num, state, interface_type='Binary GPIO', buttonID=None):
     if interface_type != 'Heartbeat':
         print(f"Sending {state} command to pin {pin_num} on MoTE {mote_id}, via {interface_type}")
     if interface_type == 'servoPWM_12V':
             #the GPIO pin we connect to is equal to the 5V the servo is "connected" to + 28
             #send_actuator_command(mote_id, 22, True)
             pass
+    
+    if buttonID is not None:
+        actuator.actuator_acks[buttonID] = False
+        actuator.actuator_states[buttonID] = "On" if state else "Off"
+        
     actuator_write_command = 0b10000000
     actuator_state_mask = 0b01000000 if state else 0
     interface_type_number = configuration.get_interface_type_number(

@@ -132,8 +132,7 @@ def handle_button_press(buttonID, state, current_time):
 
     print('received button press: ', buttonID, state, 'Delay:',(time.time_ns() // 1_000_000) - current_time)
     if armed:
-        actuator.actuator_acks[buttonID] = False
-        networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], state_bool, buttonDict['Interface Type'])
+        networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], state_bool, buttonDict['Interface Type'], buttonID=buttonID)
     else:
         print("stand is disarmed!!! " + buttonID + " was not set to " + state)
 
@@ -187,11 +186,18 @@ def handle_launch_request():
         socketio.emit('autosequence_started')
         execute_autosequence()
 
+timer_lock = False
 
 @socketio.on('start_timer')
 def broadcast_time():
     socketio.emit('start_timer_ack')
     global time_to_show
+    global timer_lock
+
+    if timer_lock:
+        return None
+    timer_lock = True
+
     print('timer started')
     while True:
         timeAtBeginning = time.perf_counter()
@@ -199,6 +205,7 @@ def broadcast_time():
         while (time.perf_counter() - timeAtBeginning) < 1:
             if autosequence_cancel or not autosequence_occuring:
                 print("timer stopped, thread ended")
+                timer_lock = False
                 return None
             socketio.sleep(.01)
         time_to_show += 1
@@ -276,7 +283,7 @@ def execute_autosequence():
         # send actuator to mote #
         if command['Type'] == 'Actuator' :
             buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
-            networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command_bool, buttonDict['Interface Type'])
+            networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command_bool, buttonDict['Interface Type'], buttonDict['P and ID'])
         while (time.perf_counter() - timeAtBeginning) < command['Sleep time(ms)']/1000:
             if autosequence_cancel or not autosequence_occuring:
                 autosequence_occuring = False
@@ -301,7 +308,7 @@ def execute_abort_sequence():
         # send actuator to mote #
         if command['Type'] == 'Actuator' :
             buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
-            networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command_bool, buttonDict['Interface Type'])
+            networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command_bool, buttonDict['Interface Type'], buttonDict['P and ID'])
         time.sleep(command['Sleep time(ms)']/1000)
 
 # start all background threads

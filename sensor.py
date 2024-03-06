@@ -88,12 +88,12 @@ def process_sensor_dict(sensor_data_dict):
 
 def log_sensor_data(timestamp, sensor_data_dict):
 
-    processed_data_dict = process_sensor_dict(sensor_data_dict)
+    unit_converted_data = process_sensor_dict(sensor_data_dict)
     data_to_log = [timestamp]
 
     for sensor in sensor_offset:
         try:
-            data_to_log.extend([sensor_data_dict[sensor], processed_data_dict[sensor], sensor_offset[sensor]])
+            data_to_log.extend([sensor_data_dict[sensor], unit_converted_data[sensor], sensor_offset[sensor]])
         except: 
             data_to_log.extend([None, None, None])
 
