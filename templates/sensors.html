@@ -222,26 +222,6 @@
             socket.emit('tare', sensorID, state);
         }
 
-
-        socket.on('responding_with_button_data', function (data) {
-            buttonID = data[0]
-            buttonState = data[1]
-
-            const a = document.getElementById("" + buttonID + "_state");
-
-            if (buttonState === 'untare'){
-                a.textContent = buttonState;
-
-            } else if (buttonState === 'tare'){
-                a.textContent = buttonState;
-
-            } else {
-                console.log("error!!!");
-            }
-
-
-        });
-
         socket.on('sensor_and_actuator_config_uploaded', function() {
             location.reload();
         });

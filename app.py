@@ -40,15 +40,10 @@ config_file_name = None
 # Global Variable that determines if stand is armed
 armed = False
 
-# Autosequence
-
-autosequence_cancel = False # has cancel button been pressed
-autosequence_occuring = False # this will be used to block most functions while autosequence is occuring
-time_to_show = 0
-
 app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app, async_mode=async_mode)
 
+# Threads 
 sensor_thread = None
 sensor_thread_lock = Lock()
 connection_thread = None
@@ -65,7 +60,7 @@ def index():
 
 @app.route('/autosequence' + sessionID, methods=['GET'])
 def autosequence():
-    return render_template('autosequence.html', autosequence_commands=autoseq.autosequence_commands, abort_sequence_commands= autoseq.abort_sequence_commands, time_to_show=time_to_show, autosequence_file_name = autoseq.autosequence_file_name, abort_sequence_file_name = autoseq.abort_sequence_file_name, redline_file_name = autoseq.redline_file_name, redline_states = autoseq.redline_states, armed = armed)
+    return render_template('autosequence.html', autosequence_commands=autoseq.autosequence_commands, abort_sequence_commands= autoseq.abort_sequence_commands, time_to_show=autoseq.time_to_show, autosequence_file_name = autoseq.autosequence_file_name, abort_sequence_file_name = autoseq.abort_sequence_file_name, redline_file_name = autoseq.redline_file_name, redline_states = autoseq.redline_states, armed = armed)
 
 @app.route('/pidview' + sessionID, methods=['GET'])
 def pidview():
@@ -173,7 +168,7 @@ def handle_redline(file, fileName):
 
 @socketio.on('launch_request')
 def handle_launch_request():
-    if autosequence_occuring:
+    if autoseq.autosequence_occuring:
         return None
     elif not autoseq.autosequence_commands:
         socketio.emit('no_autosequence')
@@ -184,14 +179,17 @@ def handle_launch_request():
         socketio.emit('stand_disarmed')
     else:
         socketio.emit('autosequence_started')
-        execute_autosequence()
+        autoseq.autosequence_occuring = True
+        autoseq.autosequence_cancel = False
+        autoseq.time_to_show = int(int(autoseq.autosequence_commands[0]['Time(ms)'])/1000)
+        execute_sequence(autoseq.autosequence_commands, 'autosequence')
+        autoseq.autosequence_occuring = False
 
 timer_lock = False
 
 @socketio.on('start_timer')
 def broadcast_time():
     socketio.emit('start_timer_ack')
-    global time_to_show
     global timer_lock
 
     if timer_lock:
@@ -201,33 +199,31 @@ def broadcast_time():
     print('timer started')
     while True:
         timeAtBeginning = time.perf_counter()
-        socketio.emit('current_time', time_to_show)
+        socketio.emit('current_time', autoseq.time_to_show)
         while (time.perf_counter() - timeAtBeginning) < 1:
-            if autosequence_cancel or not autosequence_occuring:
+            if autoseq.autosequence_cancel or not autoseq.autosequence_occuring:
                 print("timer stopped, thread ended")
                 timer_lock = False
                 return None
             socketio.sleep(.01)
-        time_to_show += 1
+        autoseq.time_to_show += 1
 
 
 @socketio.on('abort_request')
 def handle_abort_request():
-    global autosequence_occuring
     print("Received abort request")
-    if (autosequence_occuring):
-        execute_abort_sequence()
+    if (autoseq.autosequence_occuring):
+        autoseq.autosequence_occuring = False
+        autoseq.autosequence_cancel = True
+        execute_sequence(autoseq.abort_sequence_commands, 'abort_sequence')
     else:
         socketio.emit('no_autosequence_running')
 
 @socketio.on('cancel_request')
 def handle_cancel_request():
-    global time_to_show
-    global autosequence_occuring
-    print("Received cancel request at",time_to_show,"seconds")
-    if (autosequence_occuring):
-        global autosequence_cancel
-        autosequence_cancel = True
+    print("Received cancel request at",autoseq.time_to_show,"seconds")
+    if (autoseq.autosequence_occuring):
+        autoseq.autosequence_cancel = True
     else:
         socketio.emit('no_autosequence_running')
 
@@ -250,6 +246,29 @@ def update_connection_status():
         socketio.sleep(1)
 
 
+# Autosequence page functions 
+def execute_sequence(commands, sequenceName):
+    for command in commands:
+        timeAtBeginning = time.perf_counter()
+        stringState = 'on' if command['State'] == True else 'off' # on/off state used in webpages
+        socketio.emit('responding_with_button_data', [command['P and ID'], stringState])
+        command['Completed'] = True
+
+        socketio.emit(sequenceName + '_command_sent', command)
+
+        command_bool = True if command['State'].lower() == 'true' else False
+        # send actuator to mote #
+        if command['Type'] == 'Actuator' :
+            buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
+            networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command_bool, buttonDict['Interface Type'], buttonDict['P and ID'])
+        
+        while (time.perf_counter() - timeAtBeginning) < command['Sleep time(ms)']/1000:
+            if sequenceName == 'autosequence' and (autoseq.autosequence_cancel or not autoseq.autosequence_occuring):
+                autoseq.autosequence_occuring = False
+                print("Launch cancelled")
+                return None
+            time.sleep(.001)
+
 # Sensor and actuator acks page functions
 def sensor_data_and_actuator_acks_thread():
     print("started sensor data thread")
@@ -263,53 +282,6 @@ def sensor_data_and_actuator_acks_thread():
         socketio.emit('sensor_data', sensors_and_data)
         socketio.emit('update_actuator_data', actuator_data)
 
-
-# Autosequence page functions
-def execute_autosequence():
-    global autosequence_occuring
-    global time_to_show
-    global autosequence_cancel
-
-    autosequence_occuring = True
-    autosequence_cancel = False
-    time_to_show = int(int(autoseq.autosequence_commands[0]['Time(ms)'])/1000)
-    for command in autoseq.autosequence_commands:
-        timeAtBeginning = time.perf_counter()
-        stringState = 'on' if command['State'] == True else 'off' # on/off state used in webpages
-        socketio.emit('responding_with_button_data', [command['P and ID'], stringState])
-        command['Completed'] = True
-        socketio.emit('autosequence_command_sent', command)
-        command_bool = True if command['State'].lower() == 'true' else False
-        # send actuator to mote #
-        if command['Type'] == 'Actuator' :
-            buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
-            networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command_bool, buttonDict['Interface Type'], buttonDict['P and ID'])
-        while (time.perf_counter() - timeAtBeginning) < command['Sleep time(ms)']/1000:
-            if autosequence_cancel or not autosequence_occuring:
-                autosequence_occuring = False
-                print("Launch cancelled")
-                return None
-            socketio.sleep(.001)
-    autosequence_occuring = False
-
-def execute_abort_sequence():
-    global autosequence_occuring
-    global autosequence_cancel
-
-    autosequence_occuring = False
-    autosequence_cancel = True
-
-    for command in autoseq.abort_sequence_commands:
-        stringState = 'on' if command['State'] == True else 'off' # on/off state used in webpages
-        socketio.emit('responding_with_button_data', [command['P and ID'], stringState])
-        command['Completed'] = True
-        socketio.emit('abort_sequence_command_sent', command)
-        command_bool = True if command['State'].lower() == 'true' else False
-        # send actuator to mote #
-        if command['Type'] == 'Actuator' :
-            buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == command['P and ID']][0]
-            networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], command_bool, buttonDict['Interface Type'], buttonDict['P and ID'])
-        time.sleep(command['Sleep time(ms)']/1000)
 
 # start all background threads
 networking.start_telemetry_thread()

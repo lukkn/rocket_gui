@@ -366,11 +366,6 @@
             document.getElementById("performanceIndicator").textContent = `Data is: ${(Date.now() - timeAtTransmission).toFixed(1)} milliseconds old`;
         });
 
-
-        socket.on('responding_with_button_data', function (data) {
-            updateButtonColor(data);
-        });
-
         socket.on('disconnect', function (reason) {
             console.log("Disconnected from server, reason: " + reason);
             close();

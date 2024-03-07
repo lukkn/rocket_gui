@@ -1,10 +1,19 @@
+from threading import Event
+import time
+
+import networking
+
 # contains names for non-command lines in autosequence 
 actuator_name_exceptions = ["NULL", "STATE_IDLE", "STATE_ACTIVE"]
 
 actuator_list = []
 sensor_list = []
 
+time_to_show = 0
+
 # Autosequence
+autosequence_cancel = False # has cancel button been pressed
+autosequence_occuring = False # this will be used to block most functions while autosequence is occuring
 autosequence_file_name = None
 autosequence_commands = []
 
