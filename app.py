@@ -94,8 +94,8 @@ def loadConfigFile(CSVFileAndFileContents, fileName):
         except:
             socketio.emit("config_file_header_error")
         
-        sensor.initialize_sensor_info(sensor_list)
-        actuator.initialize_actuator_states(actuator_list)
+        sensor.initialize_sensor_info(sensor_list, config_file_name)
+        actuator.initialize_actuator_states(actuator_list, config_file_name)
         autoseq.initialize_sensors_and_actuators(sensor_list, actuator_list)
             
 

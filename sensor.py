@@ -1,5 +1,6 @@
 import csv
-from datetime import datetime
+import re
+import os
 
 import networking
 
@@ -11,7 +12,7 @@ SCALE_INTERNAL_TEMP = True
 sensor_offset = {}
 sensor_units = {}
 
-def initialize_sensor_info(sensor_list):
+def initialize_sensor_info(sensor_list, config_name):
 
     csv_header_list = ['Timestamp (ms)']
     for sensor in sensor_list:
@@ -23,13 +24,21 @@ def initialize_sensor_info(sensor_list):
 
     # initialize sensor_log
     global sensor_log_path
-    dt_string = datetime.now().strftime("%d%m%Y_%H%M%S")
-    sensor_log_path += dt_string + ".csv"
+
+    filenames = sorted(list(filter(lambda flname: "sensor_log" in flname, next(os.walk("logs"), (None, None, []))[2])), key=file_num_from_name)
+    try:
+        current_filenum = int(re.findall('\d+', filenames[-1])[0]) + 1
+    except: 
+        current_filenum = 0 
+
+    sensor_log_path = "logs/sensor_log_" + str(current_filenum) + "_" + config_name + ".csv"
     with open(sensor_log_path, "w") as file:
         csv.writer(file).writerow(csv_header_list)
         file.flush()
         file.close()
 
+def file_num_from_name(fname):
+    return int(re.findall('\d+', fname)[0]) + 1
 
 def get_sensor_data():
     sensor_data_dict = networking.get_sensor_data()
