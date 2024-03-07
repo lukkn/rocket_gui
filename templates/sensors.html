@@ -52,7 +52,7 @@
         overflow-y: auto;
     }
     input:checked ~ #chartContainer{
-        top: 200px;
+        top: 240px;
         height: calc(100% - 260px);
     }
     #chartContainer{
@@ -70,11 +70,13 @@
         float: left;
         background-color: #ecf2f8;
         color: #161b22;
+        width: calc(100% - 10px);
     }
     .container {
         position: relative;
         float: left;
         min-width: 250px;
+        width: calc(50% - 40px);
         margin: 10px;
         padding: 10px;
         background-color: #ecf2f8;
@@ -131,6 +133,9 @@
     }
     th {
         padding: 10px 5px; 
+    }
+    td {
+        padding: 5px;
     }
 
     table, th, td {
@@ -202,33 +207,13 @@
 
     <script>
 
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
-
-        socket.on('sensor_data', function (sensorDataDict) {
-            for(const [sensorID, sensorValue] of Object.entries(sensorDataDict)){
-                document.getElementById(sensorID + '_data').textContent = sensorValue.toFixed(3);
-            }
-            // second param is number of data points to store for graphing
-            updateData(sensorDataDict, 20*15);
-
-            // plot updated data for each chart
-            const containerList = document.getElementsByTagName('container');
-            for (container of containerList){
-                plotLines(container.id.replace("container", ""));
-            }
-        });
+        var socket = io.connect('http://' + document.domain + ':' + location.port)
 
         function tare(sensorID, state) {
             socket.emit('tare', sensorID, state);
         }
 
-        socket.on('sensor_and_actuator_config_uploaded', function() {
-            location.reload();
-        });
-
         var chartCounter = 1;
-
-
         function addChart(){
             const chartNumber = chartCounter;
             chartCounter ++;
@@ -237,15 +222,12 @@
             var container = document.createElement("container");
             container.id = "container" + chartNumber;
             container.className = "container";
-            container.setAttribute("style", "width: calc(50% - 40px);");
             document.getElementById("chartContainer").appendChild(container);
 
             // create new canvas in chartContainer
             var canvas = document.createElement("canvas");
             canvas.id = "chart" + chartNumber;
             container.appendChild(canvas);
-            canvas.width = canvas.parentElement.clientWidth - 20;
-
 
             var removeButton = document.createElement("button");
             removeButton.id = "removeButton" + chartNumber;
@@ -265,7 +247,6 @@
             document.getElementById("chartContainer").removeChild(container);
             removeCheckboxes(containerID, sensorList);
         }
-
 
         let pingTimeout;
 
@@ -311,6 +292,24 @@
                 armDisarmButton.innerHTML = '<img id = "armDisarmImg" src = "../static/icons/armed_icon.png">';
             } else {
                 armDisarmButton.innerHTML = '<img id = "armDisarmImg" src = "../static/icons/disarmed_icon.png">';
+            }
+        });
+
+        socket.on('sensor_and_actuator_config_uploaded', function() {
+            location.reload();
+        });
+
+        socket.on('sensor_data', function (sensorDataDict) {
+            for(const [sensorID, sensorValue] of Object.entries(sensorDataDict)){
+                document.getElementById(sensorID + '_data').textContent = sensorValue.toFixed(3);
+            }
+            // second param is number of data points to store for graphing
+            updateData(sensorDataDict, 20*15);
+
+            // plot updated data for each chart
+            const containerList = document.getElementsByTagName('container');
+            for (container of containerList){
+                plotLines(container.id.replace("container", ""));
             }
         });
 
