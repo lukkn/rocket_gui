@@ -1,0 +1,12 @@
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,Unit,Unpowered State
+3,sensor,SPI_ADC_2ch PGA128,PNTB,0,PNTB,PSI_M5k
+3,sensor,SPI_ADC_2ch PGA128,PNPC,1,PNPC,PSI_M1k
+3,sensor,SPI_ADC_2ch PGA128,POTB,2,POTB,PSI_M1k
+3,actuator,Binary GPIO,VNMO,0,VNMO
+3,actuator,Binary GPIO,VNMF,1,VNMF
+3,actuator,Binary GPIO,VPTF,2,VPTF
+3,actuator,Binary GPIO,IGNTN,3,IGNTN
+2,actuator,Binary GPIO,VNTO,0,VNTO
+2,actuator,Binary GPIO,VNTF,1,VNTF
+2,actuator,Binary GPIO,VQDA,2,VQDA
+2,actuator,Binary GPIO,VNOF,3,VNOF
