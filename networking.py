@@ -22,7 +22,8 @@ mote_status = [[False, None], [False, None], [False, None], [False, None]]
 last_mote_time = [0, 0, 0, 0]
 
 # value = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["unit"]]
-sensor_and_actuator_dictionary = {'1, 99': ['FireX', None, None, None]}
+sensor_dictionary = {'1, 99': ['FireX', None, None, None]}
+actuator_dictionary = {}
 most_recent_data_packet = {}
 
 actuator_states_and_sensor_tare_states = {}
@@ -71,8 +72,10 @@ heartbeat_thread = Thread(target=send_heartbeat, daemon=True)
 heartbeat_thread.start()
 
 def send_config_to_mote(sensor_list, actuator_list):
-    global sensor_and_actuator_dictionary
-    sensor_and_actuator_dictionary.update(create_sensor_dictionary(sensor_list + actuator_list))
+    global sensor_dictionary
+    global actuator_dictionary
+    sensor_dictionary.update(create_sensor_dictionary(sensor_list))
+    actuator_dictionary.update(create_sensor_dictionary(actuator_list))
     sensors_and_actuators_list = sensor_list + actuator_list
 
     print("sent sensor config data to mote")
@@ -132,12 +135,13 @@ def generate_handler():
             mote_status[int(mote_id) - 1][0] = True
             last_mote_time[int(mote_id) - 1] = time.time()
 
-            global sensor_and_actuator_dictionary
+            global sensor_dictionary
+            global actuator_dictionary
             global most_recent_data_packet
             global actuator_states_and_sensor_tare_states
 
             # check for config
-            if sensor_and_actuator_dictionary == {'1, 99': ['FireX', None, None, None]}:
+            if sensor_dictionary == {'1, 99': ['FireX', None, None, None]} or actuator_dictionary == {}:
                 return
             
             sensor_data = {}
@@ -151,14 +155,14 @@ def generate_handler():
                     pass
                 elif pin_num > 99: 
                     # ack for a actuator press
-                    p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(int(data["Pin"]) - 100)]
+                    p_and_id, interface_type, sensor_or_actuator, unit = actuator_dictionary[str(data["Mote id"]) + ", " + str(int(data["Pin"]) - 100)]
                     state = data["Value"]
                     actuator.log_actuator_ack(p_and_id, state)
                     actuator_data[p_and_id] = state
                     
                 else: 
                     # a sensor reading
-                    p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
+                    p_and_id, interface_type, sensor_or_actuator, unit = sensor_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
                     sensor_data[p_and_id] = data["Value"]
 
             if sensor_data:
@@ -166,8 +170,6 @@ def generate_handler():
                 sensor.log_sensor_data(time.time() - start_time, sensor_data)
             if actuator_data:
                 actuator.log_actuator_data(time.time() - start_time, actuator_data)
-                
-        
 
     return TelemetryRecieveHandler
 
