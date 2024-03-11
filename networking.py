@@ -17,8 +17,6 @@ import configuration
 import sensor
 import actuator
 
-
-
 start_time = time.time()
 mote_status = [[False, None], [False, None], [False, None], [False, None]]
 last_mote_time = [0, 0, 0, 0]
@@ -142,7 +140,7 @@ def generate_handler():
             if sensor_and_actuator_dictionary == {'1, 99': ['FireX', None, None, None]}:
                 return
             
-            sensor_data = {}    
+            sensor_data = {}
             actuator_data = {}
 
             for data in data_list:
@@ -157,7 +155,7 @@ def generate_handler():
                     state = data["Value"]
                     actuator.log_actuator_ack(p_and_id, state)
                     actuator_data[p_and_id] = state
-                    print(f"Recieved ACK from pin {pin_num}, P&ID {p_and_id}")
+                    
                 else: 
                     # a sensor reading
                     p_and_id, interface_type, sensor_or_actuator, unit = sensor_and_actuator_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]

@@ -60,7 +60,7 @@ def index():
 
 @app.route('/autosequence' + sessionID, methods=['GET'])
 def autosequence():
-    return render_template('autosequence.html', autosequence_commands=autoseq.autosequence_commands, abort_sequence_commands= autoseq.abort_sequence_commands, time_to_show=autoseq.time_to_show, autosequence_file_name = autoseq.autosequence_file_name, abort_sequence_file_name = autoseq.abort_sequence_file_name, redline_file_name = autoseq.redline_file_name, redline_states = autoseq.redline_states, armed = armed)
+    return render_template('autosequence.html', autosequence_commands=autoseq.autosequence_commands, abort_sequence_commands= autoseq.abort_sequence_commands, time_to_show=autoseq.time_to_show, autosequence_file_name = autoseq.autosequence_file_name, abort_sequence_file_name = autoseq.abort_sequence_file_name, redline_file_name = autoseq.redline_file_name, redline_states = autoseq.redline_states, armed = armed, redline_on = autoseq.redline_on)
 
 @app.route('/pidview' + sessionID, methods=['GET'])
 def pidview():
@@ -165,6 +165,9 @@ def handle_redline(file, fileName):
     message = autoseq.parse_and_check_redline(file, fileName)
     socketio.emit(message)
 
+@socketio.on('redline_toggle')
+def handle_redline_toggle(bool):
+    autoseq.redline_on = bool
 
 @socketio.on('launch_request')
 def handle_launch_request():

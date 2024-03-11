@@ -122,4 +122,6 @@ def parse_and_check_redline(file, filename):
         return 'valid_file_received'
 
 def redline_check(sensor_data_dict):
-    pass
+    for sensor in redline_states:
+        sensor['P and ID']
+    #TODO: check if sensor data currently exceeds min or max of redline
