@@ -199,15 +199,18 @@
         </div>
         <button id="addChart" title = "Add chart" onClick = "addChart()" style = "margin-top: 20px; background-color: transparent;"><img src = "../static/icons/add_icon.png" style = "width: 30px"></button>
         <div id="chartContainer"></div>
-    </div>
+    </div>  
 
-    
-
-    
+    <html id="redline_limits" style = "color: #21262d">{{ redline_limits }}</html>
 
     <script>
 
         var socket = io.connect('http://' + document.domain + ':' + location.port)
+        var redline_limits = JSON.parse('{{ redline_limits|tojson|safe }}');
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            assignReferenceValues(redline_limits)
+        });
 
         function tare(sensorID, state) {
             socket.emit('tare', sensorID, state);
@@ -286,7 +289,6 @@
 
         socket.on('armOrDisarmResponse', function (boolean_state) {
             const armDisarmButton = document.getElementById('armDisarmButton');
-            console.log(armDisarmImg);
             // Toggle the text and color
             if (boolean_state) {
                 armDisarmButton.innerHTML = '<img id = "armDisarmImg" src = "../static/icons/armed_icon.png">';
@@ -311,6 +313,10 @@
             for (container of containerList){
                 plotLines(container.id.replace("container", ""));
             }
+        });
+
+        socket.on('redlineFile_uploaded', function(){
+            location.reload();
         });
 
     </script>

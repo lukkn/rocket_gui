@@ -69,7 +69,7 @@ def pidview():
 
 @app.route('/sensors' + sessionID, methods=['GET'])
 def sensors():
-    return render_template('sensors.html', sensor_list=sensor_list, armed = armed)
+    return render_template('sensors.html', sensor_list=sensor_list, armed = armed, redline_limits = autoseq.redline_limits)
 
 @app.route('/actuators' + sessionID, methods=['GET'])
 def actuators():
@@ -279,7 +279,7 @@ def sensor_data_and_actuator_acks_thread():
     socketio.sleep(1)
     while True:
         socketio.sleep(1/20)
-        sensors_and_data = sensor.get_sensor_data()
+        sensors_and_data = sensor.get_dummy_sensor_data() # IMPORTANT: for testing purposes only, switch to get_sensor_data() before deployment
         autoseq.redline_check(sensors_and_data)
         actuator_data = (actuator.get_actuator_states(), actuator.get_actuator_acks())
         #timestamp = time.time_ns() // 1000000

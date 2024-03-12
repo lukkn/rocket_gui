@@ -1,0 +1,89 @@
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ GSE STATES                                                                                             │
+│ -Accepts act means that the board will accept actuator commands                                        │
+│                                                                                                        │
+│                                                                                                        │
+│                                                                                                        │
+│                      ┌──────────────────┐                                                              │
+│                      │IDLE              │                                                              │
+│                      │-Rejects act      │    NET:Idle                                                  │
+│       Connection     │commands          ◄───────────────────────┐                                      │
+│            ──────────►                  │                       │                                      │
+│                      │                  │                       │                                      │
+│            ┌─────────►                  │                       │                                      │
+│            │         └─┬────▲───────────┘                       │                                      │
+│            │           │    │                          ┌────────┴─────────┐                            │
+│            │           │    │NET:Idle                  │ABORT             │                            │
+│            │     NET:  │    │                          │-Sets valves to   │ No connection              │
+│            │     Manual│    │      ┌───────────────────►safe states       ◄─────────                   │
+│            │           │    │      │  NET:Abort        │-Accepts act      │                            │
+│            │           │    │      │                   │                  │                            │
+│            │           │    │      │                   │                  │                            │
+│            │           │    │      │                   └──────▲──────────▲┘                            │
+│            │         ┌─▼────┴──────┴────┐                     │          │                             │
+│            │         │MANUAL            │                     │          │                             │
+│            │         │-Accepts act      │                     │NET:      │Watchdog:Abort               │
+│            │         │commands          │                     │Abort     │                             │
+│            │         │                  ├───────────────────┐ │          │                             │
+│            │         │                  │   NET:Live        │ │          │                             │
+│            │         │                  │                ┌──▼─┴──────────┴─┐                           │
+│            │         └────────────────▲─┘                │LIVE             │                           │
+│            │                          │                  │-Redline         │                           │
+│            │                          └──────────────────┤-Accepts act     │                           │
+│            │                            NET:MANUAL       │-Watchdog ON     │                           │
+│            │                                             │                 │                           │
+│            └─────────────────────────────────────────────┤                 │                           │
+│                NET:IDLE                                  └───┬─────────────┘                           │
+│                                             NET:Launch       │                                         │
+│                                            ┌─────────────────┘                                         │
+│                                            │                                                           │
+├────────────────────────────────────────────┼───────────────────────────────────────────────────────────┤
+│                                            │                                                           │
+│                                  ┌─────────▼─────────┐                                                 │
+│                                  │  LAUNCH           │                                                 │
+│                                  │                   │    T+6s - place holder                          │
+│                                  │                   ├───────────┐                                     │
+│                                  │                   │           │                                     │
+│                                  │                   │           │                                     │
+│                                  │                   │           │                                     │
+│                                  └───────────────────┘           │                                     │
+│                                                         ┌────────▼─────────┐                           │
+│                                                         │MECO              │                           │
+│                                                         │-Dump OPEN        │                           │
+│                                                         │                  │                           │
+│                                                         │                  │                           │
+│                                                         │                  │                           │
+│                                                         │                  │                           │
+│                                                         └────────┬─────────┘                           │
+│                                                                  │                                     │
+│     FC STATES                                                    │                                     │
+│     -Only available to                                           │T+10s - This is arbitrary. The FC    │
+│      flight computer                                             │        will start looking for apogee│
+│     -Watchdog OFF                                                │        10s after launch. This does  │
+│     -If the board power cycles,                         ┌────────▼─────────┐ not mean apogee will      │
+│      it will enter one of these                         │ CHUTE1           │ happen 10s after launch.  │
+│      states and never return to                         │-Apogee detection │                           │
+│      a GSE state                                        │-Drogue deployment│                           │
+│                                                         │-Dump close       │                           │
+│                                                         │                  │                           │
+│                                                         │                  │                           │
+│                                                         └────────┬─────────┘                           │
+│                                                                  │                                     │
+│                                                                  │                                     │
+│                                                                  │ALTIMETER:5000m && CHUTE1:deployed   │
+│                                                                  │-5000 m is arbitrary                 │
+│                                                                  │                                     │
+│                                                                  │                                     │
+│                                                                  │                                     │
+│                                                         ┌────────▼─────────┐                           │
+│                                                         │ CHUTE2           │                           │
+│                                                         │-Main deployment  │                           │
+│                                                         │at 1000m?         │                           │
+│                                                         │                  │                           │
+│                                                         │                  │                           │
+│                                                         │                  │                           │
+│                                                         └──────────────────┘                           │
+│                                                                                                        │
+│                                                                                                        │
+│                                                                                                        │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────┘

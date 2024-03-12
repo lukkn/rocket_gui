@@ -32,6 +32,10 @@ redline_data_window_size = 10  # number of consecutive datapoints that need to e
 sequence_header = ['P and ID', 'State','Time(ms)','Comments']
 redline_header = ['P and ID', 'Min', 'Max','State' ]
 
+# Machine state
+state_list = ['IDLE', 'MANUAL', 'ABORT', 'LIVE', 'LAUNCH']
+current_state = None
+
 socketio = None
 
 def setup_socket(socket):
@@ -73,8 +77,10 @@ def check_actuators_in_sequence(commands):
 
 def check_sensors_in_sequence(sensors_in_commands):
     global sensor_list
+    print(sensors_in_commands)
+    print(sensor_list)
     for sensor in sensors_in_commands:
-        if (sensor not in sensor_list):
+        if not any(config_sensor['P and ID'] == sensor for config_sensor in sensor_list):
             return False
     return True
 
@@ -109,22 +115,23 @@ def parse_and_check_redline(file, filename):
     commands = [line.split(",") for line in file_content[1:]]
 
     formatted_commands = {}
+    sensors_in_redline_list = []
     index = 0
     for command in commands:
+        sensors_in_redline_list.append(command[0])
         command_line = {'Min': command[1], 'Max': command[2], 'State': command[3]}
         index += 1
         formatted_commands[command[0]] = command_line
 
     if not check_file_format(header, redline_header):
         return 'file_header_error'
-    elif not check_sensors_in_sequence(formatted_commands.keys):
+    elif not check_sensors_in_sequence(sensors_in_redline_list):
         return 'file_sensors_error'
     else:
         global redline_limits
         global redline_file_name
         redline_file_name = filename
         redline_limits = formatted_commands
-        print(redline_limits)
         return 'valid_file_received'
 
 def redline_check(sensor_data_dict):
@@ -133,6 +140,7 @@ def redline_check(sensor_data_dict):
             redline_sensor_data_window[sensor].append(sensor_data_dict[sensor['P and ID']])
             if len(redline_sensor_data_window[sensor]) > redline_data_window_size:
                 redline_sensor_data_window[sensor].pop(0)
+                # TODO: check if current machine state matches redline state, if not, redline is inactive for current sensor
                 if redline_exceeded(sensor['P and ID'], redline_sensor_data_window[sensor]):
                     socketio.emit('abort_request')
         except:

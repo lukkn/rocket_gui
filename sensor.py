@@ -1,6 +1,7 @@
 import csv
 import re
 import os
+import random # For testing purposes only
 
 import networking
 
@@ -110,3 +111,9 @@ def log_sensor_data(timestamp, sensor_data_dict):
         csv.writer(file).writerow(data_to_log)
         file.flush()
         file.close()
+
+def get_dummy_sensor_data():
+    dummy_data_dict = {}
+    for sensor in sensor_offset:
+        dummy_data_dict[sensor] = random.random()*100
+    return dummy_data_dict
