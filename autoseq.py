@@ -23,11 +23,10 @@ abort_sequence_commands = []
 
 # Redline
 redline_on = False
-sensor_redline = {}
 redline_file_name = None
 redline_limits = []
 redline_sensor_data_window = {}
-redline_data_window_size = 30
+redline_data_window_size = 10  # number of consecutive datapoints that need to exceed redline limit to abort 
 
 # Format check
 sequence_header = ['P and ID', 'State','Time(ms)','Comments']
@@ -72,10 +71,10 @@ def check_actuators_in_sequence(commands):
             command['Type'] = 'Actuator'
     return file_valid
 
-def check_sensors_in_sequence(commands):
+def check_sensors_in_sequence(sensors_in_commands):
     global sensor_list
-    for command in commands:
-        if not any (sensor['P and ID'] == command ['P and ID'] for sensor in sensor_list):
+    for sensor in sensors_in_commands:
+        if (sensor not in sensor_list):
             return False
     return True
 
@@ -109,16 +108,16 @@ def parse_and_check_redline(file, filename):
     header = file_content[0].split(",")
     commands = [line.split(",") for line in file_content[1:]]
 
-    formatted_commands = []
+    formatted_commands = {}
     index = 0
     for command in commands:
-        command_line = {'P and ID': command[0], 'Min': command[1], 'Max': command[2], 'State': command[3]}
+        command_line = {'Min': command[1], 'Max': command[2], 'State': command[3]}
         index += 1
-        formatted_commands.append(command_line)
+        formatted_commands[command[0]] = command_line
 
     if not check_file_format(header, redline_header):
         return 'file_header_error'
-    elif not check_sensors_in_sequence(formatted_commands):
+    elif not check_sensors_in_sequence(formatted_commands.keys):
         return 'file_sensors_error'
     else:
         global redline_limits
@@ -134,11 +133,15 @@ def redline_check(sensor_data_dict):
             redline_sensor_data_window[sensor].append(sensor_data_dict[sensor['P and ID']])
             if len(redline_sensor_data_window[sensor]) > redline_data_window_size:
                 redline_sensor_data_window[sensor].pop(0)
-                if redline_exceeded(sensor['P and ID'], sensor_data_dict[sensor['P and ID']]):
+                if redline_exceeded(sensor['P and ID'], redline_sensor_data_window[sensor]):
                     socketio.emit('abort_request')
         except:
             redline_sensor_data_window[sensor] = []
 
-def redline_exceeded(sensor_id, datapoint):
-    # TODO: check if datapoint exceeds redline limit
-    return False
+def redline_exceeded(sensor_id, most_recent_data):
+    sensor_limits_dict = redline_limits[sensor_id]
+    for data in most_recent_data:
+        # TODO: create separate checks for min and max
+        if data > sensor_limits_dict['Min'] and data < sensor_limits_dict['Max']:
+            return False
+    return True
