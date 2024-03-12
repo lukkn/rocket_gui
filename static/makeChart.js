@@ -71,15 +71,17 @@ function plotLines(chartNumber) {
             context.lineWidth = 2;
             context.strokeStyle = sensorColors[sensor];
             context.stroke();
+            context.fillText(sensor + '_max', 45 , maxYIndex);
 
             // draw min line
             context.beginPath();
-            const minYIndex = canvas.height*((maxLabel - referenceValuesDictionary[sensor]['Max'])/(maxLabel - minLabel))
+            const minYIndex = canvas.height*((maxLabel - referenceValuesDictionary[sensor]['Min'])/(maxLabel - minLabel))
             context.moveTo(40, minYIndex);
             context.lineTo(canvas.width, minYIndex);
             context.lineWidth = 2;
             context.strokeStyle = sensorColors[sensor];
             context.stroke();
+            context.fillText(sensor + '_min', 45 , minYIndex);
         }
         
 
@@ -115,6 +117,11 @@ function defineScale(containerID){
 
     maxLabel = Math.ceil(Math.max(...activeData));
     minLabel = Math.floor(Math.min(...activeData));
+
+    dataRange = maxLabel - minLabel
+
+    maxLabel += dataRange * 0.1
+    minLabel -= dataRange * 0.1
 }
 
 function createEmptyChart(containerID, sensorsList){
