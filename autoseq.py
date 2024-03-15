@@ -135,16 +135,17 @@ def parse_and_check_redline(file, filename):
         return 'valid_file_received'
 
 def redline_check(sensor_data_dict):
-    for sensor in redline_limits:
-        try:
-            redline_sensor_data_window[sensor].append(sensor_data_dict[sensor['P and ID']])
-            if len(redline_sensor_data_window[sensor]) > redline_data_window_size:
-                redline_sensor_data_window[sensor].pop(0)
-                # TODO: check if current machine state matches redline state, if not, redline is inactive for current sensor
-                if redline_exceeded(sensor['P and ID'], redline_sensor_data_window[sensor]):
-                    socketio.emit('abort_request')
-        except:
-            redline_sensor_data_window[sensor] = []
+    if (redline_on):
+        for sensor in redline_limits:
+            try:
+                redline_sensor_data_window[sensor].append(sensor_data_dict[sensor['P and ID']])
+                if len(redline_sensor_data_window[sensor]) > redline_data_window_size:
+                    redline_sensor_data_window[sensor].pop(0)
+                    # TODO: check if current machine state matches redline state, if not, redline is inactive for current sensor
+                    if redline_exceeded(sensor['P and ID'], redline_sensor_data_window[sensor]):
+                        socketio.emit('abort_request')
+            except:
+                redline_sensor_data_window[sensor] = []
 
 def redline_exceeded(sensor_id, most_recent_data):
     sensor_limits_dict = redline_limits[sensor_id]
