@@ -14,19 +14,21 @@ sensor_TTL = 100 # number of packets sensor is considered alive without data
 sensor_offset = {} # To keep track of taring
 sensor_units = {}  # Store the units corresponding to each sensor P and ID
 sensor_data_TTL = {} # Keeps track of how many more packets without data for a particular sensor before it is considered disconnected
-sensor_data_dict = {} # Contains sensor data
+raw_data_dict = {} # Contains raw sensor data
+processed_data_dict = {} # Contains tared and unit converted data 
 
 def initialize_sensor_info(sensor_list, config_name):
 
     csv_header_list = ['Timestamp (ms)']
     for sensor in sensor_list:
         sensor_offset[sensor['P and ID']] = 0
-        sensor_data_TTL[sensor] = sensor_TTL
+        sensor_data_TTL[sensor['P and ID']] = sensor_TTL
         sensor_units[sensor['P and ID']] = sensor["Unit"]
         csv_header_list.append(sensor["P and ID"] + "_raw")
         csv_header_list.append(sensor["P and ID"] + "_value")
         csv_header_list.append(sensor["P and ID"] + "_offset")
-        sensor_data_dict[sensor['P and ID']] = None
+        raw_data_dict[sensor['P and ID']] = None
+        processed_data_dict[sensor['P and ID']] = None
 
     # initialize sensor_log
     global sensor_log_path
@@ -49,18 +51,21 @@ def file_num_from_name(fname):
 def get_sensor_data():
     global sensor_data_dict
     most_recent_data_packet = networking.get_sensor_data()
+    print(most_recent_data_packet)
     # decrease sensor TTL
     for sensor in sensor_data_TTL:
         sensor_data_TTL[sensor] -= 1
         if sensor_data_TTL[sensor] == 0 :
-            sensor_data_dict[sensor] = None
+            processed_data_dict[sensor] = None
+            raw_data_dict[sensor] = None
             sensor_data_TTL[sensor] = sensor_TTL
 
     # process data and update data dictionary
     for sensor in most_recent_data_packet:
-        sensor_data_dict[sensor] = process_sensor_data(sensor, most_recent_data_packet[sensor])
+        raw_data_dict[sensor] = most_recent_data_packet[sensor]
+        processed_data_dict[sensor] = process_sensor_data(sensor, most_recent_data_packet[sensor])
         sensor_data_TTL[sensor] = sensor_TTL
-    return sensor_data_dict
+    return processed_data_dict
 
 def tare(sensorID):
     sensor_offset[sensorID] = sensor_data_dict[sensorID]
@@ -107,13 +112,11 @@ def process_sensor_data(sensor_id, sensor_data):
 
 
 def log_sensor_data(timestamp, sensor_data_dict):
-
-    unit_converted_data = process_sensor_dict(sensor_data_dict)
     data_to_log = [timestamp]
 
     for sensor in sensor_offset:
         try:
-            data_to_log.extend([sensor_data_dict[sensor], unit_converted_data[sensor], sensor_offset[sensor]])
+            data_to_log.extend([raw_data_dict[sensor], processed_data_dict[sensor], sensor_offset[sensor]])
         except: 
             data_to_log.extend([None, None, None])
 
