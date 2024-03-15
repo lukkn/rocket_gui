@@ -167,7 +167,7 @@
         </div>
         <div id = "systemTimeContainer" title = "System Time">
           <img id = "systemTimeIcon" src = "../static/icons/time_icon.png">
-          <div id = "systemTime">0s</div>
+          <div id = "systemTime">00:00:00</div>
         </div>
       </div>
 
@@ -284,7 +284,7 @@
                 }
             });
             const time = document.getElementById("systemTime")
-            time.textContent = Math.trunc(system_time) + "s"
+            time.textContent = system_time
             });
 
         socket.on('armOrDisarmResponse', function (boolean_state) {

@@ -245,8 +245,13 @@ def update_connection_status():
     global mote_status
     global start_time
     while True:
+        system_time_in_seconds = int(time.time() - start_time)
+        seconds = ('0' + str(system_time_in_seconds%60)) if (system_time_in_seconds%60 < 10) else str(system_time_in_seconds%60)
+        minutes = ('0' + str((system_time_in_seconds//60)%60)) if ((system_time_in_seconds//60)%60 < 10) else str((system_time_in_seconds//60)%60)
+        hours = ('0' + str((system_time_in_seconds//60)//60)) if ((system_time_in_seconds//60)//60 < 10) else str((system_time_in_seconds//60)//60)
+        system_time = hours + ":" + minutes + ":" + seconds 
         mote_status = networking.get_mote_status()
-        socketio.emit('mote_status_and_system_time', (mote_status, time.time()- start_time))
+        socketio.emit('mote_status_and_system_time', (mote_status, system_time))
         socketio.sleep(1)
 
 
