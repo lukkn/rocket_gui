@@ -284,7 +284,7 @@ def sensor_data_and_actuator_acks_thread():
     socketio.sleep(1)
     while True:
         socketio.sleep(1/20)
-        sensors_and_data = sensor.get_dummy_sensor_data() # IMPORTANT: for testing purposes only, switch to get_sensor_data() before deployment
+        sensors_and_data = sensor.get_sensor_data() 
         autoseq.redline_check(sensors_and_data)
         actuator_data = (actuator.get_actuator_states(), actuator.get_actuator_acks())
         #timestamp = time.time_ns() // 1000000

@@ -13,6 +13,8 @@ SCALE_INTERNAL_TEMP = True
 sensor_offset = {}
 sensor_units = {}
 
+sensor_data_dict = {}
+
 def initialize_sensor_info(sensor_list, config_name):
 
     csv_header_list = ['Timestamp (ms)']
@@ -22,6 +24,7 @@ def initialize_sensor_info(sensor_list, config_name):
         csv_header_list.append(sensor["P and ID"] + "_raw")
         csv_header_list.append(sensor["P and ID"] + "_value")
         csv_header_list.append(sensor["P and ID"] + "_offset")
+        sensor_data_dict[sensor['P and ID']] = None
 
     # initialize sensor_log
     global sensor_log_path
@@ -42,15 +45,19 @@ def file_num_from_name(fname):
     return int(re.findall('\d+', fname)[0]) + 1
 
 def get_sensor_data():
-    sensor_data_dict = networking.get_sensor_data()
+    global sensor_data_dict
+    most_recent_data_packet = networking.get_sensor_data()
+    for data in most_recent_data_packet:
+        sensor_data_dict[data] = most_recent_data_packet[data]
     processed_data_dict = {}
     for sensor in sensor_data_dict:
-        processed_data_dict[sensor] = sensor_data_dict[sensor] - sensor_offset[sensor]
+        if sensor_data_dict[sensor]:
+            processed_data_dict[sensor] = sensor_data_dict[sensor] - sensor_offset[sensor]
     return processed_data_dict
 
 
 def tare(sensorID):
-    sensor_offset[sensorID] = networking.get_sensor_data()[sensorID]
+    sensor_offset[sensorID] = sensor_data_dict[sensorID]
 
 
 def untare(sensorID):
