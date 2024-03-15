@@ -9,16 +9,19 @@ sensor_log_path = "logs/sensor_log_"
 internal_temp = 20 # assume room temp
 SCALE_INTERNAL_TEMP = True
 
-sensor_offset = {}
-sensor_units = {}
+sensor_TTL = 100 # number of packets sensor is considered alive without data
 
-sensor_data_dict = {}
+sensor_offset = {} # To keep track of taring
+sensor_units = {}  # Store the units corresponding to each sensor P and ID
+sensor_data_TTL = {} # Keeps track of how many more packets without data for a particular sensor before it is considered disconnected
+sensor_data_dict = {} # Contains sensor data
 
 def initialize_sensor_info(sensor_list, config_name):
 
     csv_header_list = ['Timestamp (ms)']
     for sensor in sensor_list:
         sensor_offset[sensor['P and ID']] = 0
+        sensor_data_TTL[sensor] = sensor_TTL
         sensor_units[sensor['P and ID']] = sensor["Unit"]
         csv_header_list.append(sensor["P and ID"] + "_raw")
         csv_header_list.append(sensor["P and ID"] + "_value")
@@ -45,65 +48,62 @@ def file_num_from_name(fname):
 
 def get_sensor_data():
     global sensor_data_dict
-
-    # get sensor data
     most_recent_data_packet = networking.get_sensor_data()
-    for data in most_recent_data_packet:
-        sensor_data_dict[data] = most_recent_data_packet[data]
-    
-    # handle unit conversion
-    final_dict = process_sensor_dict(sensor_data_dict)
-    return final_dict
+    # decrease sensor TTL
+    for sensor in sensor_data_TTL:
+        sensor_data_TTL[sensor] -= 1
+        if sensor_data_TTL[sensor] == 0 :
+            sensor_data_dict[sensor] = None
+            sensor_data_TTL[sensor] = sensor_TTL
 
+    # process data and update data dictionary
+    for sensor in most_recent_data_packet:
+        sensor_data_dict[sensor] = process_sensor_data(sensor, most_recent_data_packet[sensor])
+        sensor_data_TTL[sensor] = sensor_TTL
+    return sensor_data_dict
 
 def tare(sensorID):
     sensor_offset[sensorID] = sensor_data_dict[sensorID]
 
-
 def untare(sensorID):
     sensor_offset[sensorID] = 0
 
-def process_sensor_dict(sensor_data_dict):
-    processed_dict = {}
+def process_sensor_data(sensor_id, sensor_data):
     global internal_temp
+    raw_value = sensor_data - sensor_offset[sensor_id]
+    val_in_volts = raw_value / 1000.0
+    processed_value = None
 
-    for sensor in sensor_data_dict:
-        if sensor_data_dict[sensor]:
-            raw_value = sensor_data_dict[sensor] - sensor_offset[sensor]
-            val_in_volts = raw_value / 1000.0
+    match sensor_units[sensor_id]:
+        case "PSI_S1k":
+            processed_value = 250 * val_in_volts - 125
+        case "PSI_H5k":
+            processed_value = 1250 * 2 * val_in_volts - 625
+        case "PSI_M1k":
+            processed_value = (1000.0 * val_in_volts)/(0.100 * 128)
+        case "PSI_M5k":
+            processed_value = (5000.0 * val_in_volts)/(0.100 * 128)
+        case "Degrees C":
+            processed_value = (195.8363374*val_in_volts + 5.4986782) + internal_temp
+        case "Volts":
+            processed_value = val_in_volts
+        case "C Internal":
+            internal_temp = raw_value/1000 if SCALE_INTERNAL_TEMP else raw_value
+        case "lbs_tank":
+            processed_value = val_in_volts*1014.54 - 32.5314
+        case "lbs_engine":
+            processed_value = (-val_in_volts*5128.21 - 11.2821)/2
+        case "alt_ft":
+            processed_value = raw_value * 3.281 #m to ft. Dammit Kamer!
+        case "g_force":
+            processed_value = raw_value * 0.00102 # cm/s^2 to G
+        case "loop_ms":
+            processed_value = raw_value / 1_000
+        case _ :
+            pass
+            print("Unexpected Unit")
 
-            match sensor_units[sensor]:
-                case "PSI_S1k":
-                    raw_value = 250 * val_in_volts - 125
-                case "PSI_H5k":
-                    raw_value = 1250 * 2 * val_in_volts - 625
-                case "PSI_M1k":
-                    raw_value = (1000.0 * val_in_volts)/(0.100 * 128)
-                case "PSI_M5k":
-                    raw_value = (5000.0 * val_in_volts)/(0.100 * 128)
-                case "Degrees C":
-                    raw_value = (195.8363374*val_in_volts + 5.4986782) + internal_temp
-                case "Volts":
-                    raw_value = val_in_volts
-                case "C Internal":
-                    internal_temp = raw_value/1000 if SCALE_INTERNAL_TEMP else raw_value
-                case "lbs_tank":
-                    raw_value = val_in_volts*1014.54 - 32.5314
-                case "lbs_engine":
-                    raw_value = (-val_in_volts*5128.21 - 11.2821)/2
-                case "alt_ft":
-                    raw_value = raw_value * 3.281 #m to ft. Dammit Kamer!
-                case "g_force":
-                    raw_value = raw_value * 0.00102 # cm/s^2 to G
-                case "loop_ms":
-                    raw_value = raw_value / 1_000
-                case _ :
-                    pass
-                    print("Unexpected Unit")
-
-            processed_dict[sensor] = raw_value
-
-    return processed_dict
+    return processed_value
 
 
 def log_sensor_data(timestamp, sensor_data_dict):
