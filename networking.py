@@ -24,7 +24,6 @@ last_mote_time = [0, 0, 0, 0]
 # value = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["unit"]]
 sensor_dictionary = {'1, 99': ['FireX', None, None, None]}
 actuator_dictionary = {}
-most_recent_data_packet = {}
 
 actuator_states_and_sensor_tare_states = {}
 
@@ -137,7 +136,6 @@ def generate_handler():
 
             global sensor_dictionary
             global actuator_dictionary
-            global most_recent_data_packet
             global actuator_states_and_sensor_tare_states
 
             # check for config
@@ -163,10 +161,10 @@ def generate_handler():
                 else: 
                     # a sensor reading
                     p_and_id, interface_type, sensor_or_actuator, unit = sensor_dictionary[str(data["Mote id"]) + ", " + str(data["Pin"])]
-                    sensor_data[p_and_id] = data["Value"]
+                    sensor_data[p_and_id] = data['Value']
+                    sensor.raw_data_dict[p_and_id] = data["Value"]
 
             if sensor_data:
-                most_recent_data_packet = sensor_data
                 sensor.log_sensor_data(time.time() - start_time, sensor_data)
             if actuator_data:
                 actuator.log_actuator_data(time.time() - start_time, actuator_data)
@@ -198,10 +196,6 @@ def create_sensor_dictionary(sensor_and_actuator_list):
     for sensor in sensor_and_actuator_list:
         dict[sensor["Mote id"] + ", " + sensor["Pin"]] = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["Unit"]]
     return dict
-
-def get_sensor_data():
-    global most_recent_data_packet
-    return most_recent_data_packet
 
 def updateTares(actuator_states_and_sensor_tare_states_from_app_dot_py):
     global actuator_states_and_sensor_tare_states

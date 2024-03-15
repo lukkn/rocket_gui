@@ -49,26 +49,11 @@ def file_num_from_name(fname):
     return int(re.findall('\d+', fname)[0]) + 1
 
 def get_sensor_data():
-    global sensor_data_dict
-    most_recent_data_packet = networking.get_sensor_data()
-    print(most_recent_data_packet)
-    # decrease sensor TTL
-    for sensor in sensor_data_TTL:
-        sensor_data_TTL[sensor] -= 1
-        if sensor_data_TTL[sensor] == 0 :
-            processed_data_dict[sensor] = None
-            raw_data_dict[sensor] = None
-            sensor_data_TTL[sensor] = sensor_TTL
-
-    # process data and update data dictionary
-    for sensor in most_recent_data_packet:
-        raw_data_dict[sensor] = most_recent_data_packet[sensor]
-        processed_data_dict[sensor] = process_sensor_data(sensor, most_recent_data_packet[sensor])
-        sensor_data_TTL[sensor] = sensor_TTL
+    global processed_data_dict
     return processed_data_dict
 
 def tare(sensorID):
-    sensor_offset[sensorID] = sensor_data_dict[sensorID]
+    sensor_offset[sensorID] = raw_data_dict[sensorID]
 
 def untare(sensorID):
     sensor_offset[sensorID] = 0
@@ -113,12 +98,21 @@ def process_sensor_data(sensor_id, sensor_data):
 
 def log_sensor_data(timestamp, sensor_data_dict):
     data_to_log = [timestamp]
-
     for sensor in sensor_offset:
-        try:
-            data_to_log.extend([raw_data_dict[sensor], processed_data_dict[sensor], sensor_offset[sensor]])
-        except: 
-            data_to_log.extend([None, None, None])
+        raw_data = sensor_data_dict[sensor]
+        processed_data = process_sensor_data(sensor_data_dict[sensor])
+        # update raw and processed data in dictionaries
+        raw_data_dict[sensor] = raw_data
+        processed_data_dict[sensor] = processed_data
+        # add data to be logged to file
+        data_to_log.extend([raw_data, processed_data, sensor_offset[sensor]])
+        # decrease sensor TTL
+        for sensor in sensor_data_TTL:
+            sensor_data_TTL[sensor] -= 1
+            if sensor_data_TTL[sensor] == 0 :
+                processed_data_dict[sensor] = None
+                raw_data_dict[sensor] = None
+                sensor_data_TTL[sensor] = sensor_TTL
 
     with open(sensor_log_path, "a") as file:
         csv.writer(file).writerow(data_to_log)
