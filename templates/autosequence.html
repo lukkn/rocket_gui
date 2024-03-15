@@ -468,7 +468,11 @@
             const timer = document.getElementById("timer");
             timer.innerText = time_to_show + " s";
             redline_switch = document.getElementById('redlineOn');
-            redline_switch.checked = redline_on;
+            if (redline_on == "True") { 
+                redline_switch.checked = true 
+            } else if (redline_on == "False"){
+                redline_switch.checked = false
+            }
             if (autosequence_commands.length > 0){
                 displayCSV(autosequence_commands, "autosequence", ['P and ID', 'State', 'Time(ms)', 'Comments']);
             }
@@ -572,6 +576,7 @@
         }
 
         function redlineToggle(bool){
+            console.log(bool)
             socket.emit('redline_toggle', bool)
         }
 
