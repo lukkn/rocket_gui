@@ -111,14 +111,16 @@ def log_sensor_data(timestamp, sensor_data_dict):
             raw_data = sensor_data_dict[sensor]
             processed_data = process_sensor_data(sensor, sensor_data_dict[sensor])
             sensor_data_TTL[sensor] = sensor_TTL
+            # update raw and processed data in dictionaries
+            raw_data_dict[sensor] = raw_data
+            processed_data_dict[sensor] = processed_data
+            # add data to be logged to file
+            data_to_log.extend([raw_data, processed_data, sensor_offset[sensor]])
         except: 
-            raw_data = raw_data_dict[sensor]
-            processed_data = processed_data_dict[sensor]
-        # update raw and processed data in dictionaries
-        raw_data_dict[sensor] = raw_data
-        processed_data_dict[sensor] = processed_data
-        # add data to be logged to file
-        data_to_log.extend([raw_data, processed_data, sensor_offset[sensor]])
+            data_to_log.extend([None, None, None])
+
+        
+        
         
 
     with open(sensor_log_path, "a") as file:
