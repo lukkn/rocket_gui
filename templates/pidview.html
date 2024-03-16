@@ -157,10 +157,10 @@
             <legend id="sensorOrActuatorName">{{sensor['unit']}}</legend>
 
             <input type="radio" id="{{ sensor['P and ID'] }} Tare" name="{{ sensor['P and ID'] }}" class="checkbox"
-                onclick="buttonClicked(name, 'tare')" /><label id="{{ sensor['P and ID'] }} tare background"
+                onclick="tare(name, true)" /><label id="{{ sensor['P and ID'] }} tare background"
                 for="{{ sensor['P and ID'] }} Tare" class="toggleOn" style="font-size: small;">Tare</label><input
                 type="radio" id="{{ sensor['P and ID'] }} Untare" name="{{ sensor['P and ID'] }}" class="checkbox"
-                onclick="buttonClicked(name, 'untare')" /><label id="{{ sensor['P and ID'] }} untare background"
+                onclick="tare(name, false)" /><label id="{{ sensor['P and ID'] }} untare background"
                 for="{{ sensor['P and ID'] }} Untare" class="toggleOff" style="font-size: small;">Untare</label>
         </div>
 
@@ -243,8 +243,6 @@
             current_time = Date.now();
             socket.emit('actuator_button_press', id, state, current_time);
         }
-
-
 
         function submitCoordinates() {
             const textprompt = "tim hates linux"
@@ -348,26 +346,15 @@
             messageContainer.innerHTML = "Button Positions are UNLOCKED, Buttons are DISARMED";
         }
 
+        function tare(sensorID, state) {
+            socket.emit('tare', sensorID, state);
+        }
+
         socket.on('update_actuator_data', function (state, acks) {
             actuator_list.forEach(function (actuator) {
                 updateButtonColor([actuator['P and ID'], state[actuator['P and ID']]]);
             });
         });
-
-
-        // socket.on('sensor_data', function (data) {
-        //     // right now sending data as a list, index0 = data, index1 = timestamp of data and time of transmission
-        //     const listOfSensorIDValueTuples = data[0];
-        //     const timeAtTransmission = data[1];
-
-        //     listOfSensorIDValueTuples.forEach(function (sensorTuple) {
-        //         const sensorID = sensorTuple[0] + 'sensorValueLegend';
-        //         const sensorValue = sensorTuple[1];
-        //         document.getElementById(sensorID).textContent = sensorValue;
-        //     });
-
-        //     document.getElementById("performanceIndicator").textContent = `Data is: ${(Date.now() - timeAtTransmission).toFixed(1)} milliseconds old`;
-        // });
 
         socket.on('sensor_data', function (sensorDataDict) {
             for(const [sensorID, sensorValue] of Object.entries(sensorDataDict)){
