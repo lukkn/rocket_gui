@@ -138,10 +138,11 @@
             <legend id="sensorOrActuatorName">{{actuator['P and ID']}}</legend>
 
             <input type="radio" id="{{ actuator['P and ID'] }} OFF" name="{{ actuator['P and ID'] }}" class="checkbox"
-                onclick="buttonClicked(name, 'off')" /><label id="{{ actuator['P and ID'] }} off background" for="{{ actuator['P and ID'] }} OFF"
-                class="toggleOff">OFF</label><input type="radio" id="{{ actuator['P and ID'] }} ON" name="{{ actuator['P and ID'] }}"
-                class="checkbox" onclick="buttonClicked(name, 'on')" /><label id="{{ actuator['P and ID'] }} on background" for="{{ actuator['P and ID'] }} ON"
-                class="toggleOn">ON</label>
+                onclick="buttonClicked(name, 'Off')" /><label id="{{ actuator['P and ID'] }} Off background"
+                for="{{ actuator['P and ID'] }} OFF" class="toggleOff">OFF</label><input type="radio"
+                id="{{ actuator['P and ID'] }} ON" name="{{ actuator['P and ID'] }}" class="checkbox"
+                onclick="buttonClicked(name, 'On')" /><label id="{{ actuator['P and ID'] }} On background"
+                for="{{ actuator['P and ID'] }} ON" class="toggleOn">ON</label>
         </div>
 
 
@@ -156,9 +157,10 @@
             <legend id="sensorOrActuatorName">{{sensor['unit']}}</legend>
 
             <input type="radio" id="{{ sensor['P and ID'] }} Tare" name="{{ sensor['P and ID'] }}" class="checkbox"
-                onclick="buttonClicked(name, 'tare')" /><label id="{{ sensor['P and ID'] }} tare background" for="{{ sensor['P and ID'] }} Tare" class="toggleOn"
-                style="font-size: small;">Tare</label><input type="radio" id="{{ sensor['P and ID'] }} Untare"
-                name="{{ sensor['P and ID'] }}" class="checkbox" onclick="buttonClicked(name, 'untare')" /><label id="{{ sensor['P and ID'] }} untare background"
+                onclick="buttonClicked(name, 'tare')" /><label id="{{ sensor['P and ID'] }} tare background"
+                for="{{ sensor['P and ID'] }} Tare" class="toggleOn" style="font-size: small;">Tare</label><input
+                type="radio" id="{{ sensor['P and ID'] }} Untare" name="{{ sensor['P and ID'] }}" class="checkbox"
+                onclick="buttonClicked(name, 'untare')" /><label id="{{ sensor['P and ID'] }} untare background"
                 for="{{ sensor['P and ID'] }} Untare" class="toggleOff" style="font-size: small;">Untare</label>
         </div>
 
@@ -188,8 +190,7 @@
 
     <script>
         // fetch all button states as a variable
-        var actuatorStatesAndSensorTareStates = {{ actuator_states_and_sensor_tare_states | tojson | safe }};
-        //console.log("actuatorStatesAndSensorTareStates: ", actuatorStatesAndSensorTareStates);
+        var actuator_list = JSON.parse('{{ actuator_list|tojson|safe }}');
 
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -202,11 +203,6 @@
 
             // Fetch coordinates when the page is loaded
             getCoordinates();
-
-            // we load colors of the buttons saved in our python dictionary
-            for (let element of Object.entries(actuatorStatesAndSensorTareStates)) {
-                updateButtonColor(element);
-            };
 
             draggableElements.forEach(function (element) {
                 element.addEventListener('dragstart', function (e) {
@@ -243,9 +239,9 @@
             // when we unlock buttons we want to ignore any accidental clicks, not needed because of checkbox disable but here for extra protection
             if (!isLocked) {
                 return;
-            }            
+            }
             current_time = Date.now();
-            socket.emit('received_button_press', id, state, current_time);
+            socket.emit('actuator_button_press', id, state, current_time);
         }
 
 
@@ -292,25 +288,26 @@
             });
         }
 
-        function updateButtonColor(element){
+        function updateButtonColor(element) {
+            console.log("element", element);
             buttonID = element[0];
             buttonState = element[1];
 
             const a = document.getElementById("" + buttonID + " " + buttonState + " background");
 
-            if (buttonState === 'off'){
-                const b = document.getElementById("" + buttonID + " on" + " background");
+            if (buttonState === 'Off') {
+                const b = document.getElementById("" + buttonID + " On" + " background");
                 a.style.backgroundColor = "lightcoral";
                 b.style.backgroundColor = "white";
-            } else if (buttonState === 'on'){
-                const b = document.getElementById("" + buttonID + " off" + " background");
+            } else if (buttonState === 'On') {
+                const b = document.getElementById("" + buttonID + " Off" + " background");
                 a.style.backgroundColor = "lightgreen";
                 b.style.backgroundColor = "white";
-            } else if (buttonState === 'untare'){
+            } else if (buttonState === 'untare') {
                 const b = document.getElementById("" + buttonID + " tare" + " background");
                 a.style.backgroundColor = "lightcoral";
                 b.style.backgroundColor = "white";
-            } else if (buttonState === 'tare'){
+            } else if (buttonState === 'tare') {
                 const b = document.getElementById("" + buttonID + " untare" + " background");
                 a.style.backgroundColor = "lightgreen";
                 b.style.backgroundColor = "white";
@@ -351,6 +348,12 @@
             messageContainer.innerHTML = "Button Positions are UNLOCKED, Buttons are DISARMED";
         }
 
+        socket.on('update_actuator_data', function (state, acks) {
+            actuator_list.forEach(function (actuator) {
+                updateButtonColor([actuator['P and ID'], state[actuator['P and ID']]]);
+            });
+        });
+
 
         socket.on('sensor_data', function (data) {
             // right now sending data as a list, index0 = data, index1 = timestamp of data and time of transmission
@@ -358,7 +361,7 @@
             const timeAtTransmission = data[1];
 
             listOfSensorIDValueTuples.forEach(function (sensorTuple) {
-                const sensorID = sensorTuple[0]+'sensorValueLegend';
+                const sensorID = sensorTuple[0] + 'sensorValueLegend';
                 const sensorValue = sensorTuple[1];
                 document.getElementById(sensorID).textContent = sensorValue;
             });
@@ -370,8 +373,8 @@
             console.log("Disconnected from server, reason: " + reason);
             close();
         });
-        
-        socket.on('sensor_and_actuator_config_uploaded', function() {
+
+        socket.on('sensor_and_actuator_config_uploaded', function () {
             location.reload();
         });
 
