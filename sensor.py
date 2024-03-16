@@ -9,7 +9,7 @@ sensor_log_path = "logs/sensor_log_"
 internal_temp = 20 # assume room temp
 SCALE_INTERNAL_TEMP = True
 
-sensor_TTL = 100 # number of packets sensor is considered alive without data
+sensor_TTL = 20 # number of polls sensor is considered alive without data
 
 sensor_offset = {} # To keep track of taring
 sensor_units = {}  # Store the units corresponding to each sensor P and ID
@@ -50,6 +50,14 @@ def file_num_from_name(fname):
 
 def get_sensor_data():
     global processed_data_dict
+    global raw_data_dict
+    # decrease sensor TTL
+    for sensor in sensor_data_TTL:
+        if sensor_data_TTL[sensor] > 0 :
+            sensor_data_TTL[sensor] -= 1
+        else:
+            processed_data_dict[sensor] = None
+            raw_data_dict[sensor] = None
     return processed_data_dict
 
 def tare(sensorID):
@@ -99,20 +107,19 @@ def process_sensor_data(sensor_id, sensor_data):
 def log_sensor_data(timestamp, sensor_data_dict):
     data_to_log = [timestamp]
     for sensor in sensor_offset:
-        raw_data = sensor_data_dict[sensor]
-        processed_data = process_sensor_data(sensor_data_dict[sensor])
+        try:
+            raw_data = sensor_data_dict[sensor]
+            processed_data = process_sensor_data(sensor, sensor_data_dict[sensor])
+            sensor_data_TTL[sensor] = sensor_TTL
+        except: 
+            raw_data = raw_data_dict[sensor]
+            processed_data = processed_data_dict[sensor]
         # update raw and processed data in dictionaries
         raw_data_dict[sensor] = raw_data
         processed_data_dict[sensor] = processed_data
         # add data to be logged to file
         data_to_log.extend([raw_data, processed_data, sensor_offset[sensor]])
-        # decrease sensor TTL
-        for sensor in sensor_data_TTL:
-            sensor_data_TTL[sensor] -= 1
-            if sensor_data_TTL[sensor] == 0 :
-                processed_data_dict[sensor] = None
-                raw_data_dict[sensor] = None
-                sensor_data_TTL[sensor] = sensor_TTL
+        
 
     with open(sensor_log_path, "a") as file:
         csv.writer(file).writerow(data_to_log)
