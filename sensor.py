@@ -97,6 +97,8 @@ def process_sensor_data(sensor_id, sensor_data):
             processed_value = raw_value * 0.00102 # cm/s^2 to G
         case "loop_ms":
             processed_value = raw_value / 1_000
+        case "Rail_Voltage":
+            processed_value = val_in_volts * 23
         case _ :
             pass
             print("Unexpected Unit")
