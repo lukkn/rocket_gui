@@ -27,6 +27,8 @@
         cursor: pointer;
         border: none;
         border-radius: 5px;
+        padding: 5px;
+        width: 60px;
     }
     .sidebar{
         position: fixed;
@@ -150,6 +152,18 @@
         z-index: -1;
         opacity: 0.05;
     }
+    .tare_true {
+        background-color: #89929b;
+    }
+    .tare_false {
+        background-color: #ecf2f8;
+    }
+    .untare_true {
+        background-color: #89929b;
+    }
+    .untare_false {
+        background-color: #ecf2f8;
+    }
 
 </style>
 <body>
@@ -190,7 +204,10 @@
                             <td>{{ sensor['P and ID'] }}</td>
                             <td id="{{ sensor['P and ID'] }}_data" style="min-width: 100px; max-width: 100px; overflow-wrap: break-word;">No Data</td>
                             <td>{{ sensor['Unit'] }}</td>
-                            <td><button id="{{ sensor['P and ID'] }}" onclick="tare(id, true)" >Tare</button><button id="{{ sensor['P and ID'] }}" onclick="tare(id, false)"  >Untare</button></td>
+                            <td>
+                                <button id = "{{ sensor['P and ID'] }}_tare" name = "{{ sensor['P and ID'] }}" onclick="tare(name, true)" class = "{% if sensor_offset[sensor['P and ID']] == 0 %} tare_false {% else %} tare_true {% endif %}">Tare</button>
+                                <button id="{{ sensor['P and ID'] }}_untare" name = "{{ sensor['P and ID'] }}" onclick="tare(name, false)" class = "{% if sensor_offset[sensor['P and ID']] == 0 %} untare_true {% else %} untare_false {% endif %}">Untare</button>
+                            </td>
                             <script> sensorList.push("{{ sensor['P and ID'] }}") </script>
                         </tr>
                     {% endfor %}
@@ -201,17 +218,24 @@
         <div id="chartContainer"></div>
     </div>
 
-    
-
-    
-
+    <html id="sensor_offset" style = "color: #21262d">{{ sensor_offset }}</htm l>
     <script>
 
         var socket = io.connect('http://' + document.domain + ':' + location.port)
+        var sensor_offset = JSON.parse('{{ sensor_offset|tojson|safe }}');
 
         function tare(sensorID, state) {
             socket.emit('tare', sensorID, state);
-        }
+            if (document.getElementById(sensorID + '_data').textContent != "No Data"){
+                if (state) {
+                    document.getElementById(sensorID + "_tare").style.backgroundColor = "#89929b"
+                    document.getElementById(sensorID + "_untare").style.backgroundColor = "#ecf2f8"
+                } else {
+                    document.getElementById(sensorID + "_tare").style.backgroundColor = "#ecf2f8"
+                    document.getElementById(sensorID + "_untare").style.backgroundColor = "#89929b"
+                }
+            }
+        } 
 
         var chartCounter = 1;
         function addChart(){

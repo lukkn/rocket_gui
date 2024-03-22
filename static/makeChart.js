@@ -15,7 +15,6 @@ var activeSensorsList = Object.create(null); // key: canvasID    value: array of
 var dataDict = Object.create(null);
 var maxLabel = -Infinity;
 var minLabel = Infinity;
-var referenceValuesDictionary = Object.create(null)
 
 function plotLines(chartNumber) {
     const canvasID = "chart" + chartNumber
@@ -59,32 +58,8 @@ function plotLines(chartNumber) {
         context.stroke();
     }
 
-    // plot lines and draw references for active sensors
+    // plot lines
     activeSensors.forEach (function (sensor) {
-
-        if (referenceValuesDictionary[sensor]) {
-            // draw max line
-            const maxYIndex = canvas.height*((maxLabel - referenceValuesDictionary[sensor]['Max'])/(maxLabel - minLabel))
-            context.beginPath();
-            context.moveTo(40, maxYIndex);
-            context.lineTo(canvas.width, maxYIndex);
-            context.lineWidth = 2;
-            context.strokeStyle = sensorColors[sensor];
-            context.stroke();
-            context.fillText(sensor + '_max', 45 , maxYIndex);
-
-            // draw min line
-            context.beginPath();
-            const minYIndex = canvas.height*((maxLabel - referenceValuesDictionary[sensor]['Min'])/(maxLabel - minLabel))
-            context.moveTo(40, minYIndex);
-            context.lineTo(canvas.width, minYIndex);
-            context.lineWidth = 2;
-            context.strokeStyle = sensorColors[sensor];
-            context.stroke();
-            context.fillText(sensor + '_min', 45 , minYIndex);
-        }
-        
-
         let data = dataDict[sensor];
 
         const dataPoints = data.map((value, index) => ({
@@ -117,11 +92,6 @@ function defineScale(containerID){
 
     maxLabel = Math.ceil(Math.max(...activeData));
     minLabel = Math.floor(Math.min(...activeData));
-
-    dataRange = maxLabel - minLabel
-
-    maxLabel += dataRange * 0.1
-    minLabel -= dataRange * 0.1
 }
 
 function createEmptyChart(containerID, sensorsList){
@@ -217,9 +187,5 @@ function resizeCanvasToDisplaySize(canvas) {
         canvas.width  = displayWidth;
         canvas.height = displayHeight;
     }
-}
-
-function assignReferenceValues(refValDict){
-    referenceValuesDictionary = refValDict
 }
 

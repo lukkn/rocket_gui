@@ -17,10 +17,13 @@ Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,Unit,Unpowered
 1,sensor,SPI_ADC_1ch,POIM,2,POIM,PSI_S1k
 1,sensor,SPI_ADC_1ch,PFIM,3,PFIM,PSI_S1k
 1,sensor,SPI_ADC_1ch,PMCC,4,PMCC,PSI_S1k
+1,sensor,SPI_ADC_2ch PGA128,TOTR,10,TOTR,Degrees C
+1,sensor,ADC Internal Temp,TMP1,18,TMP1,C Internal
 1,sensor,Loop_Timer,TMR1,80,TMR1,loop_ms
 1,sensor,Volt_Monitor,12VM,71,12VM,Rail_Voltage
 1,sensor,Volt_Monitor,3V3M,72,3V3M,Rail_Voltage
 1,sensor,Volt_Monitor,5V0M,73,5V0M,Rail_Voltage
+1,sensor,Icarus_ALT,Altitude,49,ALTM,alt_ft
 1,actuator,Binary GPIO,VOTV,0,VOTV
 1,actuator,Binary GPIO,VOTD,1,VOTD
 1,actuator,Binary GPIO,VFTV,2,VFTV

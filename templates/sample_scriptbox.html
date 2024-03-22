@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autosequence</title>
+    <script src="{{ url_for('static', filename='socket.io.js') }}"></script>
+    <script src="{{ url_for('static', filename='papaparse.js') }}"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #21262d;
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px;
+            cursor: pointer;
+            border: none; 
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        table, th, td {
+            align-items: right;
+            border: 1px solid;
+            border-color: #ecf2f8;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+        table {
+            width: 50%;
+            color: #ecf2f8;
+        }
+
+        /* Style for file input and upload button */
+        input[type="file"] {
+            display: none;
+        }
+        #configButtons{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #csvFileMessage{
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ecf2f8;
+        }
+        #configContents {
+            margin: auto;
+            width: 90%;
+        }
+        #timer{
+            position: fixed;
+            top: 0;
+            left: 0;
+            font-size: 50px;
+            padding: 5px 10px;
+            margin: 10px;
+            border-radius: 5px;
+            background-color: #77bdfb;
+            
+        }
+        #launchButton {
+            background-color: #7ce38b;
+            font-size: 20px;
+            width: 20%;
+            padding: 10px;
+            margin: 0;
+            margin-bottom: 20px;
+            float: left;
+        }
+        #cancelButton {
+            background-color: #77bdfb;
+            font-size: 20px;
+            width: 50%;
+            padding: 10px;
+            margin: 0;
+            margin-bottom: 20px;
+            float: left;
+        }
+        #abortButton {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            background-color: #fa7970;
+            padding: 20px;
+            font-size: 30px;
+            width: 100%;
+            margin: 0;
+        }
+        #configContainer {
+            float: left;
+            width: 100%;
+            margin-bottom: 100px;
+        }
+        
+        .upload-button {
+            background-color: #77bdfb;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            overflow: wrap;
+        }
+        .activeRow{
+            background-color: #faa356;
+            color: #21262d;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="configContainer">
+        <div id="timer">0 s</div>
+        <div id="configButtons">
+            <label for="csvFile" class="upload-button">Upload CSV File</label>
+            <input type="file" id="csvFile" accept=".csv" onchange="updateFileName('csvFile')">
+            <button type="button" onclick="submitCSV('csvFile')">Submit CSV</button>
+        </div>
+        <div id="csvFileMessage" class= "fileName"></div>
+        <form onsubmit="return false;">
+            <button id="launchButton" onclick="launch()">
+            LAUNCH
+            </button>
+        </form>
+        <form onsubmit="return false;">
+            <button id="cancelButton" onclick="cancel()">
+               CANCEL
+            </button>
+        </form>
+        <div id="configContents">
+            <table id="configTable"></table>
+        </div>
+    </div>
+    <form onsubmit="return false;">
+        <button id="abortButton" onclick="abort()">
+           ABORT
+        </button>
+    </form>
+
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        var startTime = 0;
+        var time = 0;   
+        var timerStopped = false;
+
+        function updateFileName(inputId) {
+            const fileInput = document.getElementById(inputId);
+            const file = fileInput.files[0];
+            console.log(`File ${file.name} uploaded`);
+
+            const fileMessage = document.getElementById(inputId + "Message");
+            fileMessage.innerHTML = `File ${file.name} uploaded`;
+        }
+
+
+        function submitCSV(inputId) {
+            const fileInput = document.getElementById(inputId);
+            const file = fileInput.files[0];
+
+            if (file) {
+                // display submitted message
+                const fileMessage = document.getElementById(inputId + "Message");
+                fileMessage.innerHTML = `File ${file.name} submitted`;
+
+                // display file contents
+                displayCSV(file);
+
+                // send file to backend
+                socket.emit('autosequence', file);
+            } else {
+                alert('Please select a file before submitting.');
+            }
+        } 
+
+        function displayCSV(file){
+            const configTable = document.getElementById("configTable");
+            configTable.innerHTML = "";
+            Papa.parse(file, {
+                complete: function(results) {
+                    const table = createTable(results.data);
+                    startTime = results.data[1][2];
+                    time = parseInt(startTime)/1000;
+                    const timer = document.getElementById("timer");
+                    timer.innerText = time + " s";
+                }
+            });
+            
+        }
+
+        function createTable(tableData) {
+            var table = document.getElementById("configTable");
+            var tableBody = document.createElement('tbody');
+            var tableHead = document.createElement('thead');
+
+            const headData = tableData[0];
+            const bodyData = tableData.slice(1)
+
+            // create table head
+            var headRow = document.createElement('tr');
+            headData.forEach(function(headData){
+                var cell = document.createElement('th');
+                cell.border = "1px solid #ecf2f8";
+                cell.appendChild(document.createTextNode(headData));
+                headRow.appendChild(cell);
+            });
+            tableHead.appendChild(headRow);
+            table.appendChild(tableHead);
+
+            // create table body
+            bodyData.forEach(function(rowData) {
+                var row = document.createElement('tr');
+                row.id = rowData[0] + rowData[1] + rowData[2];
+
+                rowData.forEach(function(cellData) {
+                    var cell = document.createElement('td');
+                    cell.appendChild(document.createTextNode(cellData));
+                    row.appendChild(cell);
+                });
+
+                tableBody.appendChild(row);
+            });
+            
+            table.appendChild(tableBody);
+        }
+
+        function cancel(){
+            stopTimer();
+            socket.emit('cancel_request');
+        }
+
+        function abort(){
+            stopTimer();
+            socket.emit('abort_request');
+        }
+
+        function launch(){
+            socket.emit('launch_request');
+        }
+
+
+        function startTimer(){
+            timerStopped = false;
+            const timer = document.getElementById("timer");
+            var interval = 100; // ms
+            var expected = Date.now() + interval;
+            setTimeout(step, interval);
+            function step() {
+                var dt = Date.now() - expected; // the drift (positive for overshooting)
+                time += 0.1;
+                timer.innerText = time.toFixed(0) + " s";
+
+                expected += interval;
+                timeout = setTimeout(step, Math.max(0, interval - dt)); //take into account drift   
+                if (timerStopped){clearTimeout(timeout);}
+            }
+        }
+
+        function resetTimer() {
+            stopTimer();
+            time = parseInt(startTime)/1000;
+            const timer = document.getElementById("timer");
+            timer.innerText = time + " s";
+        }
+
+        function stopTimer() {
+            timerStopped = true;
+        }
+
+        socket.on('command', function (command) {
+            commandID = command[0] + command[1] + command[2];
+            var tableRow = document.getElementById(commandID);
+            tableRow.className = "activeRow";
+        });
+
+        socket.on('no_config', function(){
+            alert ("Please submit an autosequence file.")
+        })
+
+        socket.on('launch', function(){
+            startTimer();
+        })
+
+        socket.on('cancel', function(){
+            alert("Launch cancelled");
+        })
+    </script>
+</body>
+
+</html>

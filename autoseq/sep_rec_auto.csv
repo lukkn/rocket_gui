@@ -1,0 +1,7 @@
+P and ID,State,Time(ms),Comments
+PYRO1,False,-10000,Autoseq Start
+PYRO2,False,-10000,???
+PYRO1,True,0,Drogue Deployment
+PYRO1,False,1000,Drogue off
+PYRO2,True,1000,Main Deployment
+PYRO2,False,2000, Main off

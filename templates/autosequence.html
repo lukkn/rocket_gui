@@ -157,67 +157,16 @@
             vertical-align: middle;
             padding: 8px;
         }
-        #redlineSwitch {
-            position: fixed;
-            top: 50px;
-            right: 15px;
-            color: #ecf2f8;
-            text-align: center;
-            font-size: 15px;
-        }
-        #redlineOn{
+        input#switch {
             display: none;
         }
-        p {
-            color: #21262d;
-            font-weight: bold;
-            padding: 0 10px;
+        #redlineSwitch {
+            position: fixed;
+            top: 40px;
+            right: 5px;
+            color: #ecf2f8;
+            text-align: center;
             font-size: 13px;
-        }
-        #redlineOffText {
-            position: absolute;
-            top: -2px;
-            right: 28px;
-        }
-        #redlineOnText {
-            position: absolute;
-            top: -2px;
-            right: 0px;
-        }
-        .toggle {
-            margin-top: 2px;
-            position : relative;
-            display : inline-block;
-            width : 70px;
-            height : 35px;
-            background-color: #fa7970;
-            border-radius: 30px;
-            border: 2px solid #21262d;
-        }
-        .toggle:after {
-            content: 'OFF';
-            position: absolute;
-            width: 35px;
-            height: 23px;
-            border-radius: 50%;
-            background-color: #21262d;
-            top: 1px; 
-            left: 1px;
-            transition:  all 0.2s;
-            font-size: 13px;
-            font-weight: bold;
-            color: #fa7970;
-            padding-top: 10px;
-        }
-        #redlineOn:checked + .toggle::after {
-            left : 34px;
-            content: 'ON';
-            color: #7ce38b;
-        }
-            
-        /* Checkbox checked toggle label bg color */
-        #redlineOn:checked + .toggle {
-            background-color: #7ce38b;
         }
 
         .autosequenceActiveRow {
@@ -319,7 +268,6 @@
             display: inline-block;
             margin-bottom: 5px;
         }
-        
 
     </style>
 </head>
@@ -360,12 +308,9 @@
         </div>
             
         <div id="redlineSwitch">
-            Redline <br>
-            <input type = "checkbox" id = "redlineOn" onchange="redlineToggle(checked)">
-            <label for = "redlineOn" class = "toggle">
-                <p id = "redlineOffText"> OFF </p>   
-                <p id = "redlineOnText"> ON </p>
-            </label>
+            <input type="checkbox" id="switch">
+            <label for="switch"><img src = "../static/icons/redlineoff_icon.png">
+            <br> Redline Off</label>
         </div>
 
         
@@ -448,7 +393,7 @@
     <html id="redline_file_name" style = "color: #21262d">{{ redline_file_name }}</html>
     <html id="redline_states" style = "color: #21262d">{{ redline_states }}</html>
     <html id="time_to_show" style = "color: #21262d">{{ time_to_show }}</html>
-    <html id="redline_on" style = "color: #21262d">{{ redline_on }}</html>
+
     <script>
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
@@ -460,19 +405,12 @@
         var autosequence_file_name = '{{ autosequence_file_name }}'
         var abort_sequence_file_name = '{{ abort_sequence_file_name }}'
         var redline_file_name = '{{ redline_file_name }}'
-        var redline_on = '{{ redline_on }}'
         
 
         // once all elements are loaded
         document.addEventListener('DOMContentLoaded', function() {
             const timer = document.getElementById("timer");
             timer.innerText = time_to_show + " s";
-            redline_switch = document.getElementById('redlineOn');
-            if (redline_on == "True") { 
-                redline_switch.checked = true 
-            } else if (redline_on == "False"){
-                redline_switch.checked = false
-            }
             if (autosequence_commands.length > 0){
                 displayCSV(autosequence_commands, "autosequence", ['P and ID', 'State', 'Time(ms)', 'Comments']);
             }
@@ -497,7 +435,6 @@
                 fileName.innerText = redline_file_name
                 fileName.style.color = "#ecf2f8"
             }
-                
         });
 
         function submitCSV(inputId) {
@@ -573,11 +510,6 @@
                 }
                 
             });
-        }
-
-        function redlineToggle(bool){
-            console.log(bool)
-            socket.emit('redline_toggle', bool)
         }
 
 

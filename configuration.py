@@ -24,7 +24,7 @@ def get_interface_type_number(interface_name):
                       'i2c ADC 2ch PGA128', 'ADC Internal Temp', 'SPI_ADC_1ch', 
                       'SPI_ADC_2ch', 'SPI_ADC_2ch PGA2', 'SPI_ADC_2ch PGA4', 'SPI_ADC_2ch PGA8', 
                       'SPI_ADC_2ch PGA16', 'SPI_ADC_2ch PGA32', 'SPI_ADC_2ch PGA64', 'SPI_ADC_2ch PGA128',
-                      'Icarus_ALT', 'Icarus_IMU', 'Loop_Timer']
+                      'Icarus_ALT', 'Icarus_IMU', 'Volt_Monitor', 'Loop_Timer']
 
     # +1 because interface numbers start at 1, not 0
     return interface_list.index(interface_name) + 1

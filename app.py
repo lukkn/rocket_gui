@@ -52,7 +52,6 @@ connection_thread_lock = Lock()
 #i am in webthocket hell
 #lmao skill issue
 
-autoseq.setup_socket(socketio)
 
 # flask routes for webpages
 @app.route('/' + sessionID, methods=['GET']) # + sessionID here if needed
@@ -61,7 +60,7 @@ def index():
 
 @app.route('/autosequence' + sessionID, methods=['GET'])
 def autosequence():
-    return render_template('autosequence.html', autosequence_commands=autoseq.autosequence_commands, abort_sequence_commands= autoseq.abort_sequence_commands, time_to_show=autoseq.time_to_show, autosequence_file_name = autoseq.autosequence_file_name, abort_sequence_file_name = autoseq.abort_sequence_file_name, redline_file_name = autoseq.redline_file_name, redline_states = autoseq.redline_limits, armed = armed, redline_on = autoseq.redline_on)
+    return render_template('autosequence.html', autosequence_commands=autoseq.autosequence_commands, abort_sequence_commands= autoseq.abort_sequence_commands, time_to_show=autoseq.time_to_show, autosequence_file_name = autoseq.autosequence_file_name, abort_sequence_file_name = autoseq.abort_sequence_file_name, redline_file_name = autoseq.redline_file_name, redline_states = autoseq.redline_states, armed = armed)
 
 @app.route('/pidview' + sessionID, methods=['GET'])
 def pidview():
@@ -69,7 +68,7 @@ def pidview():
 
 @app.route('/sensors' + sessionID, methods=['GET'])
 def sensors():
-    return render_template('sensors.html', sensor_list=sensor_list, armed = armed, redline_limits = autoseq.redline_limits)
+    return render_template('sensors.html', sensor_list=sensor_list, armed = armed, sensor_offset = sensor.sensor_offset)
 
 @app.route('/actuators' + sessionID, methods=['GET'])
 def actuators():
@@ -166,9 +165,6 @@ def handle_redline(file, fileName):
     message = autoseq.parse_and_check_redline(file, fileName)
     socketio.emit(message)
 
-@socketio.on('redline_toggle')
-def handle_redline_toggle(bool):
-    autoseq.redline_on = bool
 
 @socketio.on('launch_request')
 def handle_launch_request():
@@ -245,6 +241,11 @@ def update_connection_status():
     global mote_status
     global start_time
     while True:
+        system_time_in_seconds = int(time.time() - start_time)
+        seconds = ('0' + str(system_time_in_seconds%60)) if (system_time_in_seconds%60 < 10) else str(system_time_in_seconds%60)
+        minutes = ('0' + str((system_time_in_seconds//60)%60)) if ((system_time_in_seconds//60)%60 < 10) else str((system_time_in_seconds//60)%60)
+        hours = ('0' + str((system_time_in_seconds//60)//60)) if ((system_time_in_seconds//60)//60 < 10) else str((system_time_in_seconds//60)//60)
+        system_time = hours + ":" + minutes + ":" + seconds 
         system_time_in_seconds = int(time.time() - start_time)
         seconds = ('0' + str(system_time_in_seconds%60)) if (system_time_in_seconds%60 < 10) else str(system_time_in_seconds%60)
         minutes = ('0' + str((system_time_in_seconds//60)%60)) if ((system_time_in_seconds//60)%60 < 10) else str((system_time_in_seconds//60)%60)

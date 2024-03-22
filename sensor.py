@@ -7,9 +7,9 @@ import networking
 sensor_log_path = "logs/sensor_log_"
 
 internal_temp = 20 # assume room temp
-SCALE_INTERNAL_TEMP = True
+SCALE_INTERNAL_TEMP = False
 
-sensor_TTL = 20 # number of polls sensor is considered alive without data
+sensor_TTL = 100 # number of polls sensor is considered alive without data (20 polls = 1 second)
 
 sensor_offset = {} # To keep track of taring
 sensor_units = {}  # Store the units corresponding to each sensor P and ID
@@ -17,7 +17,7 @@ sensor_data_TTL = {} # Keeps track of how many more packets without data for a p
 raw_data_dict = {} # Contains raw sensor data
 processed_data_dict = {} # Contains tared and unit converted data 
 
-def initialize_sensor_info(sensor_list, config_name):
+def initialize_sensor_info(sensor_list, config_name): 
 
     csv_header_list = ['Timestamp (ms)']
     for sensor in sensor_list:
@@ -39,7 +39,7 @@ def initialize_sensor_info(sensor_list, config_name):
     except: 
         current_filenum = 0 
 
-    sensor_log_path = "logs/sensor_log_" + str(current_filenum) + "_" + config_name + ".csv"
+    sensor_log_path = "logs/sensor_log_" + str(current_filenum) + "_" + config_name[0:-4] + ".csv"
     with open(sensor_log_path, "w") as file:
         csv.writer(file).writerow(csv_header_list)
         file.flush()
@@ -73,10 +73,12 @@ def process_sensor_data(sensor_id, sensor_data):
     processed_value = None
 
     match sensor_units[sensor_id]:
+        case "Volts":
+            processed_value = val_in_volts
         case "PSI_S1k":
             processed_value = 250 * val_in_volts - 125
         case "PSI_H5k":
-            processed_value = 1250 * 2 * val_in_volts - 625
+            processed_value = 1250 * val_in_volts - 625
         case "PSI_M1k":
             processed_value = (1000.0 * val_in_volts)/(0.100 * 128)
         case "PSI_M5k":
@@ -87,6 +89,7 @@ def process_sensor_data(sensor_id, sensor_data):
             processed_value = val_in_volts
         case "C Internal":
             internal_temp = raw_value/1000 if SCALE_INTERNAL_TEMP else raw_value
+            processed_value = internal_temp
         case "lbs_tank":
             processed_value = val_in_volts*1014.54 - 32.5314
         case "lbs_engine":
@@ -120,11 +123,6 @@ def log_sensor_data(timestamp, sensor_data_dict):
             data_to_log.extend([raw_data, processed_data, sensor_offset[sensor]])
         except: 
             data_to_log.extend([None, None, None])
-
-        
-        
-        
-
     with open(sensor_log_path, "a") as file:
         csv.writer(file).writerow(data_to_log)
         file.flush()
