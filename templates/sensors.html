@@ -134,7 +134,7 @@
         text-align: center;
     }
     th {
-        padding: 10px 5px; 
+        padding: 5px; 
     }
     td {
         padding: 5px;
@@ -202,7 +202,7 @@
                     {% for sensor in sensor_list %}
                         <tr>
                             <td>{{ sensor['P and ID'] }}</td>
-                            <td id="{{ sensor['P and ID'] }}_data" style="min-width: 100px; max-width: 100px; overflow-wrap: break-word;">No Data</td>
+                            <td id="{{ sensor['P and ID'] }}_data">No Data</td>
                             <td>{{ sensor['Unit'] }}</td>
                             <td>
                                 <button id = "{{ sensor['P and ID'] }}_tare" name = "{{ sensor['P and ID'] }}" onclick="tare(name, true)" class = "{% if sensor_offset[sensor['P and ID']] == 0 %} tare_false {% else %} tare_true {% endif %}">Tare</button>
