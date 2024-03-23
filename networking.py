@@ -55,16 +55,18 @@ def send_actuator_command(mote_id, pin_num, state, interface_type='Binary GPIO',
     config_byte = actuator_write_command | actuator_state_mask | interface_type_number
     ip = get_ip(mote_id=mote_id)
     #for _ in range(3):
-    sock.sendto(bytes([int(pin_num), config_byte]), (ip, 8888))
+    try:
+        sock.sendto(bytes([int(pin_num), config_byte]), (ip, 8888))
+    except:
+        print("Actuator command failed to send. MoteID: " + str(mote_id) + " Pin Num: "  + str(pin_num) + " Interface type: " + interface_type)
 
 def send_heartbeat():
     print("Started heartbeat thread")
     while True:
-        # send 3 UDP packets for redundancy
         send_actuator_command(1, 100, True, interface_type='Heartbeat')
         send_actuator_command(2, 100, True, interface_type='Heartbeat')
         send_actuator_command(3, 100, True, interface_type='Heartbeat')
-        #print("sending hearbeat")S
+        send_actuator_command(4, 100, True, interface_type='Heartbeat')
         time.sleep(2.5)
 
 heartbeat_thread = Thread(target=send_heartbeat, daemon=True)
