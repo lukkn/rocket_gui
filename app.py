@@ -162,8 +162,11 @@ def actuator_button_coordinates(get_request_or_coordinate_data):
 def handle_autoseqeunce(file, fileName):
     global time_to_show
     message = autoseq.parse_and_check_sequence_files('autosequence', fileName, file)
-    time_to_show = int(int(autoseq.autosequence_commands[0]['Time(ms)'])/1000)
     socketio.emit(message)
+    try:
+        time_to_show = int(int(autoseq.autosequence_commands[0]['Time(ms)'])/1000)
+    except:
+        pass
     #print("an autosequence file error occured")
 
 

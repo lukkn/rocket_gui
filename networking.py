@@ -40,7 +40,7 @@ def send_actuator_command(mote_id, pin_num, state, interface_type='Binary GPIO',
     if interface_type != 'Heartbeat':
         print(f"Sending {state} command to pin {pin_num} on MoTE {mote_id}, via {interface_type}")
         actuator_pid = actuator_dictionary[str(mote_id) + ", " + str(pin_num)][0]
-        actuator.log_actuator_data(time.time() - start_time, {actuator_pid: state})
+        actuator.log_actuator_data(round((time.time() - start_time) * 1000, 1), {actuator_pid: state})
     if interface_type == 'servoPWM_12V':
             #the GPIO pin we connect to is equal to the 5V the servo is "connected" to + 28
             #send_actuator_command(mote_id, 22, True)
@@ -172,9 +172,9 @@ def generate_handler():
                     sensor.raw_data_dict[p_and_id] = data["Value"]
 
             if sensor_data:
-                sensor.log_sensor_data(time.time() - start_time, sensor_data)
+                sensor.log_sensor_data(round((time.time() - start_time) * 1000, 1), sensor_data)
             if actuator_data:
-                actuator.log_actuator_data(time.time() - start_time, actuator_data)
+                actuator.log_actuator_data(round((time.time() - start_time) * 1000, 1), actuator_data)
 
     return TelemetryRecieveHandler
 

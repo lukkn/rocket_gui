@@ -24,7 +24,7 @@ def initialize_actuator_states(actuator_list, config_name):
         actuator_acks[actuator['P and ID']] = False
 
     # initialize actuator_log 
-    csv_header_list = ['Timestamp (ms)', "P and ID", "State"]
+    csv_header_list = ['Timestamp (s)', "P and ID", "State"]
     global actuator_log_path
 
     filenames = sorted(list(filter(lambda flname: "actuator_log" in flname, next(os.walk("logs"), (None, None, []))[2])), key=file_num_from_name)
