@@ -115,9 +115,12 @@ def ping_mote():
                 mote_status[moteID - 1] = [False, None]
             else:
                 # don't attempt to ping if the box is not there
-                pingRepsonse = ping(ip_address, unit='ms', timeout=1)
-                if pingRepsonse is not None:
-                    mote_status[moteID - 1] = [True, round(pingRepsonse, 2)]
+                try:
+                    pingRepsonse = ping(ip_address, unit='ms', timeout=1)
+                    if pingRepsonse is not None:
+                        mote_status[moteID - 1] = [True, round(pingRepsonse, 2)]
+                except:
+                    print('ping failed on MoTE' + str(moteID))
 
         time.sleep(1)
 
