@@ -17,7 +17,6 @@
             column-gap: 10px;
             margin: 0;
             font-size: 14px;
-
             max-width: 100%; /* prevents horizontal scrolling */
             overflow-x: hidden;
         }
@@ -53,13 +52,14 @@
             float: left;
             width: 100px;
             font-size: 13px;
-            padding:5px ;
+            padding:10px;
         }
 
         .pageLink {
             margin-top: 20px;
             text-align: center;
             padding: 10px;
+            border-radius: 10px;
         }
 
         .pageLink button {
@@ -105,6 +105,7 @@
             height: 110px;
             color: #ecf2f8;
             border: none;
+            border-radius: 10px;
         }
 
         .controlButton img{
@@ -160,10 +161,10 @@
 
     <!-- Page Links -->
     <div id="pageLinks">
-        <div class = "pageLink"><button onclick="openPage('/actuators' + '{{ sessionID }}');"><img src = "../static/icons/actuator_icon.png"></button> Actuators</div>
-        <div class = "pageLink"><button onclick="openPage('/sensors' + '{{ sessionID }}');"><img src = "../static/icons/sensor_icon.png"></button> Sensors</div>
-        <div class = "pageLink"><button onclick="openPage('/pidview' + '{{ sessionID }}');"><img src = "../static/icons/pid_icon.png"></button>PID View</div>
-        <div class = "pageLink"><button onclick="openPage('/autosequence' + '{{ sessionID }}');"><img src = "../static/icons/autosequence_icon.png"></button>Autosequence</div>
+        <div class = "pageLink" name = "responsiveButton"><button onclick="openPage('/actuators' + '{{ sessionID }}');"><img src = "../static/icons/actuator_icon.png"></button> Actuators</div>
+        <div class = "pageLink" name = "responsiveButton"><button onclick="openPage('/sensors' + '{{ sessionID }}');"><img src = "../static/icons/sensor_icon.png"></button> Sensors</div>
+        <div class = "pageLink" name = "responsiveButton"><button onclick="openPage('/pidview' + '{{ sessionID }}');"><img src = "../static/icons/pid_icon.png"></button>PID View</div>
+        <div class = "pageLink" name = "responsiveButton"><button onclick="openPage('/autosequence' + '{{ sessionID }}');"><img src = "../static/icons/autosequence_icon.png"></button>Autosequence</div>
     </div>
 
 
@@ -185,19 +186,19 @@
                 </tr>
                 <tr>
                     <td>MoTE2</td>
-                    <td>{{ mote_names[1] }}</td>
+                    <td><input type = 'text' value = "{{ mote_names[1] }}" onchange="submitMoteName(2, value)"></td>
                     <td id = "mote2connection"></td>
                     <td id = "mote2ping"></td>
                 </tr>
                 <tr>
                     <td>MoTE3</td>
-                    <td>{{ mote_names[2] }}</td>
+                    <td><input type = 'text' value = "{{ mote_names[2] }}" onchange="submitMoteName(3, value)"></td>
                     <td id = "mote3connection"></td>
                     <td id = "mote3ping"></td>
                 </tr>
                 <tr>
                     <td>MoTE4</td>
-                    <td>{{ mote_names[3] }}</td>
+                    <td><input type = 'text' value = "{{ mote_names[3] }}" onchange="submitMoteName(4, value)"></td>
                     <td id = "mote4connection"></td>
                     <td id = "mote4ping"></td>
                 </tr>
@@ -250,21 +251,21 @@
 
     <div id="systemControls">
         <!-- Arm button -->
-        <div class = "controlButton">
+        <div class = "controlButton" name = "responsiveButton">
             <button id="armDisarmButton" class = 'controlButton' name="{% if armed %}armed{% else %}disarmed{% endif %}" onclick="socket.emit('armOrDisarmRequest');">
                 <img id = "armDisarmImg" src = "{% if armed %}../static/icons/armed_icon.png{% else %}../static/icons/disarmed_icon.png{% endif %}"> 
                 {% if armed %}Armed{% else %}Disarmed{% endif %}
             </button>
         </div>
          <!-- Upload buttons for CSV file -->
-        <div class = "controlButton">
+        <div class = "controlButton" name = "responsiveButton">
             <button id = "uploadButton" class = 'controlButton' >
                 <label for ="csvFile1"><img src = "../static/icons/upload_icon.png">Upload Config</label>
                 <input type="file" id="csvFile1" accept=".csv" onchange="uploadFile('csvFile1')">
             </button>
         </div>
         <!-- Connect button -->
-        <div class = "controlButton">
+        <div class = "controlButton" name = "responsiveButton">
             <button id = "connectButton" class = 'controlButton' title = "Send config to MoTE" onclick="connectToMote()">
                 <img src = "../static/icons/connect_icon.png" style = "width: 70px">
                 Connect
@@ -286,6 +287,18 @@
 
     <script>
         var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        const responsiveButtons = [...document.getElementsByName("responsiveButton")]
+        responsiveButtons.forEach(function(button) {
+            button.addEventListener("mousedown", function () {
+                button.style.backgroundColor = "#161b22";
+                button.style.opacity = "0.5";
+            });
+            button.addEventListener("mouseup", function () {
+                button.style.backgroundColor = "transparent";
+                button.style.opacity = "1";
+            });
+        });
 
         function openPage(page) {
             //var myWindow = window.open(page, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=${screenWidth}, top=${screenHeight}`);
