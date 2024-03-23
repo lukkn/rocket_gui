@@ -5,6 +5,7 @@ import os
 import time
 import webbrowser
 import sys
+import csv
 
 # Define the path to the custom library directory and import the custom libs
 # if there are yellow error squiggles under some import stuff ignore it
@@ -56,7 +57,7 @@ connection_thread_lock = Lock()
 # flask routes for webpages
 @app.route('/' + sessionID, methods=['GET']) # + sessionID here if needed
 def index():
-    return render_template('index.html', armed=armed, config_file_name = config_file_name, sensor_list=sensor_list, actuator_list=actuator_list, sessionID=sessionID)
+    return render_template('index.html', armed=armed, config_file_name = config_file_name, sensor_list=sensor_list, actuator_list=actuator_list, sessionID=sessionID, mote_names=mote_names)
 
 @app.route('/autosequence' + sessionID, methods=['GET'])
 def autosequence():
@@ -115,6 +116,13 @@ def armDisarm():
         print('client requested a non-boolean state')
     socketio.emit('armOrDisarmResponse', armed)
     print('variable armed is now: ', armed)
+
+@socketio.on('mote_name_changed')
+def handle_mote_name_change_request(moteID, name):
+    mote_names[moteID-1] = name
+    with open(mote_name_file, "w") as file:
+        csv.writer(file).writerow(mote_names)
+        file.close()
 
 @socketio.on('actuator_button_press')
 def handle_button_press(buttonID, state, current_time):
@@ -292,6 +300,9 @@ def sensor_data_and_actuator_acks_thread():
         socketio.emit('sensor_data', sensors_and_data)
         socketio.emit('update_actuator_data', actuator_data)
 
+# get mote names from file
+mote_name_file = "static/moteNames.csv"
+mote_names = open(mote_name_file).read().split(",")
 
 # start all background threads
 networking.start_telemetry_thread()

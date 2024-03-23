@@ -13,7 +13,7 @@ sensor_TTL = 100 # number of polls sensor is considered alive without data (20 p
 
 sensor_offset = {} # To keep track of taring
 sensor_units = {}  # Store the units corresponding to each sensor P and ID
-sensor_data_TTL = {} # Keeps track of how many more packets without data for a particular sensor before it is considered disconnected
+sensor_data_TTL = {} # Keeps track of how many more polls can be without new data for a sensor before it is considered disconnected
 raw_data_dict = {} # Contains raw sensor data
 processed_data_dict = {} # Contains tared and unit converted data 
 
@@ -114,7 +114,7 @@ def log_sensor_data(timestamp, sensor_data_dict):
     for sensor in sensor_offset:
         try:
             raw_data = sensor_data_dict[sensor]
-            processed_data = process_sensor_data(sensor, sensor_data_dict[sensor])
+            processed_data = process_sensor_data(sensor, sensor_data_dict[sensor]) 
             sensor_data_TTL[sensor] = sensor_TTL
             # update raw and processed data in dictionaries
             raw_data_dict[sensor] = raw_data

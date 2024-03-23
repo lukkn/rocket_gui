@@ -55,28 +55,4 @@ def load_config(file=CONFIG_FILE):
             print(row)
     return actuators, sensors
 
-def load_auto_test(file_name):
-    commands = []
-    with open(file_name, 'r') as f:
-        for row in csv.DictReader(f):
-            commands.append(row)
-
-    return commands
-
-def load_setpoint_csv(file_name='../Autoseq/abort_redline.csv'):
-    setpoints = []
-    with open(file_name):
-        with open(file_name, 'r') as f:
-            for row in csv.DictReader(f):
-                sens = list(filter(lambda a : a['P and ID'] == row['P and ID'], load_config()[1]))[0]
-                sensor_id = (sens['Mote id'], sens['Pin'])
-
-                setpoints.append({**row,**{'ID': sensor_id}})
-    
-    return setpoints
-
-try:
-    setpoints = load_setpoint_csv()
-except:
-    print("Unable to load setpoints")
 

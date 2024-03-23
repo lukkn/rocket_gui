@@ -135,7 +135,16 @@
             z-index: -1;
             opacity: 0.05;
         }
-
+        input {
+            background-color: transparent;
+            border: none;
+            text-align: center;
+            color: #ecf2f8;
+        }
+        ::placeholder{
+            color: #ecf2f8;
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -170,25 +179,25 @@
                 </tr>
                 <tr >
                     <td>MoTE1</td>
-                    <td>Purge Panel</td>
+                    <td><input type = 'text' value = "{{ mote_names[0] }}" onchange="submitMoteName(1, value)"></td>
                     <td id = "mote1connection"></td>
                     <td id = "mote1ping"></td>
                 </tr>
                 <tr>
                     <td>MoTE2</td>
-                    <td>Pneumatics Panel</td>
+                    <td>{{ mote_names[1] }}</td>
                     <td id = "mote2connection"></td>
                     <td id = "mote2ping"></td>
                 </tr>
                 <tr>
                     <td>MoTE3</td>
-                    <td>Tank Stand</td>
+                    <td>{{ mote_names[2] }}</td>
                     <td id = "mote3connection"></td>
                     <td id = "mote3ping"></td>
                 </tr>
                 <tr>
                     <td>MoTE4</td>
-                    <td>LoRA</td>
+                    <td>{{ mote_names[3] }}</td>
                     <td id = "mote4connection"></td>
                     <td id = "mote4ping"></td>
                 </tr>
@@ -278,31 +287,23 @@
     <script>
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-        // used to get screen dimensions for opening small windows
-        // var screenWidth = window.screen.availWidth;
-        // var screenHeight = window.screen.availHeight;
-
-        //window.open(`/actuators`, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=0, top=0`);
-        //window.open(`/sensors`, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=${screenWidth}, top=${screenHeight}`);
-        //window.open(`/pidview`, `_blank`, `width=${screenWidth / 4}, height=${screenHeight / 4}`);
-
-
         function openPage(page) {
             //var myWindow = window.open(page, `_blank`, `width=${screenWidth / 2}, height=${screenHeight / 2}, left=${screenWidth}, top=${screenHeight}`);
             var myWindow = window.open(page, `_blank`);
         }
 
-
         function uploadFile(inputId) {
             const fileInput = document.getElementById(inputId);
             const file = fileInput.files[0];
             socket.emit("uploadConfigFile", [inputId, file], file.name);
-
         }
-
 
         function connectToMote(){
             socket.emit("connect_request");
+        }
+
+        function submitMoteName(moteID, name){
+            socket.emit('mote_name_changed', moteID, name)
         }
 
         socket.on('armOrDisarmResponse', function (boolean_state) {

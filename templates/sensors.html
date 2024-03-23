@@ -310,7 +310,6 @@
 
         socket.on('armOrDisarmResponse', function (boolean_state) {
             const armDisarmButton = document.getElementById('armDisarmButton');
-            console.log(armDisarmImg);
             // Toggle the text and color
             if (boolean_state) {
                 armDisarmButton.innerHTML = '<img id = "armDisarmImg" src = "../static/icons/armed_icon.png">';
