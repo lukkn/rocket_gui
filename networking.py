@@ -39,6 +39,8 @@ def get_ip(mote_id=None):
 def send_actuator_command(mote_id, pin_num, state, interface_type='Binary GPIO', buttonID=None):
     if interface_type != 'Heartbeat':
         print(f"Sending {state} command to pin {pin_num} on MoTE {mote_id}, via {interface_type}")
+        actuator_pid = actuator_dictionary[str(mote_id) + ", " + str(pin_num)][0]
+        actuator.log_actuator_data(time.time() - start_time, {actuator_pid: state})
     if interface_type == 'servoPWM_12V':
             #the GPIO pin we connect to is equal to the 5V the servo is "connected" to + 28
             #send_actuator_command(mote_id, 22, True)
@@ -161,7 +163,7 @@ def generate_handler():
                     p_and_id, interface_type, sensor_or_actuator, unit = actuator_dictionary[str(data["Mote id"]) + ", " + str(int(data["Pin"]) - 100)]
                     state = data["Value"]
                     actuator.log_actuator_ack(p_and_id, state)
-                    actuator_data[p_and_id] = state
+                    actuator_data[p_and_id + "_ack"] = state
                     
                 else: 
                     # a sensor reading
