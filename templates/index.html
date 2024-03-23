@@ -146,6 +146,15 @@
             color: #ecf2f8;
             font-size: 14px;
         }
+        .noConfig{
+            color: #fa7970;
+        }
+        .configMatches{
+            color: #7ce38b;
+        }
+        .configOutdated{
+            color: #faa356;
+        }
     </style>
 </head>
 
@@ -177,30 +186,35 @@
                     <th>Name</th>
                     <th>Status</th>
                     <th>Ping (ms)</th>
+                    <th>Config</th>
                 </tr>
                 <tr >
                     <td>MoTE1</td>
                     <td><input type = 'text' value = "{{ mote_names[0] }}" onchange="submitMoteName(1, value)"></td>
                     <td id = "mote1connection"></td>
                     <td id = "mote1ping"></td>
+                    <td class = "{% if mote_configs[0] == None %} noConfig {% elif mote_configs[0] == config_file_name %} configMatches {% else %} configOutdated {% endif %}">{{ mote_configs[0] }}</td>
                 </tr>
                 <tr>
                     <td>MoTE2</td>
                     <td><input type = 'text' value = "{{ mote_names[1] }}" onchange="submitMoteName(2, value)"></td>
                     <td id = "mote2connection"></td>
                     <td id = "mote2ping"></td>
+                    <td class = "{% if mote_configs[1] == None %} noConfig {% elif mote_configs[1] == config_file_name %} configMatches {% else %} configOutdated {% endif %}">{{ mote_configs[1] }}</td>
                 </tr>
                 <tr>
                     <td>MoTE3</td>
                     <td><input type = 'text' value = "{{ mote_names[2] }}" onchange="submitMoteName(3, value)"></td>
                     <td id = "mote3connection"></td>
                     <td id = "mote3ping"></td>
+                    <td class = "{% if mote_configs[2] == None %} noConfig {% elif mote_configs[2] == config_file_name %} configMatches {% else %} configOutdated {% endif %}">{{ mote_configs[2] }}</td>
                 </tr>
                 <tr>
                     <td>MoTE4</td>
                     <td><input type = 'text' value = "{{ mote_names[3] }}" onchange="submitMoteName(4, value)"></td>
                     <td id = "mote4connection"></td>
                     <td id = "mote4ping"></td>
+                    <td class = "{% if mote_configs[3] == None %} noConfig {% elif mote_configs[3] == config_file_name %} configMatches {% else %} configOutdated {% endif %}">{{ mote_configs[3] }}</td>
                 </tr>
             </table>
         </fieldset>
@@ -313,6 +327,7 @@
 
         function connectToMote(){
             socket.emit("connect_request");
+            location.reload();
         }
 
         function submitMoteName(moteID, name){

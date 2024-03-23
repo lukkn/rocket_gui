@@ -36,6 +36,7 @@ actuator_list = []
 sensor_list = []
 
 mote_status = []
+mote_configs = [None, None, None, None]
 config_file_name = None
 
 # Global Variable that determines if stand is armed
@@ -57,7 +58,7 @@ connection_thread_lock = Lock()
 # flask routes for webpages
 @app.route('/' + sessionID, methods=['GET']) # + sessionID here if needed
 def index():
-    return render_template('index.html', armed=armed, config_file_name = config_file_name, sensor_list=sensor_list, actuator_list=actuator_list, sessionID=sessionID, mote_names=mote_names)
+    return render_template('index.html', armed=armed, config_file_name = config_file_name, sensor_list=sensor_list, actuator_list=actuator_list, sessionID=sessionID, mote_names=mote_names, mote_configs = mote_configs)
 
 @app.route('/autosequence' + sessionID, methods=['GET'])
 def autosequence():
@@ -103,6 +104,9 @@ def loadConfigFile(CSVFileAndFileContents, fileName):
 @socketio.on('connect_request')
 def handle_connect_request():
     print("Attempting to send config to MoTE")
+    for index in range(len(mote_status)):
+        if mote_status[index][0]:
+            mote_configs[index] = config_file_name
     networking.send_config_to_mote(sensor_list, actuator_list) # Networking function
 
 @socketio.on('armOrDisarmRequest')
