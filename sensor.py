@@ -39,7 +39,7 @@ def initialize_sensor_info(sensor_list, config_name):
     except: 
         current_filenum = 0 
 
-    sensor_log_path = "logs/sensor_log_" + str(current_filenum) + "_" + config_name[0:-4] + ".csv"
+    sensor_log_path = "logs/sensor_log_" + str(current_filenum) + "_" + config_name
     with open(sensor_log_path, "w") as file:
         csv.writer(file).writerow(csv_header_list)
         file.flush()
