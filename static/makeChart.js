@@ -98,7 +98,9 @@ function createEmptyChart(containerID, sensorsList){
     activeSensorsList[containerID] = [];
     createCheckboxes(containerID, sensorsList);
     sensorsList.forEach(function(sensorName) {
-        dataDict[sensorName] = [];
+        if (!dataDict[sensorName]){
+            dataDict[sensorName] = [];
+        }
     });
 
 }
