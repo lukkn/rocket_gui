@@ -132,16 +132,17 @@ def handle_mote_name_change_request(moteID, name):
 def handle_button_press(buttonID, state, current_time):
     state_bool = True if state == "On" else False if state == "Off" else None
     buttonDict = [config_line for config_line in actuator_list if config_line['P and ID'] == buttonID][0]
-
     if state_bool is None:
         print(f"Invalid state {state}, no command sent")
         return
-
     print('received button press: ', buttonID, state, 'Delay:',(time.time_ns() // 1_000_000) - current_time)
-    if armed:
-        networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], state_bool, buttonDict['Interface Type'], buttonID=buttonID)
+    mote_id = buttonDict['Mote id']
+    if not armed:
+        print("Stand is disarmed!!! " + buttonID + " was not set to " + state)
+    elif not mote_status[int(mote_id) - 1][0]:
+        print("Mote " + mote_id + " is disconnected, " + buttonID + " was not set to " + state)
     else:
-        print("stand is disarmed!!! " + buttonID + " was not set to " + state)
+        networking.send_actuator_command(buttonDict['Mote id'], buttonDict['Pin'], state_bool, buttonDict['Interface Type'], buttonID=buttonID)
 
 @socketio.on('actuator_button_coordinates')
 def actuator_button_coordinates(get_request_or_coordinate_data):
