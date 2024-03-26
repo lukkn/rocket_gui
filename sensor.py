@@ -60,16 +60,15 @@ def get_sensor_data():
             raw_data_dict[sensor] = None
     return processed_data_dict
 
-def tare(sensorID):
-    sensor_offset[sensorID] = raw_data_dict[sensorID]
+def tare(sensor_id):
+    sensor_offset[sensor_id] = processed_data_dict[sensor_id]
 
-def untare(sensorID):
-    sensor_offset[sensorID] = 0
+def untare(sensor_id):
+    sensor_offset[sensor_id] = 0
 
 def process_sensor_data(sensor_id, sensor_data):
     global internal_temp
-    raw_value = sensor_data - sensor_offset[sensor_id]
-    val_in_volts = raw_value / 1000.0
+    val_in_volts = sensor_data / 1000.0
     processed_value = None
 
     match sensor_units[sensor_id]:
@@ -88,25 +87,25 @@ def process_sensor_data(sensor_id, sensor_data):
         case "Volts":
             processed_value = val_in_volts
         case "C Internal":
-            internal_temp = raw_value/1000 if SCALE_INTERNAL_TEMP else raw_value
+            internal_temp = sensor_data/1000 if SCALE_INTERNAL_TEMP else sensor_data
             processed_value = internal_temp
         case "lbs_tank":
             processed_value = val_in_volts*1014.54 - 32.5314
         case "lbs_engine":
             processed_value = (-val_in_volts*5128.21 - 11.2821)/2
         case "alt_ft":
-            processed_value = raw_value * 3.281 #m to ft. Dammit Kamer!
+            processed_value = sensor_data * 3.281 #m to ft. Dammit Kamer!
         case "g_force":
-            processed_value = raw_value * 0.00102 # cm/s^2 to G
+            processed_value = sensor_data * 0.00102 # cm/s^2 to G
         case "loop_ms":
-            processed_value = raw_value / 1_000
+            processed_value = sensor_data / 1_000
         case "Rail_Voltage":
             processed_value = val_in_volts * 23
         case _ :
             pass
             print("Unexpected Unit")
 
-    return processed_value
+    return processed_value - sensor_offset[sensor_id]
 
 
 def log_sensor_data(timestamp, sensor_data_dict):
