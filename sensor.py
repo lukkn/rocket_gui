@@ -1,8 +1,7 @@
 import csv
 import re
 import os
-
-import networking
+import ast
 
 sensor_log_path = "logs/sensor_log_"
 
@@ -30,12 +29,22 @@ def initialize_sensor_info(sensor_list, config_name):
         raw_data_dict[sensor['P and ID']] = None
         processed_data_dict[sensor['P and ID']] = None
 
+    sensor_offset_from_csv = {}
+    with open('./static/sensor_offset.csv', mode='r', newline='') as file:
+        csv_reader = csv.reader(file)
+        csv_dict = next(csv_reader, None)[0] # reads first row, before any comma outside double quotes
+        sensor_offset_from_csv = ast.literal_eval(csv_dict) # parses string dict to a python dict, preserving data types
+    
+    for key in sensor_offset_from_csv: # update sensor_offset with offsets from the csv if they exist in sensor_offset, meaning in our current config
+        if key in sensor_offset:
+            sensor_offset[key] = sensor_offset_from_csv[key]
+
     # initialize sensor_log
     global sensor_log_path
 
     filenames = sorted(list(filter(lambda flname: "sensor_log" in flname, next(os.walk("logs"), (None, None, []))[2])), key=file_num_from_name)
     try:
-        current_filenum = int(re.findall('\d+', filenames[-1])[0]) + 1
+        current_filenum = int(re.findall(r'\d+', filenames[-1])[0]) + 1 # r makes python interpret \ as a regular character instead of an escape character
     except: 
         current_filenum = 0 
 
@@ -46,7 +55,7 @@ def initialize_sensor_info(sensor_list, config_name):
         file.close()
 
 def file_num_from_name(fname):
-    return int(re.findall('\d+', fname)[0]) + 1
+    return int(re.findall(r'\d+', fname)[0]) + 1 # r makes python interpret \ as a regular character instead of an escape character
 
 def get_sensor_data():
     global processed_data_dict
@@ -62,13 +71,22 @@ def get_sensor_data():
 
 def tare(sensor_id):
     sensor_offset[sensor_id] = processed_data_dict[sensor_id]
+    writeTare_Untare()
 
 def untare(sensor_id):
     sensor_offset[sensor_id] = 0
+    writeTare_Untare()
+
+def writeTare_Untare():
+    with open('./static/sensor_offset.csv', mode='w', newline='') as file: # clears file on open
+        writer = csv.writer(file)
+        writer.writerow([sensor_offset])
+
+load_cell_filter = 0
 
 def process_sensor_data(sensor_id, sensor_data):
     global internal_temp
-    val_in_volts = sensor_data / 1000.0
+    val_in_volts = sensor_data / 1e6
     processed_value = None
 
     match sensor_units[sensor_id]:
@@ -95,12 +113,23 @@ def process_sensor_data(sensor_id, sensor_data):
             processed_value = (-val_in_volts*5128.21 - 11.2821)/2
         case "alt_ft":
             processed_value = sensor_data * 3.281 #m to ft. Dammit Kamer!
+        case "alt_hpa":
+            processed_value = sensor_data / 1000 # dpa to hpa
+        case "alt_C":
+            processed_value = sensor_data / 1000 # to degrees C
         case "g_force":
             processed_value = sensor_data * 0.00102 # cm/s^2 to G
         case "loop_ms":
             processed_value = sensor_data / 1_000
         case "Rail_Voltage":
-            processed_value = val_in_volts * 23
+            processed_value = val_in_volts * 23 * 1000
+        case "Lora_Data":
+            processed_value = sensor_data
+        case "lbm_10k":
+            global load_cell_filter
+            processed_value = -5116.72 * val_in_volts + 59.7549
+            load_cell_filter = processed_value * 0.1 + load_cell_filter * 0.9
+            processed_value = load_cell_filter
         case _ :
             pass
             print("Unexpected Unit")

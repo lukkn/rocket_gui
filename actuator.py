@@ -20,7 +20,10 @@ def initialize_actuator_states(actuator_list, config_name):
     global actuator_acks
 
     for actuator in actuator_list:
-        actuator_states[actuator['P and ID']] = 'Off'
+        if actuator['Unpowered State'] == 'Open':
+            actuator_states[actuator['P and ID']] = 'On'
+        else:
+            actuator_states[actuator['P and ID']] = 'Off'
         actuator_acks[actuator['P and ID']] = False
 
     # initialize actuator_log 

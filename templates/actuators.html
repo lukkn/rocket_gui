@@ -163,15 +163,12 @@
         <td>{{ actuator['P and ID'] }}</td>
         <td>{{ actuator['Unpowered State'] }}</td>
         <td>
-
           <button id="{{ actuator['P and ID'] }}_off" name="{{ actuator['P and ID'] }}"
             class= "{% if armed %}offButtonWhen{{ actuator_states[actuator['P and ID']] }}{% else %}offButtonWhen{{ actuator_states[actuator['P and ID']] }}Disarmed{% endif %}"
             onclick="buttonClicked(name, 'Off')">Off</button>
-
           <button id="{{ actuator['P and ID'] }}_on" name="{{ actuator['P and ID'] }}"
             class="{% if armed %}onButtonWhen{{ actuator_states[actuator['P and ID']] }}{% else %}onButtonWhen{{ actuator_states[actuator['P and ID']] }}Disarmed{% endif %}"
             onclick="buttonClicked(name, 'On')">On</button>
-
         </td>
         <td id="{{ actuator['P and ID'] }}_ack"><img id="{{ actuator['P and ID'] }}_ack_img" src="../static/icons/noack_icon.png"></td>
       </tr>
@@ -214,33 +211,20 @@
         const on_button = document.getElementById(actuator['P and ID'] + '_on')
         const off_button = document.getElementById(actuator['P and ID'] + '_off')
         if(armed && mote_status[parseInt(actuator['Mote id']) - 1]){
-          if (state[actuator['P and ID']] == "On" && actuator['Unpowered State'] != "Open") {
+          if (state[actuator['P and ID']] == "On") {
             on_button.className = "onButtonWhenOn"
             off_button.className = "offButtonWhenOn"
-          } else if (state[actuator['P and ID']] == "Off" && actuator['Unpowered State'] != "Open") {
+          } else if (state[actuator['P and ID']] == "Off") {
             on_button.className = "onButtonWhenOff"
             off_button.className = "offButtonWhenOff"
-          } else if (state[actuator['P and ID']] == "On" && actuator['Unpowered State'] == "Open") {
-            on_button.className = "onButtonWhenOff"
-            off_button.className = "offButtonWhenOff"
-          } else if (state[actuator['P and ID']] == "Off" && actuator['Unpowered State'] == "Open") {
-            on_button.className = "onButtonWhenOn"
-            off_button.className = "offButtonWhenOn"
           }
         } else {
-          if (state[actuator['P and ID']] == "On" && actuator['Unpowered State'] != "Open") {
+          if (state[actuator['P and ID']] == "On") {
             on_button.className = "onButtonWhenOnDisarmed"
             off_button.className = "offButtonWhenOnDisarmed"
-          } else if (state[actuator['P and ID']] == "Off" && actuator['Unpowered State'] != "Open") {
+          } else if (state[actuator['P and ID']] == "Off") {
             on_button.className = "onButtonWhenOffDisarmed"
             off_button.className = "offButtonWhenOffDisarmed"
-          } else if (state[actuator['P and ID']] == "On" && actuator['Unpowered State'] == "Open") {
-            on_button.className = "onButtonWhenOffDisarmed"
-            off_button.className = "offButtonWhenOffDisarmed"
-          } else if (state[actuator['P and ID']] == "Off" && actuator['Unpowered State'] == "Open") {
-            on_button.className = "onButtonWhenOnDisarmed"
-            off_button.className = "offButtonWhenOnDisarmed"
-            console.log(actuator['P and ID'], "set to on while off")
           }
         }
       });

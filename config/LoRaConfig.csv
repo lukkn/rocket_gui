@@ -1,7 +1,8 @@
-Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,unit
-9,sensor,Teensy ADC,Data,1,Data,None
-9,sensor,Teensy ADC,RSSI,2,RSSI,None
-9,sensor,Teensy ADC,SNR,3,SNR,None
-9,sensor,Teensy ADC,FREQERR,4,FREQERR,None
-9,sensor,Teensy ADC,ERR_STATE,5,ERR_STATE,None
-9,sensor,Teensy ADC,Heartbeat,6,Heartbeat,None
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,Unit,Unpowered State
+4,sensor,Teensy ADC,Data,1,Data,Lora_Data,None
+4,sensor,Teensy ADC,RSSI,2,RSSI,Lora_Data,None
+4,sensor,Teensy ADC,SNR,3,SNR,Lora_Data,None
+4,sensor,Teensy ADC,FREQERR,4,FREQERR,Lora_Data,None
+4,sensor,Teensy ADC,ERR_STATE,5,ERR_STATE,Lora_Data,None
+4,sensor,Teensy ADC,Heartbeat,6,Heartbeat,Lora_Data,None
+4,actuator,Binary GPIO,DUMMY,10,DUMMY,Lora_Data,None

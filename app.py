@@ -75,7 +75,12 @@ def sensors():
 @app.route('/actuators' + sessionID, methods=['GET'])
 def actuators():
     return render_template('actuators.html', actuator_list=actuator_list, actuator_states=actuator.actuator_states, actuator_acks = actuator.actuator_acks, armed = armed)
-
+# converts list of sensors and actuators to a single dictionary for O(1) lookup time
+def create_sensor_dictionary(sensor_and_actuator_list):
+    dict = {}
+    for sensor in sensor_and_actuator_list:
+        dict[sensor["Mote id"] + ", " + sensor["Pin"]] = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["Unit"]]
+    return dict
 
 # methods to listen for client events
 @socketio.on('uploadConfigFile')
@@ -99,6 +104,9 @@ def loadConfigFile(CSVFileAndFileContents, fileName):
         sensor.initialize_sensor_info(sensor_list, config_file_name)
         actuator.initialize_actuator_states(actuator_list, config_file_name)
         autoseq.initialize_sensors_and_actuators(sensor_list, actuator_list)
+
+        networking.sensor_dictionary.update(create_sensor_dictionary(sensor_list))
+        networking.actuator_dictionary.update(create_sensor_dictionary(actuator_list))
             
 
 @socketio.on('connect_request')

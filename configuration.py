@@ -1,7 +1,4 @@
 import csv
-import os
-
-CONFIG_FILE = 'FlaskGUI/m5_config.csv'
 
 def get_interface_type_number(interface_name):
     if interface_name == 'servoPWM_12V':
@@ -17,6 +14,8 @@ def get_interface_type_number(interface_name):
         return 44
     if interface_name == "Start_Log":
         return 45
+    if interface_name == "Watchdog":
+        return 46
     interface_list = ['Teensy ADC', 'i2c ADC 1ch', 'i2c ADC 2ch',
                       'FlowMeterCounter', 'servoPWM', 'Binary GPIO',
                       'i2c ADC 2ch PGA2', 'i2c ADC 2ch PGA4', 'i2c ADC 2ch PGA8',
@@ -24,7 +23,7 @@ def get_interface_type_number(interface_name):
                       'i2c ADC 2ch PGA128', 'ADC Internal Temp', 'SPI_ADC_1ch', 
                       'SPI_ADC_2ch', 'SPI_ADC_2ch PGA2', 'SPI_ADC_2ch PGA4', 'SPI_ADC_2ch PGA8', 
                       'SPI_ADC_2ch PGA16', 'SPI_ADC_2ch PGA32', 'SPI_ADC_2ch PGA64', 'SPI_ADC_2ch PGA128',
-                      'Icarus_ALT', 'Icarus_IMU', 'Volt_Monitor', 'Loop_Timer']
+                      'BMP_ALT', 'Icarus_IMU', 'Volt_Monitor', 'Loop_Timer', 'BMP_TEMP','BMP_Pressure']
 
     # +1 because interface numbers start at 1, not 0
     return interface_list.index(interface_name) + 1
@@ -34,7 +33,7 @@ def check_file_header(header_list):
     example_header = ['Mote id', 'Sensor or Actuator', 'Interface Type', 'Human Name', 'Pin', 'P and ID', 'Unit', 'Unpowered State']
     return header_list == example_header
 
-def load_config(file=CONFIG_FILE):
+def load_config(file):
     actuators = []
     sensors = []
     decoded_string = file.decode('utf-8')

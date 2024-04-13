@@ -75,12 +75,6 @@ heartbeat_thread = Thread(target=send_heartbeat, daemon=True)
 heartbeat_thread.start()
 
 def send_config_to_mote(sensor_list, actuator_list):
-    global sensor_dictionary
-    global actuator_dictionary
-    sensor_dictionary.update(create_sensor_dictionary(sensor_list))
-    actuator_dictionary.update(create_sensor_dictionary(actuator_list))
-    sensors_and_actuators_list = sensor_list + actuator_list
-
     print("sent sensor config data to mote")
     for m in range(1, 4):
         reset_command = bytearray(2)
@@ -90,7 +84,7 @@ def send_config_to_mote(sensor_list, actuator_list):
 
         sock.sendto(reset_command, (get_ip(m), 8888))
 
-    for sensor in sensors_and_actuators_list:
+    for sensor in sensor_list:
         #skip labjacks
         if int(sensor['Mote id']) >= 10:
             continue
@@ -196,13 +190,6 @@ def convert_to_values(packet, mote_id):
         value = int.from_bytes(data[5*i+1:5*i+5], byteorder='little', signed=True) # Tim did not have signed parameter in his networking code
         parsed_data.append({'Mote id': mote_id, 'Pin': pin_num, 'Value': value})
     return parsed_data
-
-# converts list of sensors and actuators to a single dictionary for O(1) lookup time
-def create_sensor_dictionary(sensor_and_actuator_list):
-    dict = {}
-    for sensor in sensor_and_actuator_list:
-        dict[sensor["Mote id"] + ", " + sensor["Pin"]] = [sensor["P and ID"], sensor["Interface Type"], sensor["Sensor or Actuator"], sensor["Unit"]]
-    return dict
 
 def updateTares(actuator_states_and_sensor_tare_states_from_app_dot_py):
     global actuator_states_and_sensor_tare_states
