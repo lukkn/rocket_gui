@@ -15,9 +15,11 @@ sensor_units = {}  # Store the units corresponding to each sensor P and ID
 sensor_data_TTL = {} # Keeps track of how many more polls can be without new data for a sensor before it is considered disconnected
 raw_data_dict = {} # Contains raw sensor data
 processed_data_dict = {} # Contains tared and unit converted data 
+config_file_name = None
 
 def initialize_sensor_info(sensor_list, config_name): 
-
+    global config_file_name
+    config_file_name = config_name
     csv_header_list = ['Timestamp (ms)']
     for sensor in sensor_list:
         sensor_offset[sensor['P and ID']] = 0
@@ -30,14 +32,16 @@ def initialize_sensor_info(sensor_list, config_name):
         processed_data_dict[sensor['P and ID']] = None
 
     sensor_offset_from_csv = {}
-    with open('./static/sensor_offset.csv', mode='r', newline='') as file:
-        csv_reader = csv.reader(file)
-        csv_dict = next(csv_reader, None)[0] # reads first row, before any comma outside double quotes
-        sensor_offset_from_csv = ast.literal_eval(csv_dict) # parses string dict to a python dict, preserving data types
-    
-    for key in sensor_offset_from_csv: # update sensor_offset with offsets from the csv if they exist in sensor_offset, meaning in our current config
-        if key in sensor_offset:
-            sensor_offset[key] = sensor_offset_from_csv[key]
+    try: 
+        with open('./static/sensor_offset_' + config_file_name + '.csv', mode='r', newline='') as file:
+            csv_reader = csv.reader(file)
+            csv_dict = next(csv_reader, None)[0] # reads first row, before any comma outside double quotes
+            sensor_offset_from_csv = ast.literal_eval(csv_dict) # parses string dict to a python dict, preserving data types
+        for key in sensor_offset_from_csv: # update sensor_offset with offsets from the csv if they exist in sensor_offset, meaning in our current config
+            if key in sensor_offset:
+                sensor_offset[key] = sensor_offset_from_csv[key]
+    except:
+        print ("no offset file found")
 
     # initialize sensor_log
     global sensor_log_path
@@ -78,7 +82,8 @@ def untare(sensor_id):
     writeTare_Untare()
 
 def writeTare_Untare():
-    with open('./static/sensor_offset.csv', mode='w', newline='') as file: # clears file on open
+    global config_file_name
+    with open('./static/sensor_offset_' + config_file_name + '.csv', mode='w', newline='') as file: # clears file on open
         writer = csv.writer(file)
         writer.writerow([sensor_offset])
 
