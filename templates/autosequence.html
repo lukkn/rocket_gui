@@ -409,8 +409,18 @@
 
         // once all elements are loaded
         document.addEventListener('DOMContentLoaded', function() {
+            const frame = localStorage.getItem("frame");
             const timer = document.getElementById("timer");
             timer.innerText = time_to_show + " s";
+            
+            if (frame == "autosequenceFile") {
+                document.getElementById('frame1').checked = true;
+            } else if (frame == "abortSequenceFile") {
+                document.getElementById('frame2').checked = true;
+            } else if (frame == "redlineFile") {
+                document.getElementById('frame3').checked = true;
+            }
+
             if (autosequence_commands.length > 0){
                 displayCSV(autosequence_commands, "autosequence", ['P and ID', 'State', 'Time(ms)', 'Comments']);
             }
@@ -440,6 +450,8 @@
         function submitCSV(inputId) {
             const fileInput = document.getElementById(inputId);
             const file = fileInput.files[0];
+
+            localStorage.setItem("frame", inputId);
             if (file) {
                 // send file to backend
                 socket.emit(inputId + '_uploaded', file, file.name);

@@ -1,0 +1,4 @@
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,Unit,Unpowered State
+3,sensor,Teensy ADC,Teensy ADC,14,TNSY,Volts,None
+3,actuator,Binary GPIO,Drogue,5,PYRO1,None,None
+3,actuator,Binary GPIO,Main,6,PYRO2,None,None

@@ -2,6 +2,7 @@ import csv
 import re
 import os
 import ast
+import time
 
 sensor_log_path = "logs/sensor_log_"
 
@@ -45,21 +46,48 @@ def initialize_sensor_info(sensor_list, config_name):
 
     # initialize sensor_log
     global sensor_log_path
+    global folder_path 
+    
 
-    filenames = sorted(list(filter(lambda flname: "sensor_log" in flname, next(os.walk("logs"), (None, None, []))[2])), key=file_num_from_name)
+    if not os.path.exists("logs"): 
+        print("directory for logs created! ")
+        os.mkdir("logs")
+    
+    folder_name = time.strftime("%Y-%m-%d") + "_" + config_name 
+    folder_path = os.path.join("logs",folder_name)
+
+    if not os.path.exists(folder_path): 
+        print(f"Creating {folder_name}")
+        os.mkdir(folder_path)
+
+
+
+
+    filenames = sorted(
+        list(filter(lambda flname: re.search(r'sensors_\d+\.csv', flname), 
+        next(os.walk(folder_path), (None, None, []))[2])),
+        key=lambda flname: int(re.search(r'\d+', flname).group())
+    )
+
     try:
         current_filenum = int(re.findall(r'\d+', filenames[-1])[0]) + 1 # r makes python interpret \ as a regular character instead of an escape character
     except: 
-        current_filenum = 0 
+        current_filenum = 1
 
-    sensor_log_path = "logs/sensor_log_" + str(current_filenum) + "_" + config_name
-    with open(sensor_log_path, "w") as file:
-        csv.writer(file).writerow(csv_header_list)
+    sensor_filename = f"sensors_{current_filenum}.csv"
+    sensor_log_path = os.path.join(folder_path, sensor_filename)
+    print(sensor_log_path)
+    with open(sensor_log_path, "w", newline="") as file:
+        writer = csv.writer(file) 
+        writer.writerow(csv_header_list)
         file.flush()
         file.close()
 
 def file_num_from_name(fname):
-    return int(re.findall(r'\d+', fname)[0]) + 1 # r makes python interpret \ as a regular character instead of an escape character
+    try:
+        return int(re.findall(r'\d+', fname)[0]) + 1 # r makes python interpret \ as a regular character instead of an escape character
+    except:
+        return 0
 
 def get_sensor_data():
     global processed_data_dict
@@ -74,8 +102,9 @@ def get_sensor_data():
     return processed_data_dict
 
 def tare(sensor_id):
-    sensor_offset[sensor_id] = processed_data_dict[sensor_id]
-    writeTare_Untare()
+    if sensor_offset[sensor_id] == 0:
+        sensor_offset[sensor_id] = processed_data_dict[sensor_id]
+        writeTare_Untare()
 
 def untare(sensor_id):
     sensor_offset[sensor_id] = 0

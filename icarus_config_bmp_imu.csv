@@ -1,0 +1,34 @@
+Mote id,Sensor or Actuator,Interface Type,Human Name,Pin,P and ID,Unit,Unpowered State
+3,sensor,SPI_ADC_2ch PGA128,PNTB,0,PNTB,PSI_M5k
+3,sensor,SPI_ADC_2ch PGA128,PNPC,1,PNPC,PSI_M1k
+3,sensor,SPI_ADC_2ch PGA128,POTB,2,POTB,PSI_M1k
+3,sensor,Loop_Timer,TMR3,80,TMR3,loop_ms
+3,actuator,Binary GPIO,VNMO,0,VNMO
+3,actuator,Binary GPIO,VNMF,1,VNMF
+3,actuator,Binary GPIO,VPTF,2,VPTF
+3,actuator,Binary GPIO,IGNTN,3,IGNTN
+2,sensor,Loop_Timer,TMR2,80,TMR2,loop_ms
+2,actuator,Binary GPIO,VNTO,0,VNTO
+2,actuator,Binary GPIO,VNTF,1,VNTF
+2,actuator,Binary GPIO,VQDA,2,VQDA
+2,actuator,Binary GPIO,VNOF,3,VNOF
+1,sensor,SPI_ADC_1ch,POTR,0,POTR,PSI_H5k
+1,sensor,SPI_ADC_1ch,PFTR,1,PFTR,PSI_H5k
+1,sensor,SPI_ADC_1ch,POIM,2,POIM,PSI_S1k
+1,sensor,SPI_ADC_1ch,PFIM,3,PFIM,PSI_S1k
+1,sensor,SPI_ADC_1ch,PMCC,4,PMCC,PSI_S1k
+1,sensor,SPI_ADC_2ch PGA128,TOTR,10,TOTR,Degrees C
+1,sensor,ADC Internal Temp,TMP1,18,TMP1,C Internal
+1,sensor,Loop_Timer,TMR1,80,TMR1,loop_ms
+1,sensor,Volt_Monitor,12VM,71,12VM,Rail_Voltage
+1,sensor,Volt_Monitor,3V3M,72,3V3M,Rail_Voltage
+1,sensor,Volt_Monitor,5V0M,73,5V0M,Rail_Voltage
+1,sensor,BMP_ALT,Altitude,40,ALTM,alt_ft
+1,sensor,BMP_Pressure,Barometric_Pressure,41,ALTP,alt_hpa
+1,sensor,BMP_TEMP,Altimeter_Temp,42,ALTT,alt_C
+1,sensor,Icarus_IMU,Acceleration_X,50,IMUX,g_force
+1,sensor,Icarus_IMU,Acceleration_Y,51,IMUY,g_force
+1,sensor,Icarus_IMU,Acceleration_Z,52,IMUZ,g_force
+1,actuator,Binary GPIO,VOTV,0,VOTV
+1,actuator,Binary GPIO,VOTD,1,VOTD
+1,actuator,Binary GPIO,VFTV,2,VFTV
